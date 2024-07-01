@@ -1,0 +1,20 @@
+\frametitle{Boolean and Characters in Rust}
+\begin{lstlisting}[language=Rust]
+fn main() {
+	// Boolean
+	let is_active = true;
+	println!("The values of our variables are {:?}", (a, b, c, is_active));
+	
+	let is_not_equal = 10 != 20;
+	println!("Is 10 not equal to 20? {}", is_not_equal);
+	
+	// Characters
+	let char1 = 'X';
+	let char2 = '8';
+	let char3 = '&';
+	let char4 = '\u{03A9}'; // Unicode character for Omega (Ω)
+	let char5 = '\'';
+	
+	println!("The value of char1 is {}, char2 is {}, char3 is {}, char4 is {} and char5 is {}", char1, char2, char3, char4, char5);
+}
+\end{lstlisting}

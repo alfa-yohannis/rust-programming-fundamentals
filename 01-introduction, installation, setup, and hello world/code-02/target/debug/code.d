@@ -1,1 +1,0 @@
-/data1/projects/rust-programming-fundamentals/01-introduction,\ installation,\ setup,\ and\ hello\ world/code-02/target/debug/code: /data1/projects/rust-programming-fundamentals/01-introduction,\ installation,\ setup,\ and\ hello\ world/code-02/src/main.rs

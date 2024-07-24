@@ -1,0 +1,250 @@
+\documentclass[aspectratio=169, table]{beamer}
+
+%\usepackage[beamertheme=./praditatheme]{Pradita}
+\usepackage[utf8]{inputenc}
+\usepackage{listings} 
+
+
+\usetheme{Pradita}
+
+\subtitle{IF120203-Programming Fundamentals}
+
+\title{\LARGE{Session-01:\\Introduction to Rust}
+\vspace{20pt}}
+\date[Serial]{\scriptsize {PRU/SPMI/FR-BM-18/0222}}
+\author[Pradita]{\small{\textbf{Alfa Yohannis}}}
+
+
+\lstdefinelanguage{Rust} {
+keywords={MAX, std, print, fn, let, mut, println, true, false, u8, u16, u32, u64, u128, i8, i16, i32, i64, i128, f32, f64, char, bool, if, else, for, while, loop, match, return},
+basicstyle=\ttfamily\small,
+keywordstyle=\color{blue}\bfseries,
+ndkeywords={self, String, Option, Some, None, Result, Ok, Err},
+ndkeywordstyle=\color{purple}\bfseries,
+sensitive=true,
+commentstyle=\color{gray},
+stringstyle=\color{red},
+numbers=left,
+numberstyle=\tiny\color{gray},
+breaklines=true,
+frame=lines,
+backgroundcolor=\color{lightgray!10},
+tabsize=2,
+comment=[l]{//},
+morecomment=[s]{/*}{*/},
+commentstyle=\color{gray}\ttfamily,
+stringstyle=\color{purple}\ttfamily,
+%morestring=[b]',
+%morestring=[b]"
+showstringspaces=false
+}
+
+\begin{document}
+
+\frame{\titlepage}
+
+\begin{frame}[fragile]
+\frametitle{Rust: Hello, World!}
+\begin{lstlisting}[language=Rust]
+fn main() {
+	println!("Hello, world!");
+}
+\end{lstlisting}
+\begin{itemize}
+\item This is a basic Rust program that prints "Hello, world!" to the console.
+\item \texttt{fn main()} is the entry point of every Rust program.
+\item \texttt{println!("Hello, world!");} outputs the text to the standard output (console).
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Program Outputs and Comments}
+\vspace{10pt}
+\begin{lstlisting}[language=Rust]
+fn main() {
+	// This is the first program in this tutorial.
+	// Here is another line of comment.
+	/* 
+	This comment spans 
+	multiple lines 
+	and demonstrates a block comment.
+	*/
+	// Printing a simple message.
+	println!("Hello from the Rust program!");
+\end{lstlisting}
+\begin{itemize}
+	\item Comments (\texttt{//} and \texttt{/* ... */}) document and explain the code.
+	\item Block comments (\texttt{/* ... */}) span multiple lines for longer explanations.
+	\item \texttt{println!} macro prints "Hello from the Rust program!" to the console.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}[fragile]
+\frametitle{Printing and Inline Comments}
+\begin{lstlisting}[language=Rust]
+	// Printing with an inline comment affecting the command.
+	print/*ln*/!("Hello, world without newline!");
+	
+	// Demonstrating basic output commands.
+	println!("The value of the constant is {}", 100);
+\end{lstlisting}
+\begin{itemize}
+	\item Inline comment (\texttt{print/*ln*/!}) affects the behavior of the command.
+	\item \texttt{println!} prints the value of a constant (100) within a formatted string.
+\end{itemize}
+\end{frame}
+
+
+
+\begin{frame}[fragile]
+\frametitle{Formatted Strings and Placeholders}
+\begin{lstlisting}[language=Rust]
+	// Printing a formatted string with placeholders.
+	println!("My first name is {} and my last name is {}", "Jane", "Doe");
+	
+	// Using the `print!` command which does not add a newline.
+	print!("This text is printed ");
+	print!("on the same line.");
+\end{lstlisting}
+\begin{itemize}
+	\item Formatted strings with placeholders (\texttt{\{\}}) insert variable values into the string.
+	\item \texttt{print!} prints text without automatically adding a newline.
+\end{itemize}
+\end{frame}
+
+
+
+\begin{frame}[fragile]
+\frametitle{Printing Across Multiple Lines}
+\begin{lstlisting}[language=Rust]
+	// Printing text over multiple lines.
+	print!("\nThis text is split
+	across multiple 
+	lines."); 
+\end{lstlisting}
+\begin{itemize}
+	\item Rust supports multiline strings within \texttt{print!} and \texttt{println!} macros.
+	\item Facilitates clearer code formatting with line breaks.
+\end{itemize}
+\end{frame}
+
+
+
+\begin{frame}[fragile]
+\frametitle{Escape Sequences and Special Characters}
+\vspace{10pt}
+\begin{lstlisting}[language=Rust]
+	// Using escape sequences for special formatting.
+	println!("\n\\n\n This line starts after a double newline. \t This line has a tab.");
+	
+	// Demonstrating the use of backslashes.
+	println!("Printing single quote \' and double quote \"");
+	println!("Printing a single backslash \\");
+	print!("This text is overwritten \r only this part is shown");
+\end{lstlisting}
+\begin{itemize}
+	\item Escape sequences (\texttt{\textbackslash n}, \texttt{\textbackslash t}, \texttt{\textbackslash\textbackslash}, \texttt{\textbackslash r}) for special formatting.
+	\item Print single quote (\texttt{\'}) and double quote (\texttt{\"}) using escape sequences.
+\end{itemize}
+\end{frame}
+
+
+
+
+\begin{frame}[fragile]
+\frametitle{Macro Arguments and Arithmetic Operations}
+\vspace{10pt}
+\begin{lstlisting}[language=Rust]
+	// Using positional arguments in the print macro.
+	println!("\nI have been {2} for {1} years and I {0} it", "enjoying", 15, "coding");
+	
+	// Using named arguments in the print macro.
+	println!("Rust is a systems programming language that's great for development.");
+	
+	// Performing and printing basic arithmetic.
+	println!("The result of 42 + 58 is {}", 42 + 58);
+}
+\end{lstlisting}
+\begin{itemize}
+\item Positional (\texttt{\{\}}) and named (\texttt{\{language\}}) arguments in \texttt{println!} macro for dynamic output.
+\item Rust handles basic arithmetic operations (\texttt{42 + 58}) and prints the result.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Variables in Rust}
+\begin{lstlisting}[language=Rust]
+fn main() {
+	let mut a = 10;
+	println!("The initial value of variable a = {}", a);
+	
+	a = 50;
+	println!("The updated value of variable a = {}", a);
+	
+	let b = 6 * 6;
+}
+\end{lstlisting}
+\begin{itemize}
+\item Introduced a mutable variable `a` initialized to 10, then updated to 50.
+\item Declared an immutable variable `b` as the product of 6 * 6.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}[fragile]{Data Types in Rust}
+\vspace{10pt}
+\begin{lstlisting}[language=Rust]
+fn main() {
+	// Integers
+	println!("The Maximum value for i8 = {}", std::i8::MAX);
+	println!("The Maximum value for u8 = {}", std::u8::MAX);
+	
+	// Floats
+	let c = 2.75;
+	println!("The sum of an integer and a float is {}", a as f64 + c);
+	println!("The Maximum value for f32 = {}", std::f32::MAX);
+}
+\end{lstlisting}
+\begin{itemize}
+\item Demonstrated integer types and their maximum values (i8 and u8).
+\item Showcased floating-point type `f32` and `f64` with maximum value.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Boolean Types in Rust}
+\begin{lstlisting}[language=Rust]
+fn main() {
+	// Boolean
+	let is_active = true;
+	println!("The values of our variables are {:?}", (a, b, c, is_active));
+	
+	let is_not_equal = 10 != 20;
+	println!("Is 10 not equal to 20? {}", is_not_equal);
+}
+\end{lstlisting}
+\begin{itemize}
+\item Introduced boolean type with `true` and `false`.
+\item Used comparison operator (`!=`) to check inequality.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Character Types in Rust}
+\begin{lstlisting}[language=Rust]
+fn main() {
+	// Characters
+	let char1 = 'X';
+	let char2 = '8';
+	let char3 = '&';
+	let char4 = '\u{03A9}'; // Unicode character for Omega (Ω)
+	let char5 = '\'';
+	
+	println!("The value of char1 is {}, char2 is {}, char3 is {}, char4 is {} and char5 is {}", char1, char2, char3, char4, char5);
+}
+\end{lstlisting}
+\begin{itemize}
+\item Demonstrated character types with various examples including Unicode.
+\end{itemize}
+\end{frame}
+
+
+\end{document}

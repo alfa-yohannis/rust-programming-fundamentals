@@ -1,0 +1,361 @@
+\documentclass[aspectratio=169, table]{beamer}
+
+%\usepackage[beamertheme=./praditatheme]{Pradita}
+\usepackage[utf8]{inputenc}
+\usepackage{listings} 
+
+\usetheme{Pradita}
+
+\subtitle{IF120203-Programming Fundamentals}
+
+\title{Session-02:\\\LARGE{
+Variables, Data Types, Functions,\\
+Inputs}}
+\date[Serial]{\scriptsize {PRU/SPMI/FR-BM-18/0222}}
+\author[Pradita]{\small{\textbf{Alfa Yohannis}}}
+
+\lstdefinelanguage{Rust} {
+keywords={MAX, std, print, fn, let, mut, println, true, false, u8, u16, u32, u64, u128, i8, i16, i32, i64, i128, f32, f64, char, bool, if, else, for, while, loop, match, return},
+basicstyle=\ttfamily\small,
+keywordstyle=\color{blue}\bfseries,
+ndkeywords={self, String, Option, Some, None, Result, Ok, Err},
+ndkeywordstyle=\color{purple}\bfseries,
+sensitive=true,
+commentstyle=\color{gray},
+stringstyle=\color{red},
+numbers=left,
+numberstyle=\tiny\color{gray},
+breaklines=true,
+frame=lines,
+backgroundcolor=\color{lightgray!10},
+tabsize=2,
+comment=[l]{//},
+morecomment=[s]{/*}{*/},
+commentstyle=\color{gray}\ttfamily,
+stringstyle=\color{purple}\ttfamily,
+%morestring=[b]',
+%morestring=[b]"
+showstringspaces=false
+}
+
+\begin{document}
+
+\frame{\titlepage}
+
+\begin{frame}[fragile]
+\frametitle{Initializing Multiple Variables}
+\begin{lstlisting}[language=Rust]
+fn main() {
+// Initialize height and weight variables.
+let (height, weight) = (175, 70.5);
+println!("Height: {} cm, Weight: {} kg", height, weight);
+\end{lstlisting}
+\begin{itemize}
+\item Demonstrates tuple assignment.
+\item Initializes two variables simultaneously.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Readability of Large Numbers}
+\begin{lstlisting}[language=Rust]
+// Declare city population with underscores for readability.
+let population = 8_000_000;
+println!("City population: {}", population);
+\end{lstlisting}
+\begin{itemize}
+\item Underscores improve readability for large numbers.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Integer Overflow}
+\begin{lstlisting}[language=Rust]
+// Uncommenting the following line would cause an overflow error for \texttt{u8}.
+// let max_byte: u8 = 300;
+\end{lstlisting}
+\begin{itemize}
+\item Demonstrates potential overflow error.
+\item \texttt{u8} type can only hold values from 0 to 255.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Decimal Numbers in Different Formats}
+\begin{lstlisting}[language=Rust]
+// Declare a distance variable and print it in different numeral systems.
+let distance = 123;
+println!("Distance: Hexadecimal {:X}, Octal {:o}, Binary {:b}", distance, distance, distance);
+\end{lstlisting}
+\begin{itemize}
+\item Shows decimal, hexadecimal, octal, and binary representations.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Snake Case Convention for Variables}
+\begin{lstlisting}[language=Rust]
+// Naming convention using snake_case for variables.
+let student_count = 30; // Preferred over let StudentCount = 30;
+\end{lstlisting}
+\begin{itemize}
+\item Emphasizes Rust's convention for variable naming.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Operations on Numbers in Different Formats}
+\begin{lstlisting}[language=Rust]
+// Demonstrate type casting and operations on variables.
+let apples = 20;
+let price_per_kg = 2.75;
+let total_price = price_per_kg as i32 * apples;
+println!("Total price for apples: {}", total_price);
+\end{lstlisting}
+\begin{itemize}
+\item Demonstrates type casting and arithmetic operations.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Shadowing}
+\begin{lstlisting}[language=Rust]
+// Shadowing allows redeclaration of a variable.
+// let rate = 10;
+// let rate = rate * 2;
+// println!("Updated rate: {}", rate);
+\end{lstlisting}
+\begin{itemize}
+\item Shadowing allows the reuse of variable names.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Shadowing with \texttt{mut}}
+\begin{lstlisting}[language=Rust]
+// let mut temperature = 25;
+// let temperature = temperature - 5;
+// println!("Adjusted temperature: {}", temperature);
+\end{lstlisting}
+\begin{itemize}
+\item Shadowing can also be used with mutable variables.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Changing the Type through Shadowing}
+\begin{lstlisting}[language=Rust]
+// let value = 100;
+// println!("Value as integer: {}", value);
+// let value = 'B';
+// println!("Value as character: {}", value);
+// let value = 22.9;
+// println!("Value as float: {}", value);
+\end{lstlisting}
+\begin{itemize}
+\item Demonstrates changing the type of a variable through shadowing.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Shadowing within Code Blocks}
+\begin{lstlisting}[language=Rust]
+let mut grade = 88;
+{
+	grade = 90; // Modifying variable inside a block.
+	println!("Grade inside block: {}", grade);
+}
+println!("Grade outside block: {}", grade);
+\end{lstlisting}
+\begin{itemize}
+\item Highlights the effect of shadowing within inner blocks.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Constants}
+\begin{lstlisting}[language=Rust]
+// Define a constant with uppercase and underscores.
+const MAX_CAPACITY: u32 = 50_000;
+println!("Maximum capacity: {}", MAX_CAPACITY);
+}
+\end{lstlisting}
+\begin{itemize}
+\item Constants are immutable and defined with \texttt{const} keyword.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Fixed Length Strings (\&str)}
+\begin{lstlisting}[language=Rust]
+// Declare a fixed-length string.
+let fixed_str = "Immutable fixed length string";
+println!("The text in the fixed string is \"{}\" ", fixed_str);
+\end{lstlisting}
+\begin{itemize}
+\item Demonstrates declaration of a fixed-length string.
+\item Immutable by nature.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Variable Length Strings (String)}
+\begin{lstlisting}[language=Rust]
+// Declare a mutable, growable string.
+let mut dynamic_str = String::from("This string can expand");
+println!("The initial text in the dynamic string is \"{}\" ", dynamic_str);
+\end{lstlisting}
+\begin{itemize}
+\item Demonstrates declaration of a variable-length string.
+\item Mutable and growable.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{Adding Characters to Strings}
+	\begin{lstlisting}[language=Rust]
+		// Add a character to the dynamic string.
+		dynamic_str.push('!');
+		println!("After adding a character, the string is \"{}\" ", dynamic_str);
+		
+		// Remove the last character from the dynamic string.
+		dynamic_str.pop();
+		println!("After removing the last character, the string is \"{}\" ", dynamic_str);
+	\end{lstlisting}
+	\begin{itemize}
+		\item Shows adding a character.
+		\item Demonstrates removing the last character.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{Appending Substrings}
+	\begin{lstlisting}[language=Rust]
+		// Append a substring to the dynamic string.
+		dynamic_str.push_str(" that can grow and shrink");
+		println!("After adding more text, the string is \"{}\" ", dynamic_str);
+	\end{lstlisting}
+	\begin{itemize}
+		\item Illustrates appending a substring.
+	\end{itemize}
+\end{frame}
+		
+\begin{frame}[fragile]
+	\frametitle{String Functions}
+	\begin{lstlisting}[language=Rust]
+		// Demonstrate various string functions.
+		println!(
+		"String details:\n- Is the string empty? {}\n- Length of the string: {}\n- String capacity: {}\n- Does the string contain 'grow'? {}",
+		dynamic_str.is_empty(),
+		dynamic_str.len(),
+		dynamic_str.capacity(),
+		dynamic_str.contains("grow")
+		);
+	\end{lstlisting}
+	\begin{itemize}
+		\item Demonstrates string functions: \texttt{is\_empty}, \texttt{len}, \texttt{capacity}, \texttt{contains}.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{Trimming Strings}
+	\begin{lstlisting}[language=Rust]
+		// Add spaces and demonstrate trimming.
+		dynamic_str.push_str("   ");
+		println!(
+		"Length before trimming: {}, Length after trimming: {}",
+		dynamic_str.len(),
+		dynamic_str.trim().len()
+		);
+	\end{lstlisting}
+	\begin{itemize}
+		\item Illustrates trimming of spaces.
+	\end{itemize}
+\end{frame}
+
+
+\begin{frame}[fragile]
+	\frametitle{Number to String Conversion}
+	\begin{lstlisting}[language=Rust]
+		// Convert a number to a string and compare.
+		let number = 42;
+		println!("The number as a string: {}", number.to_string());
+		println!("Does the string equal '42'? {}", number.to_string() == "42");
+	\end{lstlisting}
+	\begin{itemize}
+		\item Shows conversion of number to string and comparison.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{Character to String Conversion}
+	\begin{lstlisting}[language=Rust]
+		// Convert a character to a string and compare.
+		let character = 'b';
+		println!(
+		"The character as a string: {}, Is it equal to 'b'? {}",
+		character.to_string(),
+		character.to_string() == "b"
+		);
+	\end{lstlisting}
+	\begin{itemize}
+		\item Demonstrates conversion of character to string and comparison.
+	\end{itemize}
+\end{frame}
+
+
+\begin{frame}[fragile]
+\frametitle{Creating a String from a Name}
+\begin{lstlisting}[language=Rust]
+// Create a string from a name.
+let full_name = "John Doe".to_string();
+println!("This string contains a name: {}", full_name);
+\end{lstlisting}
+\begin{itemize}
+\item Demonstrates creating a string from a name.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Creating an Empty String}
+\begin{lstlisting}[language=Rust]
+// Create an empty string and check its length.
+let empty_str = String::new();
+println!("Length of the empty string: {}", empty_str.len());
+\end{lstlisting}
+\begin{itemize}
+\item Shows how to create an empty string.
+\item Checks the length of the empty string.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{Using \texttt{format!} to Combine Strings}
+	\begin{lstlisting}[language=Rust]
+		// Using \texttt{format!} to combine strings.
+		let first_name = "John".to_string();
+		let last_name = "Doe".to_string();
+		let full_intro = format!("My first name is {}, and my last name is {}", first_name, last_name);
+		println!("{}", full_intro);
+	\end{lstlisting}
+	\begin{itemize}
+		\item Demonstrates using \texttt{format!} to combine strings.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{Concatenating Strings with format!}
+	\begin{lstlisting}[language=Rust]
+		// Concatenating strings using \texttt{format!}.
+		let part_1 = String::from("Hello");
+		let part_2 = String::from(", World!");
+		let combined_str = format!("{}{}", part_1, part_2);
+		println!("The combined string is \"{}\"", combined_str);
+	\end{lstlisting}
+	\begin{itemize}
+		\item Shows concatenating strings with \texttt{format!}.
+	\end{itemize}
+\end{frame}
+
+\end{document}
+

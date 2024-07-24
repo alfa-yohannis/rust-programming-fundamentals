@@ -1,0 +1,16 @@
+\frametitle{Character Types in Rust}
+\begin{lstlisting}[language=Rust]
+fn main() {
+	// Characters
+	let char1 = 'X';
+	let char2 = '8';
+	let char3 = '&';
+	let char4 = '\u{03A9}'; // Unicode character for Omega (Ω)
+	let char5 = '\'';
+	
+	println!("The value of char1 is {}, char2 is {}, char3 is {}, char4 is {} and char5 is {}", char1, char2, char3, char4, char5);
+}
+\end{lstlisting}
+\begin{itemize}
+\item Demonstrated character types with various examples including Unicode.
+\end{itemize}

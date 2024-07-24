@@ -1,0 +1,11 @@
+\frametitle{Concatenating Strings with format!}
+	\begin{lstlisting}[language=Rust]
+		// Concatenating strings using \texttt{format!}.
+		let part_1 = String::from("Hello");
+		let part_2 = String::from(", World!");
+		let combined_str = format!("{}{}", part_1, part_2);
+		println!("The combined string is \"{}\"", combined_str);
+	\end{lstlisting}
+	\begin{itemize}
+		\item Shows concatenating strings with \texttt{format!}.
+	\end{itemize}

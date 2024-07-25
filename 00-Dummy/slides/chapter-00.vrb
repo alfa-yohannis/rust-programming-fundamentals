@@ -1,14 +1,14 @@
-\frametitle{Reading and Parsing Input}
+\frametitle{Ownership Transfer Example 3}
 		\begin{lstlisting}[language=Rust]
-			// Reading input from stdin and parsing it as a float
-			let mut input_string = String::new();
-			std::io::stdin()
-			.read_line(&mut input_string)
-			.expect("Failed to read input.");
-			let parsed_number: f64 = input_string.trim().parse().expect("Invalid input");
-			println!("Parsed number: {:?}", parsed_number);
+			let greeting = String::from("hi");
+			let place = String::from("there");
+			let addition = String::from(" from Rust");
+			
+			let combined = greeting + \&place + &addition;  // Ownership of only greeting changed
+			println!("{} {} {}", combined, place, addition);
 		\end{lstlisting}
 		\begin{itemize}
-			\item Shows how to read input from the standard input.
-			\item Parses the input string as a float and handles possible errors.
+			\item \texttt{greeting} is the only variable whose ownership is transferred.
+			\item \texttt{place} and \texttt{addition} are borrowed and remain valid.
+			\item \texttt{combined} contains the result of concatenating \texttt{greeting}, \texttt{place}, and \texttt{addition}.
 		\end{itemize}

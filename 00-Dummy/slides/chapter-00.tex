@@ -1,6 +1,5 @@
 \documentclass[aspectratio=169, table]{beamer}
 
-%\usepackage[beamertheme=./praditatheme]{Pradita}
 \usepackage[utf8]{inputenc}
 \usepackage{listings} 
 
@@ -8,13 +7,12 @@
 
 \subtitle{IF120203-Programming Fundamentals}
 
-\title{Session-04:\\\LARGE{
-		Functions in Rust}}
+\title{Session-04:\\\LARGE{String Concatenation and Ownership}}
 \date[Serial]{\scriptsize {PRU/SPMI/FR-BM-18/0222}}
 \author[Pradita]{\small{\textbf{Alfa Yohannis}}}
 
 \lstdefinelanguage{Rust} {
-	keywords={MAX, std, print, fn, let, mut, println, true, false, u8, u16, u32, u64, u128, i8, i16, i32, i64, i128, f32, f64, char, bool, if, else, for, while, loop, match, return, Vec},
+	keywords={MAX, std, print, fn, let, mut, println, true, false, u8, u16, u32, u64, u128, i8, i16, i32, i64, i128, f32, f64, char, bool, if, else, for, while, loop, match, return},
 	basicstyle=\ttfamily\small,
 	keywordstyle=\color{blue}\bfseries,
 	ndkeywords={self, String, Option, Some, None, Result, Ok, Err},
@@ -32,8 +30,6 @@
 	morecomment=[s]{/*}{*/},
 	commentstyle=\color{gray}\ttfamily,
 	stringstyle=\color{purple}\ttfamily,
-	%morestring=[b]',
-	%morestring=[b]"
 	showstringspaces=false
 }
 
@@ -42,119 +38,60 @@
 	\frame{\titlepage}
 	
 	\begin{frame}[fragile]
-		\frametitle{Basic Function}
-		\begin{lstlisting}[language=Rust]
-			fn call_basic_function() {
-				println!("Executing a basic function");
-			}
-		\end{lstlisting}
+		\frametitle{String Concatenation and Ownership}
 		\begin{itemize}
-			\item A basic function without parameters or return values.
-			\item Demonstrates the basic structure of a function in Rust.
+			\item Concatenation in Rust can involve ownership transfer.
+			\item Understanding how ownership changes is crucial for managing strings.
+			\item Let's explore a few examples to see how ownership is affected.
 		\end{itemize}
 	\end{frame}
 	
 	\begin{frame}[fragile]
-		\frametitle{Function with Inputs}
+		\frametitle{Ownership Transfer Example 1}
 		\begin{lstlisting}[language=Rust]
-			// Function with inputs (string and integer)
-			fn display_employee_info(name: &str, salary: i32) {
-				println!("Employee name: {} | Salary: {}", name, salary);
-			}
+			let greeting = String::from("hi"); 
+			let target: &str = "there";
+			
+			let combined = greeting + target;  // Ownership transferred here
+			println!("{}", combined);
 		\end{lstlisting}
 		\begin{itemize}
-			\item Shows how to define a function with input parameters.
-			\item Accepts a string and an integer as inputs.
+			\item \texttt{greeting} is a \texttt{String} and \texttt{target} is a \texttt{\&str}.
+			\item The \texttt{+} operator transfers ownership of \texttt{greeting} to \texttt{combined}.
+			\item \texttt{target} is borrowed, but \texttt{greeting} is consumed.
 		\end{itemize}
 	\end{frame}
 	
 	\begin{frame}[fragile]
-		\frametitle{Function with Inputs and Output}
+		\frametitle{Ownership Transfer Example 2}
 		\begin{lstlisting}[language=Rust]
-			// Function with inputs and output (multiplication of two integers)
-			fn multiply_numbers(num1: i32, num2: i32) -> i32 {
-				num1 * num2
-			}
+			let greeting = String::from("hi"); 
+			let place = String::from("there");
+			
+			let combined = greeting + &place;  // Ownership of only greeting changed
+			println!("{} {}", combined, place); 
 		\end{lstlisting}
 		\begin{itemize}
-			\item Demonstrates a function with inputs and a single output.
-			\item Multiplies two integers and returns the result.
+			\item \texttt{place} is a \texttt{String}, and \texttt{greeting} is moved into \texttt{combined}.
+			\item \texttt{place} remains valid because its ownership was not transferred.
+			\item \texttt{combined} contains the value of \texttt{greeting} concatenated with \texttt{place}.
 		\end{itemize}
 	\end{frame}
 	
 	\begin{frame}[fragile]
-		\frametitle{Function with Multiple Outputs}
+		\frametitle{Ownership Transfer Example 3}
 		\begin{lstlisting}[language=Rust]
-			// Function with inputs and multiple outputs (multiplication, addition, subtraction)
-			fn perform_operations(num1: i32, num2: i32) -> (i32, i32, i32) {
-				let multiplication = num1 * num2;
-				let addition = num1 + num2;
-				let subtraction = num1 - num2;
-				(multiplication, addition, subtraction)
-			}
+			let greeting = String::from("hi"); 
+			let place = String::from("there");
+			let addition = String::from(" from Rust");
+			
+			let combined = greeting + \&place + &addition;  // Ownership of only greeting changed
+			println!("{} {} {}", combined, place, addition); 
 		\end{lstlisting}
 		\begin{itemize}
-			\item Shows a function with inputs and multiple outputs.
-			\item Performs and returns the results of multiplication, addition, and subtraction.
-		\end{itemize}
-	\end{frame}
-	
-	\begin{frame}[fragile]
-		\frametitle{Using Functions in Main}
-		\begin{lstlisting}[language=Rust]
-			fn main() {
-				call_basic_function(); 
-				display_employee_info("John", 40_000); 
-				
-				let employee_name = "Alice";
-				let employee_salary = 50_000;
-				display_employee_info(employee_name, employee_salary); 
-				
-				let multiplication_result = multiply_numbers(10, 15);
-				println!("The result of multiplication is {}", multiplication_result);
-				
-				let (multiply_result, add_result, subtract_result) = perform_operations(10, 15);
-				println!("Multiplication = {}, Addition = {}, Subtraction = {}", multiply_result, add_result, subtract_result);
-			}
-		\end{lstlisting}
-		\begin{itemize}
-			\item Shows invoking different functions from the main function.
-			\item Demonstrates passing literal values and variables as inputs.
-			\item Displays the use of functions with both single and multiple return values.
-		\end{itemize}
-	\end{frame}
-	
-	\begin{frame}[fragile]
-		\frametitle{Code Blocks in Rust}
-		\begin{lstlisting}[language=Rust]
-			// Example of a code block
-			let full_name = {
-				let first_name = "Bob";
-				let last_name = "Smith";
-				format!("{} {}", first_name, last_name)
-			};
-			println!("Full name: {}", full_name);
-		\end{lstlisting}
-		\begin{itemize}
-			\item Demonstrates the use of code blocks in Rust.
-			\item Creates and formats a full name within a block.
-		\end{itemize}
-	\end{frame}
-	
-	\begin{frame}[fragile]
-		\frametitle{Reading and Parsing Input}
-		\begin{lstlisting}[language=Rust]
-			// Reading input from stdin and parsing it as a float
-			let mut input_string = String::new();
-			std::io::stdin()
-			.read_line(&mut input_string)
-			.expect("Failed to read input.");
-			let parsed_number: f64 = input_string.trim().parse().expect("Invalid input");
-			println!("Parsed number: {:?}", parsed_number);
-		\end{lstlisting}
-		\begin{itemize}
-			\item Shows how to read input from the standard input.
-			\item Parses the input string as a float and handles possible errors.
+			\item \texttt{greeting} is the only variable whose ownership is transferred.
+			\item \texttt{place} and \texttt{addition} are borrowed and remain valid.
+			\item \texttt{combined} contains the result of concatenating \texttt{greeting}, \texttt{place}, and \texttt{addition}.
 		\end{itemize}
 	\end{frame}
 	

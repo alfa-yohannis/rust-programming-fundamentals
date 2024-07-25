@@ -1,0 +1,451 @@
+\documentclass[aspectratio=169, table]{beamer}
+
+%\usepackage[beamertheme=./praditatheme]{Pradita}
+\usepackage[utf8]{inputenc}
+\usepackage{listings} 
+
+\usetheme{Pradita}
+
+\subtitle{IF120203-Programming Fundamentals}
+
+\title{Session-03:\\\LARGE{Ownership in Rust\\}}
+\date[Serial]{\scriptsize {PRU/SPMI/FR-BM-18/0222}}
+\author[Pradita]{\small{\textbf{Alfa Yohannis}}}
+
+\lstdefinelanguage{Rust} {
+keywords={MAX, std, print, fn, let, mut, println, true, false, u8, u16, u32, u64, u128, i8, i16, i32, i64, i128, f32, f64, char, bool, if, else, for, while, loop, match, return},
+basicstyle=\ttfamily\small,
+keywordstyle=\color{blue}\bfseries,
+ndkeywords={self, String, Option, Some, None, Result, Ok, Err},
+ndkeywordstyle=\color{purple}\bfseries,
+sensitive=true,
+commentstyle=\color{gray},
+stringstyle=\color{red},
+numbers=left,
+numberstyle=\tiny\color{gray},
+breaklines=true,
+frame=lines,
+backgroundcolor=\color{lightgray!10},
+tabsize=2,
+comment=[l]{//},
+morecomment=[s]{/*}{*/},
+commentstyle=\color{gray}\ttfamily,
+stringstyle=\color{purple}\ttfamily,
+%morestring=[b]',
+%morestring=[b]"
+showstringspaces=false
+}
+
+\begin{document}
+
+\frame{\titlepage}
+
+\begin{frame}[fragile]
+\frametitle{Rust Ownership}
+\begin{itemize}
+\item Every value in Rust has an associated variable known as its owner.
+\item Only one owner exists at any given time.
+\item When the owner exits the scope, the value is deallocated.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Basic Ownership Transfer}
+\begin{lstlisting}[language=Rust]
+// Ownership transfer example
+let mut a = 45.8; 
+let mut b = a;
+
+let str1 = String::from("xyz"); 
+let str2 = &str1; 
+println!("The value of str1 = {} and str2 = {}", str1, str2);   
+\end{lstlisting}
+\begin{itemize}
+\item Demonstrates variable ownership and transfer.
+\item \texttt{a} is moved to \texttt{b}, and \texttt{str1} is borrowed by \texttt{str2}.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Ownership Transfer and Borrowing}
+\vspace{12pt}
+\begin{lstlisting}[language=Rust]
+// Ownership and borrowing
+let num_list1: Vec<i32> = vec![1, 2, 3, 4, 5];  
+// let num_list2 = num_list1;                   // Ownership transfer
+// println!("The first list is {:?} {:?}", num_list1, num_list2);
+
+let num_list2 = &num_list1;                   // Borrowing
+println!("The first list is {:?} {:?}", num_list1, num_list2);
+
+let num_list2 = num_list1.clone();
+println!("The first list is {:?} {:?}", num_list1, num_list2);
+\end{lstlisting}
+\begin{itemize}
+\item Illustrates ownership transfer and borrowing.
+\item \texttt{num\_list1} is either moved or borrowed.
+\item \texttt{num\_list1} is cloned to \texttt{num\_list2} to demonstrate ownership duplication.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Scope and Deallocation}
+\begin{lstlisting}[language=Rust]
+// Variable scope and deallocation
+{
+	let user_name = String::from("John Doe"); 
+} 
+println!("User name is {}", user_name); 
+\end{lstlisting}
+\begin{itemize}
+\item Shows the impact of variable scope on ownership.
+\item \texttt{user\_name} is created and deallocated within a block.
+\item Accessing \texttt{user\_name} outside its scope would result in an error.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Heap and Stack Overview}
+\begin{itemize}
+\item In Rust, variables can be stored either on the heap or the stack.
+\item The stack is used for simple, fixed-size data, while the heap is used for dynamically-sized data.
+\item Understanding heap and stack memory is crucial for efficient memory management.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{Basic Code Example - Part 1}
+	\begin{lstlisting}[language=Rust]
+		const LIMIT:i32 = 50_000; 
+		fn main() {
+			let (a, b) = (3, 7); 
+			let total_value = compute_square_sum(a, b); 
+			println!("The square of the sum is {}", total_value); 
+		} 
+	\end{lstlisting}
+	\begin{itemize}
+		\item Introduces a constant \texttt{LIMIT}.
+		\item \texttt{main} function shows variable assignment and function call.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{Basic Code Example - Part 2}
+	\begin{lstlisting}[language=Rust]
+		fn compute_square_sum(val1: i32, val2: i32) -> i32 {
+			let outcome = compute_square(val1 + val2); 
+			outcome
+		}
+		
+		fn compute_square(value: i32) -> i32 {
+			value * value
+		}
+	\end{lstlisting}
+	\begin{itemize}
+		\item \texttt{compute\_square\_sum} calculates the square of the sum of two values.
+		\item \texttt{compute\_square} performs the squaring operation.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Heap and Stack in Action}
+\begin{lstlisting}[language=Rust]
+fn main() 
+{
+	let num: i32 = 10; 
+	
+	let str1 = String::from("another string");  
+	let str2 = str1; 
+	let str3 = &str2; 
+	let str4 = str2.clone(); 
+}
+\end{lstlisting}
+\begin{itemize}
+\item Shows variable assignment and borrowing with heap and stack data.
+\item \texttt{str1} is moved to \texttt{str2}, and \texttt{str2} is cloned to \texttt{str4}.
+\item \texttt{str3} is a reference to \texttt{str2}.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Rust Ownership}
+\begin{itemize}
+\item Every value in Rust has a variable known as its owner.
+\item Only one owner can exist at any given time.
+\item When the owner exits the scope, the value will be deallocated.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{Ownership and Functions - Part 1}
+	\begin{lstlisting}[language=Rust]
+		fn main() { 
+			// Ownership and Functions
+			/*
+			let integer_value = 45;  
+			let mut array_value = vec![7, 8, 9]; 
+		\end{lstlisting}
+		\begin{itemize}
+			\item Introduces variables and functions related to ownership.
+			\item \texttt{integer\_value} and \texttt{array\_value} are defined.
+		\end{itemize}
+	\end{frame}
+	
+	\begin{frame}[fragile]
+		\frametitle{Ownership and Functions - Part 2}
+		\begin{lstlisting}[language=Rust]
+			process_stack(integer_value); 
+			println!("The stack variable was copied, and the original value was {}", integer_value);
+			
+			process_heap(&mut array_value);  
+			println!("The variable after the function call is {:?}", array_value);  
+			*/ 
+		}
+	\end{lstlisting}
+	\begin{itemize}
+		\item \texttt{process\_stack} shows copying of a variable.
+		\item \texttt{process\_heap} demonstrates borrowing a mutable reference.
+	\end{itemize}
+\end{frame}
+
+
+\begin{frame}[fragile]
+\frametitle{Quiz}
+\begin{lstlisting}[language=Rust]
+// Quiz
+let mut array_value = vec![7, 8, 9]; 
+let reference1 = array_value;    
+let reference2 = &reference1; 
+\end{lstlisting}
+\begin{itemize}
+\item Illustrates variable assignment and referencing.
+\item \texttt{reference1} takes ownership, and \texttt{reference2} borrows it immutably.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{A Common Mistake}
+\begin{lstlisting}[language=Rust]
+// A Common Mistake
+let mut array_value = vec![7, 8, 9]; 
+let mut reference1 = &array_value; 
+
+println!("Immutable references are {:?}", reference1); 
+\end{lstlisting}
+\begin{itemize}
+\item Demonstrates a common mistake with mutable references.
+\item Mutable references should not be used with immutable operations.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{When References are Useful}
+\begin{lstlisting}[language=Rust]
+// When References are Useful
+let long_text1 = String::from("This is the first lengthy string"); 
+let long_text2 = String::from("This is the second lengthy string"); 
+
+let combined_texts: Vec<&str> = vec![&long_text1, &long_text2];  
+println!("The combined strings are {:?}", combined_texts);
+\end{lstlisting}
+\begin{itemize}
+\item Shows the use of references to combine strings without ownership transfer.
+\item \texttt{combined\_texts} holds references to \texttt{long\_text1} and \texttt{long\_text2}.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Function Definitions}
+\vspace{12pt}
+\begin{lstlisting}[language=Rust]
+fn process_stack(mut value:i32)    
+{   
+	value = 78; 
+	println!("The copied value has been updated to {}", value); 
+}
+
+fn process_heap(value:&mut Vec<i32>)    
+{
+	value.push(60);    
+	println!("The vector value in the function is {:?}", value); 
+}
+\end{lstlisting}
+\begin{itemize}
+\item Defines functions for processing stack and heap values.
+\item \texttt{process\_stack} works with a copied value, while \texttt{process\_heap} works with a mutable reference.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Rust Ownership}
+\begin{itemize}
+\item Every value in Rust has a variable known as its owner.
+\item Only one owner can exist at any given time.
+\item When the owner exits the scope, the value will be deallocated.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{Ownership and Functions - Part 1}
+	\begin{lstlisting}[language=Rust]
+			// Ownership and Functions
+
+			let integer_value = 45;  
+			let mut array_value = vec![7, 8, 9]; 
+			
+			process_stack(integer_value); 
+			println!("The stack variable was copied, and the original value was {}", integer_value);
+		\end{lstlisting}
+		\begin{itemize}
+			\item Introduces variables and functions related to ownership.
+			\item \texttt{integer\_value} and \texttt{array\_value} are defined.
+		\end{itemize}
+	\end{frame}
+	
+	\begin{frame}[fragile]
+		\frametitle{Ownership and Functions - Part 2}
+		\begin{lstlisting}[language=Rust]
+			process_heap(&mut array_value);  
+			println!("The variable after the function call is {:?}", array_value);  
+			
+	\end{lstlisting}
+	\begin{itemize}
+		\item \texttt{process\_stack} shows copying of a variable.
+		\item \texttt{process\_heap} demonstrates borrowing a mutable reference.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Quiz}
+\begin{lstlisting}[language=Rust]
+// Quiz
+let mut array_value = vec![7, 8, 9]; 
+let reference1 = array_value;    
+let reference2 = &reference1; 
+\end{lstlisting}
+\begin{itemize}
+\item Illustrates variable assignment and referencing.
+\item \texttt{reference1} takes ownership, and \texttt{reference2} borrows it immutably.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{A Common Mistake}
+\begin{lstlisting}[language=Rust]
+// A Common Mistake
+let mut array_value = vec![7, 8, 9]; 
+let mut reference1 = &array_value; 
+
+println!("Immutable references are {:?}", reference1); 
+\end{lstlisting}
+\begin{itemize}
+\item Demonstrates a common mistake with mutable references.
+\item Mutable references should not be used with immutable operations.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{When References are Useful}
+\begin{lstlisting}[language=Rust]
+// When References are Useful
+let long_text1 = String::from("This is the first lengthy string"); 
+let long_text2 = String::from("This is the second lengthy string"); 
+
+let combined_texts: Vec<&str> = vec![&long_text1, &long_text2];  
+println!("The combined strings are {:?}", combined_texts);
+\end{lstlisting}
+\begin{itemize}
+\item Shows the use of references to combine strings without ownership transfer.
+\item \texttt{combined\_texts} holds references to \texttt{long\_text1} and \texttt{long\_text2}.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{Function Definitions - Part 1}
+	\begin{lstlisting}[language=Rust]
+		fn process_stack(mut value:i32)    
+		{   
+			value = 78; 
+			println!("The copied value of the variable has been updated to {}", value); 
+		}
+	\end{lstlisting}
+	\begin{itemize}
+		\item Defines \texttt{process\_stack} function for processing a copied stack value.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{Function Definitions - Part 2}
+	\begin{lstlisting}[language=Rust]
+		fn process_heap(value:&mut Vec<i32>)    
+		{
+			value.push(60);    
+			println!("The value of the vector inside the function is {:?}", value); 
+		}
+	\end{lstlisting}
+	\begin{itemize}
+		\item Defines \texttt{process\_heap} function for processing a mutable reference to a heap value.
+	\end{itemize}
+\end{frame}
+
+
+\begin{frame}[fragile]
+\frametitle{String Concatenation and Ownership}
+\begin{itemize}
+\item Concatenation in Rust can involve ownership transfer.
+\item Understanding how ownership changes is crucial for managing strings.
+\item Let's explore a few examples to see how ownership is affected.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Ownership Transfer Example 1}
+\begin{lstlisting}[language=Rust]
+let greeting = String::from("hi"); 
+let target: &str = "there";
+
+let combined = greeting + target;  // Ownership transferred here
+println!("{}", combined);
+\end{lstlisting}
+\begin{itemize}
+\item \texttt{greeting} is a \texttt{String} and \texttt{target} is a \texttt{\&str}.
+\item The \texttt{+} operator transfers ownership of \texttt{greeting} to \texttt{combined}.
+\item \texttt{target} is borrowed, but \texttt{greeting} is consumed.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Ownership Transfer Example 2}
+\begin{lstlisting}[language=Rust]
+let greeting = String::from("hi"); 
+let place = String::from("there");
+
+let combined = greeting + &place;  // Ownership of only greeting changed
+println!("{} {}", combined, place); 
+\end{lstlisting}
+\begin{itemize}
+\item \texttt{place} is a \texttt{String}, and \texttt{greeting} is moved into \texttt{combined}.
+\item \texttt{place} remains valid because its ownership was not transferred.
+\item \texttt{combined} contains the value of \texttt{greeting} concatenated with \texttt{place}.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Ownership Transfer Example 3}
+\begin{lstlisting}[language=Rust]
+let greeting = String::from("hi"); 
+let place = String::from("there");
+let addition = String::from(" from Rust");
+
+let combined = greeting + \&place + &addition;  // Ownership of only greeting changed
+println!("{} {} {}", combined, place, addition); 
+\end{lstlisting}
+\begin{itemize}
+\item \texttt{greeting} is the only variable whose ownership is transferred.
+\item \texttt{place} and \texttt{addition} are borrowed and remain valid.
+\item \texttt{combined} contains the result of concatenating \texttt{greeting}, \texttt{place}, and \texttt{addition}.
+\end{itemize}
+\end{frame}
+
+
+\end{document}

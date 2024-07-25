@@ -114,37 +114,37 @@ println!("User name is {}", user_name);
 \end{frame}
 
 \begin{frame}[fragile]
-	\frametitle{Basic Code Example - Part 1}
-	\begin{lstlisting}[language=Rust]
-		const LIMIT:i32 = 50_000; 
-		fn main() {
-			let (a, b) = (3, 7); 
-			let total_value = compute_square_sum(a, b); 
-			println!("The square of the sum is {}", total_value); 
-		} 
-	\end{lstlisting}
-	\begin{itemize}
-		\item Introduces a constant \texttt{LIMIT}.
-		\item \texttt{main} function shows variable assignment and function call.
-	\end{itemize}
+\frametitle{Basic Code Example - Part 1}
+\begin{lstlisting}[language=Rust]
+const LIMIT:i32 = 50_000; 
+fn main() {
+	let (a, b) = (3, 7); 
+	let total_value = compute_square_sum(a, b); 
+	println!("The square of the sum is {}", total_value); 
+} 
+\end{lstlisting}
+\begin{itemize}
+\item Introduces a constant \texttt{LIMIT}.
+\item \texttt{main} function shows variable assignment and function call.
+\end{itemize}
 \end{frame}
 
 \begin{frame}[fragile]
-	\frametitle{Basic Code Example - Part 2}
-	\begin{lstlisting}[language=Rust]
-		fn compute_square_sum(val1: i32, val2: i32) -> i32 {
-			let outcome = compute_square(val1 + val2); 
-			outcome
-		}
-		
-		fn compute_square(value: i32) -> i32 {
-			value * value
-		}
-	\end{lstlisting}
-	\begin{itemize}
-		\item \texttt{compute\_square\_sum} calculates the square of the sum of two values.
-		\item \texttt{compute\_square} performs the squaring operation.
-	\end{itemize}
+\frametitle{Basic Code Example - Part 2}
+\begin{lstlisting}[language=Rust]
+fn compute_square_sum(val1: i32, val2: i32) -> i32 {
+	let outcome = compute_square(val1 + val2); 
+	outcome
+}
+
+fn compute_square(value: i32) -> i32 {
+	value * value
+}
+\end{lstlisting}
+\begin{itemize}
+\item \texttt{compute\_square\_sum} calculates the square of the sum of two values.
+\item \texttt{compute\_square} performs the squaring operation.
+\end{itemize}
 \end{frame}
 
 \begin{frame}[fragile]
@@ -177,35 +177,35 @@ fn main()
 \end{frame}
 
 \begin{frame}[fragile]
-	\frametitle{Ownership and Functions - Part 1}
-	\begin{lstlisting}[language=Rust]
-		fn main() { 
-			// Ownership and Functions
-			/*
-			let integer_value = 45;  
-			let mut array_value = vec![7, 8, 9]; 
-		\end{lstlisting}
-		\begin{itemize}
-			\item Introduces variables and functions related to ownership.
-			\item \texttt{integer\_value} and \texttt{array\_value} are defined.
-		\end{itemize}
-	\end{frame}
+\frametitle{Ownership and Functions - Part 1}
+\begin{lstlisting}[language=Rust]
+fn main() { 
+	// Ownership and Functions
+	/*
+	let integer_value = 45;  
+	let mut array_value = vec![7, 8, 9]; 
+\end{lstlisting}
+\begin{itemize}
+	\item Introduces variables and functions related to ownership.
+	\item \texttt{integer\_value} and \texttt{array\_value} are defined.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Ownership and Functions - Part 2}
+\begin{lstlisting}[language=Rust]
+	process_stack(integer_value); 
+	println!("The stack variable was copied, and the original value was {}", integer_value);
 	
-	\begin{frame}[fragile]
-		\frametitle{Ownership and Functions - Part 2}
-		\begin{lstlisting}[language=Rust]
-			process_stack(integer_value); 
-			println!("The stack variable was copied, and the original value was {}", integer_value);
-			
-			process_heap(&mut array_value);  
-			println!("The variable after the function call is {:?}", array_value);  
-			*/ 
-		}
-	\end{lstlisting}
-	\begin{itemize}
-		\item \texttt{process\_stack} shows copying of a variable.
-		\item \texttt{process\_heap} demonstrates borrowing a mutable reference.
-	\end{itemize}
+	process_heap(&mut array_value);  
+	println!("The variable after the function call is {:?}", array_value);  
+	*/ 
+}
+\end{lstlisting}
+\begin{itemize}
+\item \texttt{process\_stack} shows copying of a variable.
+\item \texttt{process\_heap} demonstrates borrowing a mutable reference.
+\end{itemize}
 \end{frame}
 
 
@@ -286,33 +286,33 @@ fn process_heap(value:&mut Vec<i32>)
 \end{frame}
 
 \begin{frame}[fragile]
-	\frametitle{Ownership and Functions - Part 1}
-	\begin{lstlisting}[language=Rust]
-			// Ownership and Functions
+\frametitle{Ownership and Functions - Part 1}
+\begin{lstlisting}[language=Rust]
+// Ownership and Functions
 
-			let integer_value = 45;  
-			let mut array_value = vec![7, 8, 9]; 
-			
-			process_stack(integer_value); 
-			println!("The stack variable was copied, and the original value was {}", integer_value);
-		\end{lstlisting}
-		\begin{itemize}
-			\item Introduces variables and functions related to ownership.
-			\item \texttt{integer\_value} and \texttt{array\_value} are defined.
-		\end{itemize}
-	\end{frame}
-	
-	\begin{frame}[fragile]
-		\frametitle{Ownership and Functions - Part 2}
-		\begin{lstlisting}[language=Rust]
-			process_heap(&mut array_value);  
-			println!("The variable after the function call is {:?}", array_value);  
-			
-	\end{lstlisting}
-	\begin{itemize}
-		\item \texttt{process\_stack} shows copying of a variable.
-		\item \texttt{process\_heap} demonstrates borrowing a mutable reference.
-	\end{itemize}
+let integer_value = 45;  
+let mut array_value = vec![7, 8, 9]; 
+
+process_stack(integer_value); 
+println!("The stack variable was copied, and the original value was {}", integer_value);
+\end{lstlisting}
+\begin{itemize}
+\item Introduces variables and functions related to ownership.
+\item \texttt{integer\_value} and \texttt{array\_value} are defined.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Ownership and Functions - Part 2}
+\begin{lstlisting}[language=Rust]
+process_heap(&mut array_value);  
+println!("The variable after the function call is {:?}", array_value);  
+
+\end{lstlisting}
+\begin{itemize}
+\item \texttt{process\_stack} shows copying of a variable.
+\item \texttt{process\_heap} demonstrates borrowing a mutable reference.
+\end{itemize}
 \end{frame}
 
 \begin{frame}[fragile]
@@ -361,31 +361,31 @@ println!("The combined strings are {:?}", combined_texts);
 \end{frame}
 
 \begin{frame}[fragile]
-	\frametitle{Function Definitions - Part 1}
-	\begin{lstlisting}[language=Rust]
-		fn process_stack(mut value:i32)    
-		{   
-			value = 78; 
-			println!("The copied value of the variable has been updated to {}", value); 
-		}
-	\end{lstlisting}
-	\begin{itemize}
-		\item Defines \texttt{process\_stack} function for processing a copied stack value.
-	\end{itemize}
+\frametitle{Function Definitions - Part 1}
+\begin{lstlisting}[language=Rust]
+fn process_stack(mut value:i32)    
+{   
+	value = 78; 
+	println!("The copied value of the variable has been updated to {}", value); 
+}
+\end{lstlisting}
+\begin{itemize}
+\item Defines \texttt{process\_stack} function for processing a copied stack value.
+\end{itemize}
 \end{frame}
 
 \begin{frame}[fragile]
-	\frametitle{Function Definitions - Part 2}
-	\begin{lstlisting}[language=Rust]
-		fn process_heap(value:&mut Vec<i32>)    
-		{
-			value.push(60);    
-			println!("The value of the vector inside the function is {:?}", value); 
-		}
-	\end{lstlisting}
-	\begin{itemize}
-		\item Defines \texttt{process\_heap} function for processing a mutable reference to a heap value.
-	\end{itemize}
+\frametitle{Function Definitions - Part 2}
+\begin{lstlisting}[language=Rust]
+fn process_heap(value:&mut Vec<i32>)    
+{
+	value.push(60);    
+	println!("The value of the vector inside the function is {:?}", value); 
+}
+\end{lstlisting}
+\begin{itemize}
+\item Defines \texttt{process\_heap} function for processing a mutable reference to a heap value.
+\end{itemize}
 \end{frame}
 
 

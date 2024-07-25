@@ -1,0 +1,14 @@
+\frametitle{Reading and Parsing Input}
+		\begin{lstlisting}[language=Rust]
+			// Reading input from stdin and parsing it as a float
+			let mut input_string = String::new();
+			std::io::stdin()
+			.read_line(&mut input_string)
+			.expect("Failed to read input.");
+			let parsed_number: f64 = input_string.trim().parse().expect("Invalid input");
+			println!("Parsed number: {:?}", parsed_number);
+		\end{lstlisting}
+		\begin{itemize}
+			\item Shows how to read input from the standard input.
+			\item Parses the input string as a float and handles possible errors.
+		\end{itemize}

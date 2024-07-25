@@ -45,85 +45,85 @@ showstringspaces=false
 \begin{frame}[fragile]
 \frametitle{Initializing Multiple Variables}
 \begin{lstlisting}[language=Rust]
-fn main() {
-// Initialize height and weight variables.
-let (height, weight) = (175, 70.5);
-println!("Height: {} cm, Weight: {} kg", height, weight);
-\end{lstlisting}
-\begin{itemize}
-\item Demonstrates tuple assignment.
-\item Initializes two variables simultaneously.
-\end{itemize}
+	fn main() {
+		// Initialize height and weight variables.
+		let (height, weight) = (175, 70.5);
+		println!("Height: {} cm, Weight: {} kg", height, weight);
+	\end{lstlisting}
+	\begin{itemize}
+		\item Demonstrates tuple assignment.
+		\item Initializes two variables simultaneously.
+	\end{itemize}
 \end{frame}
 
 \begin{frame}[fragile]
-\frametitle{Readability of Large Numbers}
-\begin{lstlisting}[language=Rust]
-// Declare city population with underscores for readability.
-let population = 8_000_000;
-println!("City population: {}", population);
-\end{lstlisting}
-\begin{itemize}
-\item Underscores improve readability for large numbers.
-\end{itemize}
+	\frametitle{Readability of Large Numbers}
+	\begin{lstlisting}[language=Rust]
+		// Declare city population with underscores for readability.
+		let population = 8_000_000;
+		println!("City population: {}", population);
+	\end{lstlisting}
+	\begin{itemize}
+		\item Underscores improve readability for large numbers.
+	\end{itemize}
 \end{frame}
 
 \begin{frame}[fragile]
-\frametitle{Integer Overflow}
-\begin{lstlisting}[language=Rust]
-// Uncommenting the following line would cause an overflow error for \texttt{u8}.
-// let max_byte: u8 = 300;
-\end{lstlisting}
-\begin{itemize}
-\item Demonstrates potential overflow error.
-\item \texttt{u8} type can only hold values from 0 to 255.
-\end{itemize}
+	\frametitle{Integer Overflow}
+	\begin{lstlisting}[language=Rust]
+		// Uncommenting the following line would cause an overflow error for \texttt{u8}.
+		// let max_byte: u8 = 300;
+	\end{lstlisting}
+	\begin{itemize}
+		\item Demonstrates potential overflow error.
+		\item \texttt{u8} type can only hold values from 0 to 255.
+	\end{itemize}
 \end{frame}
 
 \begin{frame}[fragile]
-\frametitle{Decimal Numbers in Different Formats}
-\begin{lstlisting}[language=Rust]
-// Declare a distance variable and print it in different numeral systems.
-let distance = 123;
-println!("Distance: Hexadecimal {:X}, Octal {:o}, Binary {:b}", distance, distance, distance);
-\end{lstlisting}
-\begin{itemize}
-\item Shows decimal, hexadecimal, octal, and binary representations.
-\end{itemize}
+	\frametitle{Decimal Numbers in Different Formats}
+	\begin{lstlisting}[language=Rust]
+		// Declare a distance variable and print it in different numeral systems.
+		let distance = 123;
+		println!("Distance: Hexadecimal {:X}, Octal {:o}, Binary {:b}", distance, distance, distance);
+	\end{lstlisting}
+	\begin{itemize}
+		\item Shows decimal, hexadecimal, octal, and binary representations.
+	\end{itemize}
 \end{frame}
 
 \begin{frame}[fragile]
-\frametitle{Snake Case Convention for Variables}
-\begin{lstlisting}[language=Rust]
-// Naming convention using snake_case for variables.
-let student_count = 30; // Preferred over let StudentCount = 30;
-\end{lstlisting}
-\begin{itemize}
-\item Emphasizes Rust's convention for variable naming.
-\end{itemize}
+	\frametitle{Snake Case Convention for Variables}
+	\begin{lstlisting}[language=Rust]
+		// Naming convention using snake_case for variables.
+		let student_count = 30; // Preferred over let StudentCount = 30;
+	\end{lstlisting}
+	\begin{itemize}
+		\item Emphasizes Rust's convention for variable naming.
+	\end{itemize}
 \end{frame}
 
 \begin{frame}[fragile]
-\frametitle{Operations on Numbers in Different Formats}
-\begin{lstlisting}[language=Rust]
-// Demonstrate type casting and operations on variables.
-let apples = 20;
-let price_per_kg = 2.75;
-let total_price = price_per_kg as i32 * apples;
-println!("Total price for apples: {}", total_price);
-\end{lstlisting}
-\begin{itemize}
-\item Demonstrates type casting and arithmetic operations.
-\end{itemize}
+	\frametitle{Operations on Numbers in Different Formats}
+	\begin{lstlisting}[language=Rust]
+		// Demonstrate type casting and operations on variables.
+		let apples = 20;
+		let price_per_kg = 2.75;
+		let total_price = price_per_kg as i32 * apples;
+		println!("Total price for apples: {}", total_price);
+	\end{lstlisting}
+	\begin{itemize}
+		\item Demonstrates type casting and arithmetic operations.
+	\end{itemize}
 \end{frame}
 
 \begin{frame}[fragile]
 \frametitle{Shadowing}
 \begin{lstlisting}[language=Rust]
-// Shadowing allows redeclaration of a variable.
-// let rate = 10;
-// let rate = rate * 2;
-// println!("Updated rate: {}", rate);
+Shadowing allows redeclaration of a variable.
+let rate = 10;
+let rate = rate * 2;
+println!("Updated rate: {}", rate);
 \end{lstlisting}
 \begin{itemize}
 \item Shadowing allows the reuse of variable names.
@@ -133,9 +133,9 @@ println!("Total price for apples: {}", total_price);
 \begin{frame}[fragile]
 \frametitle{Shadowing with \texttt{mut}}
 \begin{lstlisting}[language=Rust]
-// let mut temperature = 25;
-// let temperature = temperature - 5;
-// println!("Adjusted temperature: {}", temperature);
+let mut temperature = 25;
+let temperature = temperature - 5;
+println!("Adjusted temperature: {}", temperature);
 \end{lstlisting}
 \begin{itemize}
 \item Shadowing can also be used with mutable variables.
@@ -145,12 +145,12 @@ println!("Total price for apples: {}", total_price);
 \begin{frame}[fragile]
 \frametitle{Changing the Type through Shadowing}
 \begin{lstlisting}[language=Rust]
-// let value = 100;
-// println!("Value as integer: {}", value);
-// let value = 'B';
-// println!("Value as character: {}", value);
-// let value = 22.9;
-// println!("Value as float: {}", value);
+let value = 100;
+println!("Value as integer: {}", value);
+let value = 'B';
+println!("Value as character: {}", value);
+let value = 22.9;
+println!("Value as float: {}", value);
 \end{lstlisting}
 \begin{itemize}
 \item Demonstrates changing the type of a variable through shadowing.
@@ -160,24 +160,24 @@ println!("Total price for apples: {}", total_price);
 \begin{frame}[fragile]
 \frametitle{Shadowing within Code Blocks}
 \begin{lstlisting}[language=Rust]
-let mut grade = 88;
-{
-	grade = 90; // Modifying variable inside a block.
-	println!("Grade inside block: {}", grade);
-}
-println!("Grade outside block: {}", grade);
+	let mut grade = 88;
+	{
+		grade = 90; // Modifying variable inside a block.
+		println!("Grade inside block: {}", grade);
+	}
+	println!("Grade outside block: {}", grade);
 \end{lstlisting}
 \begin{itemize}
-\item Highlights the effect of shadowing within inner blocks.
+	\item Highlights the effect of shadowing within inner blocks.
 \end{itemize}
 \end{frame}
 
 \begin{frame}[fragile]
 \frametitle{Constants}
 \begin{lstlisting}[language=Rust]
-// Define a constant with uppercase and underscores.
-const MAX_CAPACITY: u32 = 50_000;
-println!("Maximum capacity: {}", MAX_CAPACITY);
+	// Define a constant with uppercase and underscores.
+	const MAX_CAPACITY: u32 = 50_000;
+	println!("Maximum capacity: {}", MAX_CAPACITY);
 }
 \end{lstlisting}
 \begin{itemize}
@@ -212,95 +212,95 @@ println!("The initial text in the dynamic string is \"{}\" ", dynamic_str);
 \end{frame}
 
 \begin{frame}[fragile]
-	\frametitle{Adding Characters to Strings}
-	\begin{lstlisting}[language=Rust]
-		// Add a character to the dynamic string.
-		dynamic_str.push('!');
-		println!("After adding a character, the string is \"{}\" ", dynamic_str);
-		
-		// Remove the last character from the dynamic string.
-		dynamic_str.pop();
-		println!("After removing the last character, the string is \"{}\" ", dynamic_str);
-	\end{lstlisting}
-	\begin{itemize}
-		\item Shows adding a character.
-		\item Demonstrates removing the last character.
-	\end{itemize}
+\frametitle{Adding Characters to Strings}
+\begin{lstlisting}[language=Rust]
+// Add a character to the dynamic string.
+dynamic_str.push('!');
+println!("After adding a character, the string is \"{}\" ", dynamic_str);
+
+// Remove the last character from the dynamic string.
+dynamic_str.pop();
+println!("After removing the last character, the string is \"{}\" ", dynamic_str);
+\end{lstlisting}
+\begin{itemize}
+\item Shows adding a character.
+\item Demonstrates removing the last character.
+\end{itemize}
 \end{frame}
 
 \begin{frame}[fragile]
-	\frametitle{Appending Substrings}
-	\begin{lstlisting}[language=Rust]
-		// Append a substring to the dynamic string.
-		dynamic_str.push_str(" that can grow and shrink");
-		println!("After adding more text, the string is \"{}\" ", dynamic_str);
-	\end{lstlisting}
-	\begin{itemize}
-		\item Illustrates appending a substring.
-	\end{itemize}
-\end{frame}
-		
-\begin{frame}[fragile]
-	\frametitle{String Functions}
-	\begin{lstlisting}[language=Rust]
-		// Demonstrate various string functions.
-		println!(
-		"String details:\n- Is the string empty? {}\n- Length of the string: {}\n- String capacity: {}\n- Does the string contain 'grow'? {}",
-		dynamic_str.is_empty(),
-		dynamic_str.len(),
-		dynamic_str.capacity(),
-		dynamic_str.contains("grow")
-		);
-	\end{lstlisting}
-	\begin{itemize}
-		\item Demonstrates string functions: \texttt{is\_empty}, \texttt{len}, \texttt{capacity}, \texttt{contains}.
-	\end{itemize}
+\frametitle{Appending Substrings}
+\begin{lstlisting}[language=Rust]
+// Append a substring to the dynamic string.
+dynamic_str.push_str(" that can grow and shrink");
+println!("After adding more text, the string is \"{}\" ", dynamic_str);
+\end{lstlisting}
+\begin{itemize}
+\item Illustrates appending a substring.
+\end{itemize}
 \end{frame}
 
 \begin{frame}[fragile]
-	\frametitle{Trimming Strings}
-	\begin{lstlisting}[language=Rust]
-		// Add spaces and demonstrate trimming.
-		dynamic_str.push_str("   ");
-		println!(
-		"Length before trimming: {}, Length after trimming: {}",
-		dynamic_str.len(),
-		dynamic_str.trim().len()
-		);
-	\end{lstlisting}
-	\begin{itemize}
-		\item Illustrates trimming of spaces.
-	\end{itemize}
+\frametitle{String Functions}
+\begin{lstlisting}[language=Rust]
+// Demonstrate various string functions.
+println!(
+	"String details:\n- Is the string empty? {}\n- Length of the string: {}\n- String capacity: {}\n- Does the string contain 'grow'? {}",
+	dynamic_str.is_empty(),
+	dynamic_str.len(),
+	dynamic_str.capacity(),
+	dynamic_str.contains("grow")
+);
+\end{lstlisting}
+\begin{itemize}
+	\item Demonstrates string functions: \texttt{is\_empty}, \texttt{len}, \texttt{capacity}, \texttt{contains}.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Trimming Strings}
+\begin{lstlisting}[language=Rust]
+// Add spaces and demonstrate trimming.
+dynamic_str.push_str("   ");
+println!(
+	"Length before trimming: {}, Length after trimming: {}",
+	dynamic_str.len(),
+	dynamic_str.trim().len()
+);
+\end{lstlisting}
+\begin{itemize}
+	\item Illustrates trimming of spaces.
+\end{itemize}
 \end{frame}
 
 
 \begin{frame}[fragile]
-	\frametitle{Number to String Conversion}
-	\begin{lstlisting}[language=Rust]
-		// Convert a number to a string and compare.
-		let number = 42;
-		println!("The number as a string: {}", number.to_string());
-		println!("Does the string equal '42'? {}", number.to_string() == "42");
-	\end{lstlisting}
-	\begin{itemize}
-		\item Shows conversion of number to string and comparison.
-	\end{itemize}
+\frametitle{Number to String Conversion}
+\begin{lstlisting}[language=Rust]
+// Convert a number to a string and compare.
+let number = 42;
+println!("The number as a string: {}", number.to_string());
+println!("Does the string equal '42'? {}", number.to_string() == "42");
+\end{lstlisting}
+\begin{itemize}
+\item Shows conversion of number to string and comparison.
+\end{itemize}
 \end{frame}
 
 \begin{frame}[fragile]
-	\frametitle{Character to String Conversion}
-	\begin{lstlisting}[language=Rust]
-		// Convert a character to a string and compare.
-		let character = 'b';
-		println!(
-		"The character as a string: {}, Is it equal to 'b'? {}",
-		character.to_string(),
-		character.to_string() == "b"
-		);
-	\end{lstlisting}
-	\begin{itemize}
-		\item Demonstrates conversion of character to string and comparison.
-	\end{itemize}
+\frametitle{Character to String Conversion}
+\begin{lstlisting}[language=Rust]
+// Convert a character to a string and compare.
+let character = 'b';
+println!(
+	"The character as a string: {}, Is it equal to 'b'? {}",
+	character.to_string(),
+	character.to_string() == "b"
+);
+\end{lstlisting}
+\begin{itemize}
+	\item Demonstrates conversion of character to string and comparison.
+\end{itemize}
 \end{frame}
 
 
@@ -312,7 +312,7 @@ let full_name = "John Doe".to_string();
 println!("This string contains a name: {}", full_name);
 \end{lstlisting}
 \begin{itemize}
-\item Demonstrates creating a string from a name.
+	\item Demonstrates creating a string from a name.
 \end{itemize}
 \end{frame}
 
@@ -330,32 +330,594 @@ println!("Length of the empty string: {}", empty_str.len());
 \end{frame}
 
 \begin{frame}[fragile]
-	\frametitle{Using \texttt{format!} to Combine Strings}
+\frametitle{Using \texttt{format!} to Combine Strings}
+\begin{lstlisting}[language=Rust]
+// Using \texttt{format!} to combine strings.
+let first_name = "John".to_string();
+let last_name = "Doe".to_string();
+let full_intro = format!("My first name is {}, and my last name is {}", first_name, last_name);
+println!("{}", full_intro);
+\end{lstlisting}
+\begin{itemize}
+\item Demonstrates using \texttt{format!} to combine strings.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Concatenating Strings with format!}
+\begin{lstlisting}[language=Rust]
+// Concatenating strings using \texttt{format!}.
+let part_1 = String::from("Hello");
+let part_2 = String::from(", World!");
+let combined_str = format!("{}{}", part_1, part_2);
+println!("The combined string is \"{}\"", combined_str);
+\end{lstlisting}
+\begin{itemize}
+\item Shows concatenating strings with \texttt{format!}.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Declaring Tuples}
+\begin{lstlisting}[language=Rust]
+// Declaring a tuple to store item information.
+let item_info = ("Item Price", 75_000);
+println!("{} is {}", item_info.0, item_info.1);
+println!("The entire tuple is {:?}", item_info);
+\end{lstlisting}
+\begin{itemize}
+\item Tuples group different types of values.
+\item Access tuple elements using dot notation.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Destructuring Tuples}
+\begin{lstlisting}[language=Rust]
+// Destructuring the tuple into individual variables.
+let (description, price) = item_info;
+println!("The separated values are: {} and {}", description, price);
+\end{lstlisting}
+\begin{itemize}
+\item Destructuring assigns tuple elements to variables.
+\item Useful for extracting values.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Nested Tuples}
+\begin{lstlisting}[language=Rust]
+// Creating a nested tuple.
+let complex_tuple = (7, 9.5, (2, 4), "World");
+let inner_element = complex_tuple.2.0;
+println!("The inner element is {}", inner_element);
+\end{lstlisting}
+\begin{itemize}
+\item Tuples can contain other tuples.
+\item Access inner elements with additional dot notation.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Empty Tuples}
+\begin{lstlisting}[language=Rust]
+// Declaring an empty tuple.
+let empty_tuple = ();
+}
+\end{lstlisting}
+\begin{itemize}
+\item Empty tuples are used as unit type.
+\item Represents absence of value.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Initializing Arrays}
+\begin{lstlisting}[language=Rust]
+fn main() {
+// Declaring and initializing an array of integers.
+let mut num_array: [i32; 5] = [10, 20, 30, 40, 50];
+println!("Full array: {:?}", num_array);
+\end{lstlisting}
+\begin{itemize}
+\item Arrays store multiple values of the same type.
+\item Fixed size and cannot grow.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Accessing and Modifying Arrays}
+\begin{lstlisting}[language=Rust]
+// Accessing and printing a specific element.
+println!("First element: {}", num_array[0]);
+
+// Updating an element in the array.
+num_array[3] = 100;
+println!("Updated array: {:?}", num_array);
+\end{lstlisting}
+\begin{itemize}
+\item Use index to access array elements.
+\item Arrays are mutable if declared with \texttt{mut}.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Array with Repeated Values}
+\begin{lstlisting}[language=Rust]
+// Initializing an array with the same element.
+let repeated_values_array = [3; 8];
+\end{lstlisting}
+\begin{itemize}
+\item Arrays can be initialized with repeated values.
+\item Useful for default values.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{String and Character Arrays}
+\begin{lstlisting}[language=Rust]
+// Declaring string arrays.
+let mut fruits = ["apple", "banana", "cherry"];
+let repeated_fruit = ["unknown"; 4];
+fruits[1] = "orange";
+
+// Declaring a character array.
+let char_array = ['r', 'u', 's', 't', 'y'];
+\end{lstlisting}
+\begin{itemize}
+\item Arrays can hold strings and characters.
+\item Elements can be updated if mutable.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Array Slicing}
+\begin{lstlisting}[language=Rust]
+// Creating a slice of the array.
+let subset_of_numbers: &[i32] = &num_array[1..4];  // Slices the array from index 1 to 3.
+println!("Array slice: {:?}", subset_of_numbers);
+\end{lstlisting}
+\begin{itemize}
+\item Slices are views into arrays.
+\item Specify range to create a slice.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Array Properties}
+\begin{lstlisting}[language=Rust]
+// Printing the number of elements in the array.
+println!("Number of elements in the array: {}", num_array.len());
+
+// Printing the memory size of the array.
+println!("Memory size of the array: {} bytes", std::mem::size_of_val(&num_array));
+\end{lstlisting}
+\begin{itemize}
+\item \texttt{len()} method returns the number of elements.
+\item \texttt{std::mem::size\_of\_val} returns the memory size.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{Safe Array Access}
 	\begin{lstlisting}[language=Rust]
-		// Using \texttt{format!} to combine strings.
-		let first_name = "John".to_string();
-		let last_name = "Doe".to_string();
-		let full_intro = format!("My first name is {}, and my last name is {}", first_name, last_name);
-		println!("{}", full_intro);
+		// Attempting to access an invalid index (commented out to prevent panic).
+		// num_array[10] = 5; // This will cause a runtime error if uncommented.
+		
+		// Checking for the existence of an element at a specific index.
+		let element_at_index = num_array.get(10);
+		println!("Attempt to access out-of-bounds element: {:?}", element_at_index);
+	}
+\end{lstlisting}
+\begin{itemize}
+	\item Accessing out-of-bounds index causes panic.
+	\item \texttt{get()} method safely checks for valid index.
+\end{itemize}
+\end{frame}
+\begin{frame}[fragile]
+\frametitle{Declaring Tuples}
+\begin{lstlisting}[language=Rust]
+	fn main() {
+		// Declaring a tuple to store item information.
+		let item_info = ("Item Price", 75_000);
+		println!("{} is {}", item_info.0, item_info.1); 
+		println!("The entire tuple is {:?}", item_info);
 	\end{lstlisting}
 	\begin{itemize}
-		\item Demonstrates using \texttt{format!} to combine strings.
+		\item Tuples group different types of values.
+		\item Access tuple elements using dot notation.
 	\end{itemize}
 \end{frame}
 
 \begin{frame}[fragile]
-	\frametitle{Concatenating Strings with format!}
+	\frametitle{Destructuring Tuples}
 	\begin{lstlisting}[language=Rust]
-		// Concatenating strings using \texttt{format!}.
-		let part_1 = String::from("Hello");
-		let part_2 = String::from(", World!");
-		let combined_str = format!("{}{}", part_1, part_2);
-		println!("The combined string is \"{}\"", combined_str);
+		// Destructuring the tuple into individual variables.
+		let (description, price) = item_info;
+		println!("The separated values are: {} and {}", description, price); 
 	\end{lstlisting}
 	\begin{itemize}
-		\item Shows concatenating strings with \texttt{format!}.
+		\item Destructuring assigns tuple elements to variables.
+		\item Useful for extracting values.
 	\end{itemize}
 \end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{Nested Tuples}
+	\begin{lstlisting}[language=Rust]
+		// Creating a nested tuple.
+		let complex_tuple = (7, 9.5, (2, 4), "World");
+		let inner_element = complex_tuple.2.0;
+		println!("The inner element is {}", inner_element); 
+	\end{lstlisting}
+	\begin{itemize}
+		\item Tuples can contain other tuples.
+		\item Access inner elements with additional dot notation.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{Empty Tuples}
+\begin{lstlisting}[language=Rust]
+// Declaring an empty tuple.
+let empty_tuple = ();
+\end{lstlisting}
+\begin{itemize}
+	\item Empty tuples are used as unit type.
+	\item Represents absence of value.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Initializing Arrays}
+\begin{lstlisting}[language=Rust]
+// Declaring and initializing an array of integers.
+let mut num_array: [i32; 5] = [10, 20, 30, 40, 50];  
+println!("Full array: {:?}", num_array);
+\end{lstlisting}
+\begin{itemize}
+\item Arrays store multiple values of the same type.
+\item Fixed size and cannot grow.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Accessing and Modifying Arrays}
+\begin{lstlisting}[language=Rust]
+// Accessing and printing a specific element.
+println!("First element: {}", num_array[0]);
+
+// Updating an element in the array.
+num_array[3] = 100; 
+println!("Updated array: {:?}", num_array);
+\end{lstlisting}
+\begin{itemize}
+\item Use index to access array elements.
+\item Arrays are mutable if declared with \texttt{mut}.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Array with Repeated Values}
+\begin{lstlisting}[language=Rust]
+// Initializing an array with the same element.
+let repeated_values_array = [3; 8];
+\end{lstlisting}
+\begin{itemize}
+\item Arrays can be initialized with repeated values.
+\item Useful for default values.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{String and Character Arrays}
+\begin{lstlisting}[language=Rust]
+// Declaring string arrays.
+let mut fruits = ["apple", "banana", "cherry"];
+let repeated_fruit = ["unknown"; 4]; 
+fruits[1] = "orange"; 
+
+// Declaring a character array.
+let char_array = ['r', 'u', 's', 't', 'y'];
+\end{lstlisting}
+\begin{itemize}
+\item Arrays can hold strings and characters.
+\item Elements can be updated if mutable.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Array Slicing}
+\begin{lstlisting}[language=Rust]
+// Creating a slice of the array.
+let subset_of_numbers: &[i32] = &num_array[1..4];  // Slices the array from index 1 to 3.
+println!("Array slice: {:?}", subset_of_numbers);
+\end{lstlisting}
+\begin{itemize}
+	\item Slices are views into arrays.
+	\item Specify range to create a slice.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Array Properties}
+\begin{lstlisting}[language=Rust]
+// Printing the number of elements in the array.
+println!("Number of elements in the array: {}", num_array.len());
+
+// Printing the memory size of the array.
+println!("Memory size of the array: {} bytes", std::mem::size_of_val(&num_array));
+\end{lstlisting}
+\begin{itemize}
+\item \texttt{len()} method returns the number of elements.
+\item \texttt{std::mem::size\_of\_val} returns the memory size.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Safe Array Access}
+\begin{lstlisting}[language=Rust]
+// Attempting to access an invalid index (commented out to prevent panic).
+// num_array[10] = 5; // This will cause a runtime error if uncommented.
+
+// Checking for the existence of an element at a specific index.
+let element_at_index = num_array.get(10); 
+println!("Attempt to access out-of-bounds element: {:?}", element_at_index);
+\end{lstlisting}
+\begin{itemize}
+\item Accessing out-of-bounds index causes panic.
+\item \texttt{get()} method safely checks for valid index.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Creating a Vector of Integers}
+\begin{lstlisting}[language=Rust]
+// Creating a vector of integers with initial values.
+let mut num_vector: Vec<i32> = vec![3, 6, 9, 12, 15, 18, 21, 24, 27, 30, 33, 36];
+println!("First element: {}", num_vector[0]);
+println!("Full vector: {:?}", num_vector);
+\end{lstlisting}
+\begin{itemize}
+\item Demonstrates creating a vector with initial values.
+\item Accesses and prints the first element.
+\item Displays the entire vector.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Modifying Vector Elements}
+\begin{lstlisting}[language=Rust]
+// Modifying the fifth element (index 4) of the vector.
+num_vector[4] = 50; 
+println!("Updated vector: {:?}", num_vector);
+\end{lstlisting}
+\begin{itemize}
+\item Shows how to modify an element in a vector.
+\item Updates the fifth element and prints the updated vector.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Initializing with Repeated Values}
+\begin{lstlisting}[language=Rust]
+// Initializing a vector with ten elements, all set to the value 1.
+let repeated_values_vector: Vec<i32> = vec![1; 8];
+\end{lstlisting}
+\begin{itemize}
+\item Demonstrates initializing a vector with repeated values.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Working with String Vectors}
+\begin{lstlisting}[language=Rust]
+// Creating a vector of string slices.
+let mut fruit_vector: Vec<&str> = vec!["apple", "banana", "cherry"];
+let unknown_fruit_vector: Vec<&str> = vec!["unknown"; 5]; 
+fruit_vector[1] = "orange"; 
+\end{lstlisting}
+\begin{itemize}
+\item Demonstrates creating and modifying a vector of string slices.
+\item Initializes a vector with repeated string slices.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Creating a Vector of Characters}
+\begin{lstlisting}[language=Rust]
+// Creating a vector of characters.
+let char_vector: Vec<char> = vec!['r', 'u', 's', 't', 'c'];
+\end{lstlisting}
+\begin{itemize}
+\item Shows how to create a vector of characters.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Slicing a Vector}
+\begin{lstlisting}[language=Rust]
+// Slicing the vector to get a subset of elements (from index 2 to 4).
+let sub_vector: &[i32] = &num_vector[2..5]; 
+println!("Subset of the vector: {:?}", sub_vector);
+\end{lstlisting}
+\begin{itemize}
+\item Demonstrates slicing a vector to get a subset of elements.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Common Vector Operations}
+\begin{lstlisting}[language=Rust]
+// Printing the number of elements in the vector.
+println!("Number of elements in the vector: {}", num_vector.len());
+
+// Safely checking if an element exists at the specified index (100 in this case).
+let out_of_bounds_access = num_vector.get(100); 
+println!("Attempt to access out-of-bounds element: {:?}", out_of_bounds_access);
+\end{lstlisting}
+\begin{itemize}
+\item Prints the number of elements in the vector.
+\item Safely checks for out-of-bounds access.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Adding and Removing Elements}
+\begin{lstlisting}[language=Rust]
+// Adding new elements to the end of the vector.
+num_vector.push(45);
+num_vector.push(60);
+println!("Vector after adding elements: {:?}", num_vector);
+
+// Removing the element at the sixth position (index 5) of the vector.
+num_vector.remove(3); 
+println!("Vector after removing the element at index 3: {:?}", num_vector);
+\end{lstlisting}
+\begin{itemize}
+	\item Shows how to add and remove elements from a vector.
+	\item Updates and prints the vector after modifications.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Checking for Element Existence}
+\begin{lstlisting}[language=Rust]
+	// Checking if the value 10 is present in the vector.
+	println!("Does the value 10 exist in the vector? {}", num_vector.contains(&10));
+}
+\end{lstlisting}
+\begin{itemize}
+\item Demonstrates checking for the existence of a value in a vector.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}[fragile]
+\frametitle{Basic Function}
+\begin{lstlisting}[language=Rust]
+fn call_basic_function() {
+	println!("Executing a basic function");
+}
+\end{lstlisting}
+\begin{itemize}
+\item A basic function without parameters or return values.
+\item Demonstrates the basic structure of a function in Rust.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Function with Inputs}
+\begin{lstlisting}[language=Rust]
+// Function with inputs (string and integer)
+fn display_employee_info(name: &str, salary: i32) {
+	println!("Employee name: {} | Salary: {}", name, salary);
+}
+\end{lstlisting}
+\begin{itemize}
+\item Shows how to define a function with input parameters.
+\item Accepts a string and an integer as inputs.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Function with Inputs and Output}
+\begin{lstlisting}[language=Rust]
+// Function with inputs and output (multiplication of two integers)
+fn multiply_numbers(num1: i32, num2: i32) -> i32 {
+	num1 * num2
+}
+\end{lstlisting}
+\begin{itemize}
+\item Demonstrates a function with inputs and a single output.
+\item Multiplies two integers and returns the result.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Function with Multiple Outputs}
+\begin{lstlisting}[language=Rust]
+// Function with inputs and multiple outputs (multiplication, addition, subtraction)
+fn perform_operations(num1: i32, num2: i32) -> (i32, i32, i32) {
+	let multiplication = num1 * num2;
+	let addition = num1 + num2;
+	let subtraction = num1 - num2;
+	(multiplication, addition, subtraction)
+}
+\end{lstlisting}
+\begin{itemize}
+\item Shows a function with inputs and multiple outputs.
+\item Performs and returns the results of multiplication, addition, and subtraction.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Using Functions in Main (Part 1)}
+\begin{lstlisting}[language=Rust]
+fn main() {
+	call_basic_function(); 
+	display_employee_info("John", 40_000); 
+	
+	let employee_name = "Alice";
+	let employee_salary = 50_000;
+	display_employee_info(employee_name, employee_salary); 
+\end{lstlisting}
+\begin{itemize}
+\item Shows invoking different functions from the main function.
+\item Demonstrates passing literal values and variables as inputs.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Using Functions in Main (Part 2)}
+\begin{lstlisting}[language=Rust]
+	let multiplication_result = multiply_numbers(10, 15);
+	println!("The result of multiplication is {}", multiplication_result);
+	
+	let (multiply_result, add_result, subtract_result) = perform_operations(10, 15);
+	println!("Multiplication = {}, Addition = {}, Subtraction = {}", multiply_result, add_result, subtract_result);
+}
+\end{lstlisting}
+\begin{itemize}
+\item Displays the use of functions with both single and multiple return values.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Code Blocks in Rust}
+\begin{lstlisting}[language=Rust]
+// Example of a code block
+let full_name = {
+	let first_name = "Bob";
+	let last_name = "Smith";
+	format!("{} {}", first_name, last_name)
+};
+println!("Full name: {}", full_name);
+\end{lstlisting}
+\begin{itemize}
+\item Demonstrates the use of code blocks in Rust.
+\item Creates and formats a full name within a block.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Reading and Parsing Input}
+\begin{lstlisting}[language=Rust]
+// Reading input from stdin and parsing it as a float
+let mut input_string = String::new();
+std::io::stdin()
+.read_line(&mut input_string)
+.expect("Failed to read input.");
+let parsed_number: f64 = input_string.trim().parse().expect("Invalid input");
+println!("Parsed number: {:?}", parsed_number);
+\end{lstlisting}
+\begin{itemize}
+\item Shows how to read input from the standard input.
+\item Parses the input string as a float and handles possible errors.
+\end{itemize}
+\end{frame}
+
+
 
 \end{document}
 

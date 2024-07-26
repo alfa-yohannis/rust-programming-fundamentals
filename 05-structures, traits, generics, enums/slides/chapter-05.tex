@@ -1,0 +1,1047 @@
+\documentclass[aspectratio=169, table]{beamer}
+
+\usepackage[utf8]{inputenc}
+\usepackage{listings} 
+
+\usetheme{Pradita}
+
+\subtitle{IF120203-Programming Fundamentals}
+
+\title{Session-05:\\\LARGE{Structures in Rust}\\ \vspace{10pt}}
+\date[Serial]{\scriptsize {PRU/SPMI/FR-BM-18/0222}}
+\author[Pradita]{\small{\textbf{Alfa Yohannis}}}
+
+\lstdefinelanguage{Rust} {
+keywords={MAX, std, print, fn, let, mut, println, true, false, u8, u16, u32, u64, u128, i8, i16, i32, i64, i128, f32, f64, char, bool, if, else, for, while, loop, match, return},
+basicstyle=\ttfamily\small,
+keywordstyle=\color{blue}\bfseries,
+ndkeywords={self, String, Option, Some, None, Result, Ok, Err},
+ndkeywordstyle=\color{purple}\bfseries,
+sensitive=true,
+commentstyle=\color{gray},
+stringstyle=\color{red},
+numbers=left,
+numberstyle=\tiny\color{gray},
+breaklines=true,
+frame=lines,
+backgroundcolor=\color{lightgray!10},
+tabsize=2,
+comment=[l]{//},
+morecomment=[s]{/*}{*/},
+commentstyle=\color{gray}\ttfamily,
+stringstyle=\color{purple}\ttfamily,
+showstringspaces=false
+}
+
+\begin{document}
+
+\frame{\titlepage}
+
+\begin{frame}[fragile]
+\frametitle{Structure Definition: Employee}
+\begin{lstlisting}[language=Rust]
+struct Employee {
+	nationality: String,
+	full_name: String,
+	years: i32,
+	sex: char,
+	income: i32,
+}
+\end{lstlisting}
+\begin{itemize}
+\item Defines the structure of an \texttt{Employee}.
+\item Includes fields for personal and financial details.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Implementation of Employee: Initialization}
+\vspace{15pt}
+\begin{lstlisting}[language=Rust]
+impl Employee {
+// Initialize an Employee with default values
+	fn create_default() -> Employee {
+		Employee {
+			nationality: String::from("Canada"),
+			full_name: String::from("John Doe"),
+			years: 30,
+			sex: 'F',
+			income: 50_000,
+		}
+	}
+\end{lstlisting}
+\begin{itemize}
+\item Implements methods for the \texttt{Employee} structure.
+\item \texttt{create\_default} initializes with default values.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Implementation of Employee: Tax Calculation}
+\begin{lstlisting}[language=Rust]
+	// Calculate tax based on income
+	fn calculate_tax(&self) -> f32 {
+		(self.income as f32 / 4.0) * 0.4
+	}
+}
+\end{lstlisting}
+\begin{itemize}
+\item \texttt{calculate\_tax} computes tax based on income.
+\item Returns the calculated tax as a floating-point number.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Main Function: Employee Creation (Part 1)}
+\vspace{20pt}
+\begin{lstlisting}[language=Rust]
+fn main() {
+	// Create an Employee instance with specified values
+	let employee1 = Employee {
+		full_name: String::from("Alice Smith"),
+		nationality: String::from("UK"),
+		years: 35,
+		sex: 'F',
+		income: 60_000,
+	};
+\end{lstlisting}
+\begin{itemize}
+\item Creates an \texttt{Employee} instance with specific values.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Main Function: Employee Usage (Part 2)}
+\begin{lstlisting}[language=Rust]
+// Print employee details and calculated tax
+	println!("Employee details: {} {} {}", employee1.nationality, employee1.years, employee1.sex);
+	println!("Tax for {} is {}", employee1.full_name, employee1.calculate_tax());
+}
+\end{lstlisting}
+\begin{itemize}
+\item Prints details and tax for the \texttt{Employee}.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Main Function: Employee Creation (Part 1)}
+\begin{lstlisting}[language=Rust]
+// Create an Employee with default values
+let employee2 = Employee::create_default();
+println!("Default employee: Name {}, Nationality {}", employee2.full_name, employee2.nationality);
+\end{lstlisting}
+\begin{itemize}
+\item Demonstrates creating an \texttt{Employee} with default values.
+\item Shows how to use a method for default initialization.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Main Function: Employee Field Updates (2)}
+\begin{lstlisting}[language=Rust]
+// Create and modify an Employee instance using fields from another instance
+let employee3 = Employee {
+	years: 45,
+	full_name: String::from("Robert Brown"),
+	..employee1
+};
+println!("Updated employee: Name = {}, Salary = {}", employee3.full_name, employee3.income);
+\end{lstlisting}
+\begin{itemize}
+\item Shows how to create an \texttt{Employee} instance with updated fields.
+\item Demonstrates field updates using another instance.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Main Function: Employee Modification (3)}
+\begin{lstlisting}[language=Rust]
+// Modify and display another Employee instance
+let mut employee4 = Employee::create_default();
+println!("Initial name of employee 4: {}", employee4.full_name);
+employee4.full_name = String::from("David Wilson");
+println!("Updated name of employee 4: {}", employee4.full_name);
+\end{lstlisting}
+\begin{itemize}
+\item Demonstrates modifying an existing \texttt{Employee} instance.
+\item Shows how to update fields after creation.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}[fragile]
+\frametitle{Tuple Structure: Pair}
+\vspace{20pt}
+\begin{lstlisting}[language=Rust]
+struct Pair(i32, i32);
+impl Pair {
+	// Method to get the larger value
+	fn larger(&self) -> i32 {
+		if self.0 >= self.1 { self.0 } else { self.1 }
+	}
+	// Method to get the smaller value
+	fn smaller(&self) -> i32 {
+		if self.0 < self.1 { self.0 } else { self.1 }
+	}
+}
+\end{lstlisting}
+\begin{itemize}
+\item Defines a tuple structure \texttt{Pair}.
+\item Methods \texttt{larger} and \texttt{smaller} return respective values.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Main Function: Pair Usage}
+\begin{lstlisting}[language=Rust]
+fn main() {
+	// Create a Pair instance and display values
+	let numbers = Pair(45, 23);
+	println!("Numbers are: {} and {}", numbers.0, numbers.1);
+	println!("Larger number: {}", numbers.larger());
+	println!("Smaller number: {}", numbers.smaller());
+}
+\end{lstlisting}
+\begin{itemize}
+\item Creates a \texttt{Pair} instance with two integers.
+\item Displays the values and methods' results.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}[fragile]
+\frametitle{Structure Definition: Employee}
+\begin{lstlisting}[language=Rust]
+struct Employee {
+	nationality: String,
+	full_name: String,
+	years: u8,
+	gender: char,
+	salary: i32,
+}
+\end{lstlisting}
+\begin{itemize}
+\item Defines the structure of an \texttt{Employee}.
+\item Includes personal and financial details.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Trait Definition: PersonalDetails}
+\begin{lstlisting}[language=Rust]
+trait PersonalDetails {
+	fn get_details(&self) -> (&str, u8, char);
+	
+	fn get_nation(&self) -> &str;
+}
+\end{lstlisting}
+\begin{itemize}
+\item Defines the \texttt{PersonalDetails} trait.
+\item Contains methods for retrieving details and nationality.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Trait Implementation for Employee: Part 1}
+\begin{lstlisting}[language=Rust]
+impl PersonalDetails for Employee {
+fn get_details(&self) -> (&str, u8, char) {
+(&self.full_name, self.years, self.gender)
+}
+
+fn get_nation(&self) -> &str {
+&self.nationality
+}
+}
+\end{lstlisting}
+\begin{itemize}
+\item Implements \texttt{PersonalDetails} for \texttt{Employee}.
+\item Provides methods to retrieve details and nationality.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Trait Implementation for Learner: Part 2}
+\begin{lstlisting}[language=Rust]
+impl PersonalDetails for Learner {
+fn get_details(&self) -> (&str, u8, char) {
+(&self.student_name, self.years, self.gender)
+}
+
+fn get_nation(&self) -> &str {
+&self.nation
+}
+}
+\end{lstlisting}
+\begin{itemize}
+\item Implements \texttt{PersonalDetails} for \texttt{Learner}.
+\item Provides methods to retrieve details and nationality.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}[fragile]
+\frametitle{Main Function: Using Traits (Part 1)}
+\vspace{20pt}
+\begin{lstlisting}[language=Rust]
+fn main() {
+	let emp1 = Employee {
+		full_name: String::from("John Doe"),
+		nationality: String::from("Canada"),
+		years: 45, gender: 'M', salary: 55_000,
+	};	
+	let learner1 = Learner {
+		student_name: String::from("Jane Doe"),
+		years: 20, gender: 'F',
+		nation: String::from("Australia"),
+	};
+\end{lstlisting}
+\begin{itemize}
+\item Demonstrates creating instances of \texttt{Employee} and \texttt{Learner}.
+\item Sets up data for displaying using the \texttt{PersonalDetails} trait.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Main Function: Using Traits (Part 2)}
+\begin{lstlisting}[language=Rust]
+	println!("Employee details: {:?}", emp1.get_details());
+	println!("Learner details: {:?}", learner1.get_details());
+}
+\end{lstlisting}
+\begin{itemize}
+\item Uses the \texttt{get\_details} method from the \texttt{PersonalDetails} trait.
+\item Outputs details for both \texttt{Employee} and \texttt{Learner}.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}[fragile]
+\frametitle{Trait Definition: ShapeMetrics}
+\begin{lstlisting}[language=Rust]
+trait ShapeMetrics {
+	fn compute_area(&self);
+	
+	fn compute_perimeter(&self) {
+		println!("Perimeter calculation not provided for this shape.");
+	}
+}
+\end{lstlisting}
+\begin{itemize}
+\item Defines the \texttt{ShapeMetrics} trait.
+\item Includes methods for calculating area and perimeter.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Trait Implementation: Sphere}
+\vspace{15pt}
+\begin{lstlisting}[language=Rust]
+impl ShapeMetrics for Sphere {
+	fn compute_area(&self) {
+		let area_of_sphere = 4.0 * 3.14 * (self.radius * self.radius);
+		println!("The surface area of the sphere is {}", area_of_sphere);
+	}
+	fn compute_perimeter(&self) {
+		let circumference = 2.0 * 3.14 * self.radius;
+		println!("The circumference of the sphere is {}", circumference);
+	}
+}
+\end{lstlisting}
+\begin{itemize}
+\item Implements \texttt{ShapeMetrics} for \texttt{Sphere}.
+\item Calculates the surface area and circumference of the sphere.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Trait Implementation: Square}
+\vspace{20pt}
+\begin{lstlisting}[language=Rust]
+impl ShapeMetrics for Square {
+	fn compute_area(&self) {
+		let area_of_square = self.side_length * self.side_length;
+		println!("The area of the square is {}", area_of_square);
+	}
+	fn compute_perimeter(&self) {
+		let perimeter_of_square = 4.0 * self.side_length;
+		println!("The perimeter of the square is {}", perimeter_of_square);
+	}
+}
+\end{lstlisting}
+\begin{itemize}
+\item Implements \texttt{ShapeMetrics} for \texttt{Square}.
+\item Calculates the area and perimeter of the square.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}[fragile]
+\frametitle{Main Function: Shape Metrics}
+\vspace{20pt}
+\begin{lstlisting}[language=Rust]
+fn main() {
+	let sphere = Sphere { radius: 4.0 };
+	let square = Square { side_length: 6.0 };
+	
+	sphere.compute_area();
+	sphere.compute_perimeter();
+	
+	square.compute_area();
+	square.compute_perimeter();
+}
+\end{lstlisting}
+\begin{itemize}
+\item Creates instances of \texttt{Sphere} and \texttt{Square}.
+\item Demonstrates the use of methods to calculate area and perimeter.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Trait Definition: Statistical}
+\begin{lstlisting}[language=Rust]
+struct Metrics {
+	values: Vec<i32>,
+}
+
+trait Statistical {
+	fn average(&self) -> f32; 
+	fn dispersion(&self) -> f32;  
+}
+\end{lstlisting}
+\begin{itemize}
+\item Defines a trait \texttt{Statistical}.
+\item Includes methods for computing average and dispersion.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Trait Implementation: Average Calculation}
+\begin{lstlisting}[language=Rust]
+impl Statistical for Metrics {
+	fn average(&self) -> f32 {
+	let mut total = 0; 
+	for value in self.values.iter() {
+		total += *value; 
+	}
+	total as f32 / self.values.len() as f32
+}
+\end{lstlisting}
+\begin{itemize}
+\item Implements \texttt{average} for \texttt{Metrics}.
+\item Computes the mean of the values in the dataset.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Trait Implementation: Dispersion Calculation}
+\vspace{20pt}
+\begin{lstlisting}[language=Rust]
+fn dispersion(&self) -> f32 {
+	let avg = self.average();  
+	let mut squared_diff_sum: f32 = 0.0;
+	for value in self.values.iter() {
+		squared_diff_sum += (*value as f32 - avg) * (*value as f32 - avg);
+	} 
+		squared_diff_sum / self.values.len() as f32
+	}
+}
+\end{lstlisting}
+\begin{itemize}
+\item Implements \texttt{dispersion} for \texttt{Metrics}.
+\item Calculates variance based on the average value.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Main Function: Using the Trait}
+\begin{lstlisting}[language=Rust]
+fn main() {
+	let dataset = Metrics {
+	values: vec![4, 7, 5, 9, 8, 6, 10],
+	};
+	println!("The average of the dataset is {}", dataset.average()); 
+	println!("The variance of the dataset is {}", dataset.dispersion()); 
+}
+\end{lstlisting}
+\begin{itemize}
+\item Creates an instance of \texttt{Metrics} with sample data.
+\item Demonstrates the use of \texttt{average} and \texttt{dispersion} methods.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Enum Definition: Transportation}
+\begin{lstlisting}[language=Rust]
+enum Transportation {
+	Bike, 
+	Bus,
+	Plane,
+}
+\end{lstlisting}
+\begin{itemize}
+\item Defines an enum `Transportation` with variants for different transport modes.
+\item Each variant represents a mode of transportation: Bike, Bus, and Plane.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Reimbursement Calculation Method}
+\vspace{20pt}
+\begin{lstlisting}[language=Rust]
+impl Transportation {
+	fn reimbursement(&self, distance: i32) -> f32 {
+		let rate = match self {
+			Transportation::Bike => distance as f32 * 12.0 * 1.5,  
+			Transportation::Bus => distance as f32 * 16.0 * 1.5,
+			Transportation::Plane => distance as f32 * 25.0 * 1.5,
+		}; 
+		rate
+	}
+}
+\end{lstlisting}
+\begin{itemize}
+\item Implements the `reimbursement` method to calculate travel expenses based on distance and transportation type.
+\item Demonstrates how the method is used with different transportation modes.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Using Enums: Example 1}
+\vspace{15pt}
+\begin{lstlisting}[language=Rust]
+fn main() {
+	let traveler1 = Transportation::Bike;
+	println!("The enum value for traveler1 {}", traveler1 as i32);
+	let traveler2 = Transportation::Plane; 
+	let traveler3 = Transportation::Bus;
+	println!("Traveler 1 is entitled to a reimbursement of {}", traveler1.reimbursement(70)); 
+	println!("Traveler 2 is entitled to a reimbursement of {}", traveler2.reimbursement(150)); 
+	println!("Traveler 3 is entitled to a reimbursement of {}", traveler3.reimbursement(70)); 
+}
+\end{lstlisting}
+\begin{itemize}
+\item Demonstrates using \texttt{Transportation} enum.
+\item Prints reimbursement for different types of transportation.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Enum for Transport with Associated Data}
+\begin{lstlisting}[language=Rust]
+enum Transport {
+	Bicycle(i32), 
+	Coach(i32),
+	Aircraft(i32),
+}
+\end{lstlisting}
+\begin{itemize}
+\item Defines an enum `Transport` with associated data for different transport modes.
+\item Each variant carries a distance value of type `i32`.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Calculating Reimbursement}
+\vspace{15pt}
+\begin{lstlisting}[language=Rust]
+impl Transport {
+	fn reimbursement(&self) -> f32 {
+		let rate = match self {
+				Transport::Bicycle(distance) => *distance as f32 * 12.0 * 1.5,  
+				Transport::Coach(distance) => *distance as f32 * 16.0 * 1.5,
+				Transport::Aircraft(distance) => *distance as f32 * 25.0 * 1.5,
+		}; 
+		rate }}
+\end{lstlisting}
+\begin{itemize}
+\item Implements a method `reimbursement` to calculate travel reimbursement based on distance.
+\item Demonstrates usage of the `Transport` enum and its `reimbursement` method.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}[fragile]
+\frametitle{Using Enums with Data: Example 2}
+\vspace{15pt}
+\begin{lstlisting}[language=Rust]
+fn main() {
+	let commuter1 = Transport::Bicycle(70); 
+	let commuter2 = Transport::Aircraft(150); 
+	let commuter3 = Transport::Coach(70); 
+	
+	println!("Commuter 1 is entitled to a reimbursement of {}", commuter1.reimbursement()); 
+	println!("Commuter 2 is entitled to a reimbursement of {}", commuter2.reimbursement()); 
+	println!("Commuter 3 is entitled to a reimbursement of {}", commuter3.reimbursement()); 
+}
+\end{lstlisting}
+\begin{itemize}
+\item Demonstrates using \texttt{Transport} with associated data.
+\item Prints reimbursement for different transport modes.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Enum Definition: Mixed Data Types}
+\begin{lstlisting}[language=Rust]
+#[derive(Debug)]
+enum Variant {
+	Integer(i32), 
+	Decimal(f32),
+}
+\end{lstlisting}
+\begin{itemize}
+\item Defines an enum `Variant` with two variants: `Integer` and `Decimal`.
+\item Uses `\#[derive(Debug)]` to enable easy debugging output.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Using Enums in a Vector}
+\begin{lstlisting}[language=Rust]
+fn main() {
+	let values = vec![Variant::Integer(42), Variant::Decimal(22.5)]; 
+	println!("\n\nThe integer value is {:?}, the float value is {:?}", values[0], values[1]); 
+\end{lstlisting}
+\begin{itemize}
+	\item Creates a vector containing different `Variant` enum instances.
+	\item Demonstrates accessing and printing enum values.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Processing Enums with Match}
+\begin{lstlisting}[language=Rust]
+	for item in values.iter() { 
+		match item {
+			Variant::Integer(num) => println!("The value is an integer: {}", num), 
+			Variant::Decimal(num) => println!("The value is a float: {}", num),  
+		}
+	}
+}
+\end{lstlisting}
+\begin{itemize}
+\item Uses `match` to handle different enum variants.
+\item Demonstrates processing and outputting mixed data types from a vector.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}[fragile]
+\frametitle{Generic Functions: Initial Approach}
+\vspace{20pt}
+\begin{lstlisting}[language=Rust]
+fn square_int(n: i32) -> i32 {
+	n * n
+}
+fn square_float(n: f32) -> f32 {
+	n * n
+}
+
+fn main() {
+	println!("The square of the integer is {}", square_int(5));
+	println!("The square of the float is {}", square_float(5.0));
+}
+\end{lstlisting}
+\begin{itemize}
+\item Two separate functions for different types.
+\item Code duplication for each type.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Generic Function: Simplified}
+\vspace{10pt}
+\begin{lstlisting}[language=Rust]
+fn square<T>(n: T) -> T
+where T: std::ops::Mul<Output = T> + Copy {
+	n * n
+}
+
+fn main() {
+	println!("The square of the integer is {}", square(5));
+	println!("The square of the float is {}", square(5.5));
+}
+\end{lstlisting}
+\begin{itemize}
+\item Uses generics to handle multiple types.
+\item Reduces code duplication by generalizing function.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Generic Struct: Initial Approach}
+\begin{lstlisting}[language=Rust]
+struct Coordinate {
+	x: i32,
+	y: i32,
+}
+
+fn main() {
+	let coord1 = Coordinate { x: 5, y: 5 };
+	let coord2 = Coordinate { x: 1.0, y: 4.0 }; // Error: mismatched types
+}
+\end{lstlisting}
+\begin{itemize}
+\item Struct with fixed types.
+\item Type mismatch error when using different types.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Generic Struct: Improved}
+\begin{lstlisting}[language=Rust]
+struct Coordinate<T> {
+	x: T,
+	y: T,
+}
+
+fn main() {
+	let coord1 = Coordinate { x: 5, y: 5 };
+	let coord2 = Coordinate { x: 1.0, y: 4.0 };
+	// let coord3 = Coordinate { x: 5, y: 5.0 }; // Error: mismatched types
+}
+\end{lstlisting}
+\begin{itemize}
+\item Uses generics to allow different types.
+\item Both fields must be of the same type.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Generic Struct: Basic Definition}
+\begin{lstlisting}[language=Rust]
+struct Coordinate<T, U> {
+	x: T,
+	y: U,
+}
+\end{lstlisting}
+\begin{itemize}
+\item Defines a generic struct `Coordinate` with two different types for its fields.
+\item `T` and `U` represent different types that can be used for `x` and `y`.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Generic Struct: Method Implementation}
+\begin{lstlisting}[language=Rust]
+impl<T: std::fmt::Debug, U: std::fmt::Debug> Coordinate<T, U> {
+	fn display(&self) {
+		println!("The values are {:?} and {:?}", self.x, self.y);
+	}
+}
+\end{lstlisting}
+\begin{itemize}
+\item Implements a method `display` for the `Coordinate` struct.
+\item Uses Rust's `Debug` trait to format and print the values of `x` and `y`.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Generic Struct: Usage Example}
+\begin{lstlisting}[language=Rust]
+fn main() {
+	let coord1 = Coordinate { x: 5, y: 5 };
+	coord1.display();
+	let coord2 = Coordinate { x: 1.0, y: 4.0 };
+	let coord3 = Coordinate { x: 5, y: 5.0 };
+	coord3.display();
+}
+\end{lstlisting}
+\begin{itemize}
+\item Demonstrates creating instances of `Coordinate` with different types.
+\item Shows how the `display` method works with various type combinations.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}[fragile]
+\frametitle{Option Enum: Syntax}
+\begin{lstlisting}[language=Rust]
+enum Option<T> {
+	None,
+	Some(T),
+}
+\end{lstlisting}
+\begin{itemize}
+\item `Option` is an enum used for optional values.
+\item Can be either `None` or `Some(value)`.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Example 1: Basic Usage}
+\begin{lstlisting}[language=Rust]
+fn main() {
+	let mut health_condition: Option<String> = None;
+	health_condition = Some(String::from("Hypertension"));
+	
+	match health_condition {
+		Some(condition) => println!("You have the health condition: {}", condition),
+		None => println!("You have no health conditions"),
+	}
+}
+\end{lstlisting}
+\begin{itemize}
+\item Demonstrates how to use `Option` with `String`.
+\item Uses `match` to handle `Some` and `None` cases.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Options with Various Types (Part 1)}
+\begin{lstlisting}[language=Rust]
+struct Individual {
+	name: String,
+	age: i32,
+}
+
+fn main() {
+	let str_option: Option<&str> = Some("Sample Text");
+	
+	println!("\n The value of str_option is {:?}\n The actual value is {:?} \n\n", str_option, str_option.unwrap());
+\end{lstlisting}
+\begin{itemize}
+	\item Shows how `Option` can wrap different types like `String`.
+	\item Demonstrates unwrapping `Option` values and accessing their content.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Options with Various Types (Part 2)}
+\begin{lstlisting}[language=Rust]
+	let float_option: Option<f64> = Some(12.34);
+	
+	let mut sum = 20.0;
+	sum += float_option.unwrap();
+	println!("The total value is {}", sum);
+\end{lstlisting}
+\begin{itemize}
+	\item Demonstrates using `Option` with floating-point numbers.
+	\item Shows how to perform operations on `Option` values by unwrapping them.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Options with Various Types (Part 3)}
+\begin{lstlisting}[language=Rust]
+	let vec_option: Option<Vec<i32>> = Some(vec![1, 2, 3, 4]);
+	
+	let person = Individual {
+		name: String::from("Alex"),
+		age: 28,
+	};
+	
+	let person_option: Option<Individual> = Some(person);
+}
+\end{lstlisting}
+\begin{itemize}
+\item Shows `Option` wrapping more complex types like `Vec` and custom structs.
+\item Highlights the versatility of `Option` in handling optional values of diverse types.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}[fragile]
+\frametitle{Function Example: Using Option (Part 1)}
+\vspace{15pt}
+\begin{lstlisting}[language=Rust]
+fn main() {
+	let value = Some(4);
+	
+	if calculate_square(value) != None {
+		println!("\n\n The result of the square is {:?} \n\n", calculate_square(Some(4)).unwrap());
+	} else {
+		println!("\n\n No value present \n\n");
+	}
+}
+\end{lstlisting}
+\begin{itemize}
+\item This part of the code sets up a value wrapped in `Some` and checks if the square of the value is calculated.
+\item It demonstrates how to handle `Option` values and use the `unwrap` method safely.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Function Example: Using Option (Part 2)}
+\vspace{20pt}
+\begin{lstlisting}[language=Rust]
+fn calculate_square(opt: Option<i32>) -> Option<i32> {
+	match opt {
+		Some(num) => Some(num * num),  // Wrap result in Some to match return type
+		None => None,
+	}
+}
+\end{lstlisting}
+\begin{itemize}
+\item This part defines the \texttt{calculate\_square} function that takes an `Option<i32>` and returns an `Option<i32>`.
+\item It uses pattern matching to either calculate the square of the number if present or return `None`.
+\item Highlights how to work with `Option` types and manage cases where values may or may not be present.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}[fragile]
+\frametitle{Result Enum: Syntax}
+\begin{lstlisting}[language=Rust]
+enum Result<T, E> {
+	Ok(T),
+	Err(E),
+}
+\end{lstlisting}
+\begin{itemize}
+\item `Result` is an enum used for error handling.
+\item Can be either `Ok(value)` for success or `Err(error)` for failure.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Example 1: Division Function}
+\vspace{40pt}
+\begin{columns}[T]
+\begin{column}{0.2\textwidth}
+	\begin{itemize}
+		\item Demonstrates handling division by zero with `Result`.
+		\item Uses `match` to differentiate between valid and error cases.
+	\end{itemize}
+\end{column}
+\begin{column}{0.78\textwidth}
+\begin{lstlisting}[language=Rust]
+fn safe_divide(numerator: f64, denominator: f64) -> Result<f64, String> {
+	match denominator {
+		0. => Err(String::from("Error: Cannot divide by zero")),
+		_ => Ok(numerator / denominator),
+	}
+}
+
+fn main() {
+	println!("\n\nResult: {:?}", safe_divide(18.0, 6.0));  
+	println!("Result: {:?}", safe_divide(5.0, 0.0));
+	println!("Result: {:?} \n\n", safe_divide(0.0, 3.0));
+}
+\end{lstlisting}
+\end{column}
+\end{columns}
+\end{frame}
+
+
+\begin{frame}[fragile]
+\frametitle{Example 2: Vector Lookup}
+\begin{lstlisting}[language=Rust]
+fn main() {
+	let numbers: Vec<i32> = vec![10, 20, 30, 40, 50];
+	
+	let result = match numbers.get(7) {
+		Some(value) => Ok(value),
+		None => Err("Index out of bounds"),
+	};
+	
+	println!("Result of the lookup: {:?}", result);
+}
+\end{lstlisting}
+\begin{itemize}
+\item Shows usage of `Result` with vector indexing.
+\item Handles the case where the index is out of bounds.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Hash Maps: Basic Operations (1)}
+\vspace{10pt}
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.7\textwidth}
+\begin{lstlisting}[language=Rust]
+use std::collections::HashMap;
+
+fn main() {
+	let mut people_ages: HashMap<&str, i32> = HashMap::new();
+	people_ages.insert("Alice", 30);
+	people_ages.insert("Bob", 25);
+	people_ages.insert("Charlie", 35);
+	
+	println!("Alice's age is {:?}", people_ages.get("Alice").unwrap());
+\end{lstlisting}
+\end{column}
+\begin{column}{0.3\textwidth}
+\begin{itemize}
+	\item Creating and using a `HashMap` for storing key-value pairs.
+	\item Methods for adding, retrieving, and checking entries.
+\end{itemize}
+\end{column}
+\end{columns}
+\end{frame}
+
+
+\begin{frame}[fragile]
+\frametitle{Hash Maps: Basic Operations (2)}
+\vspace{20pt}
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.7\textwidth}
+\begin{lstlisting}[language=Rust,firstnumber=10]
+	if people_ages.contains_key("Alice") {
+		println!("The key 'Alice' is present.");
+	} else {
+		println!("The key 'Alice' is not found.");
+	}
+	match people_ages.get("Alice") {
+		Some(age) => println!("Alice's age: {}", age),
+		None => println!("No entry for Alice."),
+	}
+	
+	for (name, age) in &people_ages {
+		println!("{} is {} years old", name, age);
+	}
+}
+\end{lstlisting}
+\end{column}
+\begin{column}{0.3\textwidth}
+	\begin{itemize}
+		\item Creating and using a `HashMap` for storing key-value pairs.
+		\item Methods for adding, retrieving, and checking entries.
+	\end{itemize}
+\end{column}
+\end{columns}
+\end{frame}
+
+
+
+\begin{frame}[fragile]
+\frametitle{Hash Maps: Using `entry` API}
+\begin{lstlisting}[language=Rust]
+fn main() {
+	let mut favorite_fruits: HashMap<&str, &str> = HashMap::new();
+	
+	favorite_fruits.entry("Alice").or_insert("banana");
+	favorite_fruits.entry("Alice").or_insert("cherry");
+	
+	println!("Alice's favorite fruits: {:?}", favorite_fruits);
+}
+\end{lstlisting}
+\begin{itemize}
+\item Demonstrates the `entry` API for updating or inserting values.
+\item Useful for setting default values or updating existing entries.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Hash Maps: Frequency Counting}
+\begin{lstlisting}[language=Rust]
+fn main() {
+	let numbers: Vec<i32> = vec![1, 2, 2, 3, 3, 3, 4, 4, 4, 4];
+	let mut counts: HashMap<i32, u32> = HashMap::new();
+	
+	for number in &numbers {
+		let counter: &mut u32 = counts.entry(*number).or_insert(0);
+		*counter += 1;
+	}
+	
+	println!("Number frequencies: {:?}", counts);
+}
+\end{lstlisting}
+\begin{itemize}
+\item Counts occurrences of elements in a vector.
+\item Utilizes \texttt{entry} and \texttt{or\_insert} to manage counts.
+\end{itemize}
+\end{frame}
+
+\end{document}

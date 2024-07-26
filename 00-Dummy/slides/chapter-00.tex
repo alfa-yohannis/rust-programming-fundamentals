@@ -1,13 +1,13 @@
 \documentclass[aspectratio=169, table]{beamer}
 
 \usepackage[utf8]{inputenc}
-\usepackage{listings} 
+\usepackage{listings}
 
 \usetheme{Pradita}
 
 \subtitle{IF120203-Programming Fundamentals}
 
-\title{Session-12:\\\LARGE{Finding Pythagorean Triplets}}
+\title{Session-10:\\\LARGE{Hash Maps in Rust}\\ \vspace{10pt}}
 \date[Serial]{\scriptsize {PRU/SPMI/FR-BM-18/0222}}
 \author[Pradita]{\small{\textbf{Alfa Yohannis}}}
 
@@ -15,7 +15,7 @@
 	keywords={MAX, std, print, fn, let, mut, println, true, false, u8, u16, u32, u64, u128, i8, i16, i32, i64, i128, f32, f64, char, bool, if, else, for, while, loop, match, return},
 	basicstyle=\ttfamily\small,
 	keywordstyle=\color{blue}\bfseries,
-	ndkeywords={self, String, Option, Some, None, Result, Ok, Err},
+	ndkeywords={self, String, HashMap, Entry, or_insert},
 	ndkeywordstyle=\color{purple}\bfseries,
 	sensitive=true,
 	commentstyle=\color{gray},
@@ -38,28 +38,76 @@
 	\frame{\titlepage}
 	
 	\begin{frame}[fragile]
-		\frametitle{Finding Pythagorean Triplets}
+		\frametitle{Hash Maps: Basic Operations}
 		\begin{lstlisting}[language=Rust]
+			use std::collections::HashMap;
+			
 			fn main() {
-				// Iterate over possible values of a, b, and c
-				for a in 1..=1000 {
-					for b in a + 1..1000 {
-						for c in b + 1..1000 {
-							// Check if the numbers form a Pythagorean triplet and their sum is 1000
-							if a * a + b * b == c * c && a + b + c == 1000 {
-								println!("\n\nThe required Pythagorean triplet is ({}, {}, {})\n\n", a, b, c);
-								// Exit the program after finding the triplet
-								return;
-							}
-						}
-					}
+				let mut people_ages: HashMap<&str, i32> = HashMap::new();
+				people_ages.insert("Alice", 30);
+				people_ages.insert("Bob", 25);
+				people_ages.insert("Charlie", 35);
+				
+				println!("Alice's age is {:?}", people_ages.get("Alice").unwrap());
+				
+				if people_ages.contains_key("Alice") {
+					println!("The key 'Alice' is present.");
+				} else {
+					println!("The key 'Alice' is not found.");
+				}
+				
+				match people_ages.get("Alice") {
+					Some(age) => println!("Alice's age: {}", age),
+					None => println!("No entry for Alice."),
+				}
+				
+				for (name, age) in &people_ages {
+					println!("{} is {} years old", name, age);
 				}
 			}
 		\end{lstlisting}
 		\begin{itemize}
-			\item Searches for Pythagorean triplets (a, b, c) such that \(a^2 + b^2 = c^2\) and \(a + b + c = 1000\).
-			\item Uses nested loops to explore possible values for \(a\), \(b\), and \(c\).
-			\item Prints the triplet and terminates the program once found.
+			\item Creating and using a `HashMap` for storing key-value pairs.
+			\item Methods for adding, retrieving, and checking entries.
+		\end{itemize}
+	\end{frame}
+	
+	\begin{frame}[fragile]
+		\frametitle{Hash Maps: Using `entry` API}
+		\begin{lstlisting}[language=Rust]
+			fn main() {
+				let mut favorite_fruits: HashMap<&str, &str> = HashMap::new();
+				
+				favorite_fruits.entry("Alice").or_insert("banana");
+				favorite_fruits.entry("Alice").or_insert("cherry");
+				
+				println!("Alice's favorite fruits: {:?}", favorite_fruits);
+			}
+		\end{lstlisting}
+		\begin{itemize}
+			\item Demonstrates the `entry` API for updating or inserting values.
+			\item Useful for setting default values or updating existing entries.
+		\end{itemize}
+	\end{frame}
+	
+	\begin{frame}[fragile]
+		\frametitle{Hash Maps: Frequency Counting}
+		\begin{lstlisting}[language=Rust]
+			fn main() {
+				let numbers: Vec<i32> = vec![1, 2, 2, 3, 3, 3, 4, 4, 4, 4];
+				let mut counts: HashMap<i32, u32> = HashMap::new();
+				
+				for number in &numbers {
+					let counter: &mut u32 = counts.entry(*number).or_insert(0);
+					*counter += 1;
+				}
+				
+				println!("Number frequencies: {:?}", counts);
+			}
+		\end{lstlisting}
+		\begin{itemize}
+			\item Counts occurrences of elements in a vector.
+			\item Utilizes \texttt{entry} and \texttt{or\_insert} to manage counts.
 		\end{itemize}
 	\end{frame}
 	

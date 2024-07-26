@@ -1,0 +1,18 @@
+\frametitle{Hash Maps: Frequency Counting}
+\begin{lstlisting}[language=Rust]
+fn main() {
+	let numbers: Vec<i32> = vec![1, 2, 2, 3, 3, 3, 4, 4, 4, 4];
+	let mut counts: HashMap<i32, u32> = HashMap::new();
+	
+	for number in &numbers {
+		let counter: &mut u32 = counts.entry(*number).or_insert(0);
+		*counter += 1;
+	}
+	
+	println!("Number frequencies: {:?}", counts);
+}
+\end{lstlisting}
+\begin{itemize}
+\item Counts occurrences of elements in a vector.
+\item Utilizes \texttt{entry} and \texttt{or\_insert} to manage counts.
+\end{itemize}

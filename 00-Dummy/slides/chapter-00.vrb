@@ -1,14 +1,23 @@
-\frametitle{Ownership Transfer Example 3}
+\frametitle{Finding Pythagorean Triplets}
 		\begin{lstlisting}[language=Rust]
-			let greeting = String::from("hi");
-			let place = String::from("there");
-			let addition = String::from(" from Rust");
-			
-			let combined = greeting + \&place + &addition;  // Ownership of only greeting changed
-			println!("{} {} {}", combined, place, addition);
+			fn main() {
+				// Iterate over possible values of a, b, and c
+				for a in 1..=1000 {
+					for b in a + 1..1000 {
+						for c in b + 1..1000 {
+							// Check if the numbers form a Pythagorean triplet and their sum is 1000
+							if a * a + b * b == c * c && a + b + c == 1000 {
+								println!("\n\nThe required Pythagorean triplet is ({}, {}, {})\n\n", a, b, c);
+								// Exit the program after finding the triplet
+								return;
+							}
+						}
+					}
+				}
+			}
 		\end{lstlisting}
 		\begin{itemize}
-			\item \texttt{greeting} is the only variable whose ownership is transferred.
-			\item \texttt{place} and \texttt{addition} are borrowed and remain valid.
-			\item \texttt{combined} contains the result of concatenating \texttt{greeting}, \texttt{place}, and \texttt{addition}.
+			\item Searches for Pythagorean triplets (a, b, c) such that \(a^2 + b^2 = c^2\) and \(a + b + c = 1000\).
+			\item Uses nested loops to explore possible values for \(a\), \(b\), and \(c\).
+			\item Prints the triplet and terminates the program once found.
 		\end{itemize}

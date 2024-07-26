@@ -7,7 +7,7 @@
 
 \subtitle{IF120203-Programming Fundamentals}
 
-\title{Session-04:\\\LARGE{String Concatenation and Ownership}}
+\title{Session-12:\\\LARGE{Finding Pythagorean Triplets}}
 \date[Serial]{\scriptsize {PRU/SPMI/FR-BM-18/0222}}
 \author[Pradita]{\small{\textbf{Alfa Yohannis}}}
 
@@ -38,60 +38,28 @@
 	\frame{\titlepage}
 	
 	\begin{frame}[fragile]
-		\frametitle{String Concatenation and Ownership}
-		\begin{itemize}
-			\item Concatenation in Rust can involve ownership transfer.
-			\item Understanding how ownership changes is crucial for managing strings.
-			\item Let's explore a few examples to see how ownership is affected.
-		\end{itemize}
-	\end{frame}
-	
-	\begin{frame}[fragile]
-		\frametitle{Ownership Transfer Example 1}
+		\frametitle{Finding Pythagorean Triplets}
 		\begin{lstlisting}[language=Rust]
-			let greeting = String::from("hi"); 
-			let target: &str = "there";
-			
-			let combined = greeting + target;  // Ownership transferred here
-			println!("{}", combined);
+			fn main() {
+				// Iterate over possible values of a, b, and c
+				for a in 1..=1000 {
+					for b in a + 1..1000 {
+						for c in b + 1..1000 {
+							// Check if the numbers form a Pythagorean triplet and their sum is 1000
+							if a * a + b * b == c * c && a + b + c == 1000 {
+								println!("\n\nThe required Pythagorean triplet is ({}, {}, {})\n\n", a, b, c);
+								// Exit the program after finding the triplet
+								return;
+							}
+						}
+					}
+				}
+			}
 		\end{lstlisting}
 		\begin{itemize}
-			\item \texttt{greeting} is a \texttt{String} and \texttt{target} is a \texttt{\&str}.
-			\item The \texttt{+} operator transfers ownership of \texttt{greeting} to \texttt{combined}.
-			\item \texttt{target} is borrowed, but \texttt{greeting} is consumed.
-		\end{itemize}
-	\end{frame}
-	
-	\begin{frame}[fragile]
-		\frametitle{Ownership Transfer Example 2}
-		\begin{lstlisting}[language=Rust]
-			let greeting = String::from("hi"); 
-			let place = String::from("there");
-			
-			let combined = greeting + &place;  // Ownership of only greeting changed
-			println!("{} {}", combined, place); 
-		\end{lstlisting}
-		\begin{itemize}
-			\item \texttt{place} is a \texttt{String}, and \texttt{greeting} is moved into \texttt{combined}.
-			\item \texttt{place} remains valid because its ownership was not transferred.
-			\item \texttt{combined} contains the value of \texttt{greeting} concatenated with \texttt{place}.
-		\end{itemize}
-	\end{frame}
-	
-	\begin{frame}[fragile]
-		\frametitle{Ownership Transfer Example 3}
-		\begin{lstlisting}[language=Rust]
-			let greeting = String::from("hi"); 
-			let place = String::from("there");
-			let addition = String::from(" from Rust");
-			
-			let combined = greeting + \&place + &addition;  // Ownership of only greeting changed
-			println!("{} {} {}", combined, place, addition); 
-		\end{lstlisting}
-		\begin{itemize}
-			\item \texttt{greeting} is the only variable whose ownership is transferred.
-			\item \texttt{place} and \texttt{addition} are borrowed and remain valid.
-			\item \texttt{combined} contains the result of concatenating \texttt{greeting}, \texttt{place}, and \texttt{addition}.
+			\item Searches for Pythagorean triplets (a, b, c) such that \(a^2 + b^2 = c^2\) and \(a + b + c = 1000\).
+			\item Uses nested loops to explore possible values for \(a\), \(b\), and \(c\).
+			\item Prints the triplet and terminates the program once found.
 		\end{itemize}
 	\end{frame}
 	

@@ -1,0 +1,703 @@
+\documentclass[aspectratio=169, table]{beamer}
+
+\usepackage[utf8]{inputenc}
+\usepackage{listings} 
+
+\usetheme{Pradita}
+
+\subtitle{IF120203-Programming Fundamentals}
+
+\title{Session-04:\\\LARGE{Flow Control in Rust}\\ \vspace{10pt}}
+\date[Serial]{\scriptsize {PRU/SPMI/FR-BM-18/0222}}
+\author[Pradita]{\small{\textbf{Alfa Yohannis}}}
+
+\lstdefinelanguage{Rust} {
+keywords={MAX, std, print, fn, let, mut, println, true, false, u8, u16, u32, u64, u128, i8, i16, i32, i64, i128, f32, f64, char, bool, if, else, for, while, loop, match, return},
+basicstyle=\ttfamily\small,
+keywordstyle=\color{blue}\bfseries,
+ndkeywords={self, String, Option, Some, None, Result, Ok, Err},
+ndkeywordstyle=\color{purple}\bfseries,
+sensitive=true,
+commentstyle=\color{gray},
+stringstyle=\color{red},
+numbers=left,
+numberstyle=\tiny\color{gray},
+breaklines=true,
+frame=lines,
+backgroundcolor=\color{lightgray!10},
+tabsize=2,
+comment=[l]{//},
+morecomment=[s]{/*}{*/},
+commentstyle=\color{gray}\ttfamily,
+stringstyle=\color{purple}\ttfamily,
+showstringspaces=false
+}
+
+\begin{document}
+
+\frame{\titlepage}
+
+\begin{frame}[fragile]
+\frametitle{Simple If Statement}
+\begin{lstlisting}[language=Rust]
+let value = 25;
+if value < 30 {
+println!("The value is less than 30");
+}
+println!("This line runs regardless of the above condition");
+\end{lstlisting}
+\begin{itemize}
+\item Basic if statement checks if a condition is true.
+\item The code block inside the if statement executes if the condition is true.
+\item Code outside the if block runs regardless of the condition.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{If with Compound Conditions}
+\begin{lstlisting}[language=Rust]
+let score = 75;
+if score >= 70 && score <= 80 {
+println!("The score is within the expected range");
+}
+\end{lstlisting}
+\begin{itemize}
+\item Using logical operators to combine conditions.
+\item The code block executes if both conditions are true.
+\item Helps in checking complex conditions.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{If-Else Statement}
+\begin{lstlisting}[language=Rust]
+let score = 90;
+if score > 60 {
+println!("You have passed the test");
+} else {
+println!("You have failed the test");
+}
+\end{lstlisting}
+\begin{itemize}
+\item If-Else statement provides alternative execution paths.
+\item The else block executes if the if condition is false.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{If-Else If Ladder}
+\vspace{25pt}
+\begin{columns}[t,onlytextwidth]
+\begin{column}{0.7\textwidth}
+\begin{lstlisting}[language=Rust]
+let test_score = 85;
+let mut grade = 'U';
+if test_score >= 80 {
+	grade = 'A';
+} else if test_score >= 70 {
+	grade = 'B';
+} else if test_score >= 60 {
+	grade = 'C';
+} else if test_score >= 50 {
+	grade = 'D';
+} else {
+	grade = 'E';
+}
+println!("The assigned grade is {}", grade);
+\end{lstlisting}
+\end{column}
+\begin{column}{0.3\textwidth}
+\begin{itemize}
+\item Checks multiple conditions sequentially.
+\item Executes the block of the first true condition.
+\item Optional else block runs if none are true.
+\end{itemize}
+\end{column}
+\end{columns}
+\end{frame}
+
+
+\begin{frame}[fragile]
+\frametitle{Nested If Statements}
+\vspace{25pt}
+\begin{columns}[t]
+\begin{column}{0.25\textwidth}
+\begin{itemize}
+\item Allows checking multiple conditions.
+\item Outer if checks the main condition.
+\item Inner if-else handles detailed conditions.
+\end{itemize}
+\end{column}
+\begin{column}{0.75\textwidth}
+\begin{lstlisting}[language=Rust]
+println!("Please input a number"); 
+let mut input = String::new();
+std::io::stdin().read_line(&mut input).expect("Error reading input.");
+let input: i32 = input.trim().parse().expect("Invalid number");
+if input != 0 {
+	if input % 2 == 0 {
+		println!("The number is even.");
+	} else {
+		println!("The number is odd.");
+	}  
+} else {
+	println!("The number is zero, which is neither even nor odd.");
+}
+\end{lstlisting}
+\end{column}
+\end{columns}
+\end{frame}
+
+
+\begin{frame}[fragile]
+\frametitle{If Let Statement}
+\begin{columns}[t,onlytextwidth]
+\begin{column}{0.6\textwidth}
+\begin{lstlisting}[language=Rust]
+let score = 75; 
+let rank = if score >= 85 {  
+	'A'
+} else if score >= 75 {
+	'B'
+} else if score >= 65 { 
+	'C'
+} else if score >= 55 {
+	'D'
+} else {
+	'F' // Else block is mandatory
+};
+println!("The achieved rank is {}", rank);
+\end{lstlisting}
+\end{column}
+\begin{column}{0.4\textwidth}
+\begin{itemize}
+\item Simplifies variable assignments based on conditions.
+\item All branches must return the same type.
+\item The else block ensures the variable is always initialized.
+\end{itemize}
+\end{column}
+\end{columns}
+\end{frame}
+
+
+\begin{frame}[fragile]
+\frametitle{Simple Match Statement}
+\begin{lstlisting}[language=Rust]
+let value = 30; 
+match value {
+	1 | 2 => println!("Value is 1 or 2"),  
+	3 | 4 => println!("Value is 3 or 4"), 
+	5..=40 => println!("Value is between 5 and 40 inclusive"),       
+	_ => println!("Value is greater than 40"), 
+}
+\end{lstlisting}
+\begin{itemize}
+\item Match statements compare a value against patterns.
+\item Patterns can include single values, ranges, and multiple values.
+\item The underscore (\_) acts as a default case.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Converting If-Else Ladder to Match}
+\vspace{12pt}
+\begin{lstlisting}[language=Rust]
+let points = 72; 
+let mut level = 'U'; 
+
+match points {
+	90..=100 => level = 'X', 
+	80..=89  => level = 'Y', 
+	70..=79  => level = 'Z',
+	60..=69  => level = 'W',
+	_ => level = 'V',
+}
+println!("Achieved level is {}", level);
+\end{lstlisting}
+\begin{itemize}
+\item Match statements can simplify complex if-else ladders.
+\item Each match arm assigns a value based on the pattern.
+\item The default case handles any unmatched values.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Using Match in Place of If Let}
+\begin{lstlisting}[language=Rust]
+let points = 85; 
+let level = match points {
+90..=100 => 'X', 
+80..=89  => 'Y', 
+70..=79  => 'Z',
+60..=69  => 'W',
+_ => 'V',
+};
+println!("Achieved level is {}", level);	
+\end{lstlisting}
+\begin{itemize}
+\item Matches can directly return values.
+\item This allows for clean and concise code.
+\item The returned value is based on the pattern matched.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{While Loop Example 1}
+\vspace{10pt}
+\begin{columns}[t,onlytextwidth]
+\begin{column}{0.7\textwidth}
+\begin{lstlisting}[language=Rust]
+let secret_num = 7;
+println!("Guess the number (1-20)");
+let mut correct = false;
+while !correct {
+	let mut input = String::new();
+	std::io::stdin().read_line(&mut input).expect("Input error");
+	let input: u8 = input.trim().parse().expect("Invalid input");
+	if secret_num == input {
+		println!("You guessed it!");
+		correct = true;
+	} else {
+		println!("Try again!");
+	}
+}
+\end{lstlisting}
+\end{column}
+\begin{column}{0.3\textwidth}
+\begin{itemize}
+\item Uses a while loop to ask for user input.
+\item Checks if the input matches the secret number.
+\item Continues until the correct guess is made.
+\end{itemize}
+\end{column}
+\end{columns}
+\end{frame}
+
+
+
+\begin{frame}[fragile]
+\frametitle{While Loop Example 2}
+\vspace{10pt}
+\begin{lstlisting}[language=Rust]
+println!("Enter a number:");
+
+let mut num = String::new();
+std::io::stdin().read_line(&mut num).expect("Input error");
+let mut num: u8 = num.trim().parse().expect("Invalid input");
+
+num += 1;
+while !(num % 2 == 0 && num % 5 == 0) {
+	num += 1;
+}
+println!("Next divisible by 2 and 5: {}", num);
+\end{lstlisting}
+\begin{itemize}
+\item Prompts the user for a number.
+\item Finds the next number divisible by both 2 and 5.
+\item Uses a while loop to increment the number until the condition is met.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{For Loop with Index}
+\begin{lstlisting}[language=Rust]
+let numbers = vec![12, 24, 36, 48, 60, 72];
+
+for index in 0..=5 {   // Range 0 to 5 inclusive
+println!("Element {} at index {} is {}", index, index, numbers[index]);
+}
+\end{lstlisting}
+\begin{itemize}
+\item Iterates through indices of a vector.
+\item Accesses elements using the index.
+\item Useful for cases where both the index and value are needed.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{For Loop with Ownership}
+\begin{lstlisting}[language=Rust]
+let values = vec![12, 24, 36, 48, 60, 72];
+for value in values {
+	println!("{}", value);
+}
+println!("{:?}", values);   // This line will cause an error as `values` is moved
+\end{lstlisting}
+\begin{itemize}
+\item Iterates over vector elements with ownership.
+\item After iteration, the vector is no longer available.
+\item This example will fail due to the moved ownership of `values`.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{For Loop with Immutable References}
+\begin{lstlisting}[language=Rust]
+let values = vec![12, 24, 36, 48, 60, 72];
+for value in values.iter() {   // Iterate over immutable references
+	println!("{}", value);
+}
+println!("{:?}", values);   // `values` remains valid here
+\end{lstlisting}
+\begin{itemize}
+\item Uses `.iter()` to loop over immutable references.
+\item Vector remains available after iteration.
+\item Useful for read-only access to elements.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{For Loop with Mutable References}
+\begin{lstlisting}[language=Rust]
+let mut numbers = vec![12, 24, 36, 48, 60, 72];
+	for item in numbers.iter_mut() {   // Iterate over mutable references
+	*item += 10;
+	println!("{}", item);
+}
+println!("{:?}", numbers);
+\end{lstlisting}
+\begin{itemize}
+\item Uses \texttt{.iter\_mut()} for mutable references.
+\item Allows modifying elements in place.
+\item After the loop, the vector reflects the changes.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Using Break to Exit a Loop}
+\begin{lstlisting}[language=Rust]
+let mut num = 100;
+loop {
+	num -= 1;
+	if num % 13 == 0 {
+		break;
+	}
+}
+println!("The highest number less than the given number divisible by 13 is {}", num);
+\end{lstlisting}
+\begin{itemize}
+\item Demonstrates using \texttt{break} to exit a loop early.
+\item Stops when a condition is met (number divisible by 13).
+\item Outputs the highest number below 100 that is divisible by 13.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Using Continue to Skip Iterations}
+\vspace{10pt}
+\begin{columns}
+\column{.6\textwidth}
+\begin{lstlisting}[language=Rust]
+let mut num = 0;
+let mut count = 0;
+loop {
+num += 1;
+if num % 5 == 0 && 
+num % 3 == 0 {
+	println!("\nThe number divisible by both 3 and 5 is: {}\n", num);
+	count += 1;
+	if count == 3 {
+		break;
+	} else {
+		continue;
+	}
+}
+\end{lstlisting}
+
+\column{.4\textwidth}
+\begin{lstlisting}[language=Rust]
+print!("{} ", num); // This line is skipped due to continue
+}
+\end{lstlisting}
+\begin{itemize}
+\item Uses \texttt{continue} to skip the rest of the loop iteration.
+\item Prints numbers until the third divisible by both 3 and 5 is found.
+\item Skips printing numbers that do not meet the condition.
+\end{itemize}
+\end{columns}
+\end{frame}
+
+
+\begin{frame}[fragile]
+\frametitle{Returning Values with Loop}
+\vspace{10pt}
+\begin{columns}
+\column{.6\textwidth}
+\begin{lstlisting}[language=Rust]
+let mut num = 0;
+let mut count = 0;
+let third_highest: i32 = loop {
+	num += 1;
+	if num % 5 == 0 && 
+	num % 3 == 0 {
+		println!("\nNumber divisible by 3 and 5: {}\n", num);
+		count += 1;
+		if count == 3 {
+			break num;
+		} else {
+			continue;
+		}
+	}
+\end{lstlisting}
+
+\column{.4\textwidth}
+\begin{lstlisting}[language=Rust]
+	print!("{} ", num);
+};
+println!("The third highest number divisible by both 3 and 5 is {}", third_highest);
+\end{lstlisting}
+
+\begin{itemize}
+\item Uses a loop to find numbers divisible by both 3 and 5.
+\item Breaks the loop after finding the third such number.
+\item Prints the third highest number found.
+\end{itemize}
+\end{columns}
+\end{frame}
+
+
+\begin{frame}[fragile]
+\frametitle{Returning Values with Loop (Part 2)}
+\begin{lstlisting}[language=Rust]
+println!("The third highest number divisible by both 3 and 5 is {}", third_highest);
+\end{lstlisting}
+\begin{itemize}
+\item Prints the third highest number found.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}[fragile]
+\frametitle{Collecting Student Marks (Part 1)}
+\begin{lstlisting}[language=Rust]
+let mut continue_input = true;
+println!("Enter student marks:");
+let mut student_grades = Vec::new(); 
+\end{lstlisting}
+\begin{itemize}
+\item Initializes the loop for collecting user input.
+\item Prepares a vector to store student grades.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Collecting Student Marks (Part 2)}
+\begin{lstlisting}[language=Rust]
+while continue_input {
+	println!("Enter student's marks:");
+	let mut input_marks = String::new();                                       
+	std::io::stdin().read_line(&mut input_marks).unwrap();
+	let marks: i32 = input_marks.trim().parse().unwrap(); 
+	student_grades.push(marks); 
+\end{lstlisting}
+\begin{itemize}
+\item Uses a loop to collect marks.
+\item Reads and parses user input for student marks.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Collecting Student Marks (Part 3)}
+\begin{lstlisting}[language=Rust]
+	println!("Enter marks for another? [Y/N]"); 
+	
+	let user_choice: char = {
+		let mut choice_input = String::new();                                
+		std::io::stdin().read_line(&mut choice_input).unwrap();
+		choice_input.trim().parse().unwrap()
+	};
+\end{lstlisting}
+\begin{itemize}
+\item Prompts the user to continue or stop.
+\item Reads and parses the user's choice.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Collecting Student Marks (Part 4)}
+\begin{lstlisting}[language=Rust]
+	continue_input = user_choice == 'Y';
+}
+
+println!("Grades: {:?}", student_grades);
+\end{lstlisting}
+\begin{itemize}
+\item Decides whether to continue or stop based on user input.
+\item Displays the collected student grades.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Calculations with Sums and Squares (Part 1)}
+\begin{lstlisting}[language=Rust]
+// Read user input
+let mut input = String::new();
+std::io::stdin().read_line(&mut input).unwrap();
+let n: i32 = input.trim().parse().unwrap();
+\end{lstlisting}
+\begin{itemize}
+\item Reads a number from the user.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Calculations with Sums and Squares (Part 2)}
+\begin{lstlisting}[language=Rust]
+// Initialize variables
+let (mut sum_of_numbers, mut sum_of_squares) = (0, 0);
+
+// Loop through numbers
+for i in 1..=n { 
+	sum_of_numbers += i;   
+	sum_of_squares += i.pow(2);  
+}
+\end{lstlisting}
+\begin{itemize}
+\item Initializes variables for calculations.
+\item Computes the sum of numbers and their squares.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Calculations with Sums and Squares (Part 3)}
+\begin{lstlisting}[language=Rust]
+// Calculate difference
+let difference = sum_of_numbers.pow(2) - sum_of_squares; 
+
+// Print result
+println!("Difference for N = {}: {}", n, difference);  
+\end{lstlisting}
+\begin{itemize}
+\item Calculates the difference between the square of the sum and the sum of squares.
+\item Outputs the result.
+\end{itemize}
+\end{frame}
+
+
+
+\begin{frame}[fragile]
+\frametitle{Handling Multiples and Sums (Part 1)}
+\begin{lstlisting}[language=Rust]
+// Read user input
+let mut input = String::new();
+std::io::stdin().read_line(&mut input).unwrap();
+let n: i32 = input.trim().parse().unwrap();
+
+// Initialize vectors
+let mut multiples_of_3 = vec![0];
+let mut multiples_of_5 = vec![0]; 
+\end{lstlisting}
+\begin{itemize}
+\item Reads a number from the user.
+\item Initializes vectors to store multiples.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Handling Multiples and Sums (Part 2)}
+\begin{lstlisting}[language=Rust]
+// Populate vectors
+for i in 1..n {
+	multiples_of_3.push((i % 3 == 0) as i32);
+	multiples_of_5.push((i % 5 == 0) as i32);
+}
+// Combine multiples
+let mut combined_list = vec![0]; 
+for i in 1..n as usize {
+	combined_list.push((multiples_of_3[i] | multiples_of_5[i]) as i32);
+}	
+\end{lstlisting}
+\begin{itemize}
+\item Populates vectors with multiples of 3 and 5.
+\item Combines multiples of 3 and 5.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Handling Multiples and Sums (Part 3)}
+\begin{lstlisting}[language=Rust]
+// Compute values of multiples
+let values_of_multiples: Vec<_> = (1..=n).map(|i| combined_list[i as usize] * i).collect();
+
+// Print results
+println!("Multiples: {:?}", values_of_multiples);  
+println!("Sum: {:?}", values_of_multiples.iter().sum::<i32>());
+\end{lstlisting}
+\begin{itemize}
+\item Computes values of multiples.
+\item Prints the multiples.
+\item Prints the sum of multiples.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Palindrome Check (Part 1)}
+\begin{lstlisting}[language=Rust]
+// Initialize string and flags
+let input = "abbbbaa".to_string();
+let mut is_palindrome = true;
+
+// Check empty string case
+if input.is_empty() {
+	println!("\n\nPalindrome: {:?}", is_palindrome);
+	return;
+}
+\end{lstlisting}
+\begin{itemize}
+\item Initialize string and palindrome flag.
+\item Handle empty string separately.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Palindrome Check (Part 2)}
+\begin{lstlisting}[language=Rust]
+// Compare characters from both ends
+let mut chars = input.chars().peekable();
+while let (Some(front), Some(back)) = (chars.next(), chars.next_back()) {
+	if front != back {
+		is_palindrome = false;
+		break;
+	}
+}
+// Output result
+println!("\n\nPalindrome: {:?}", is_palindrome);
+\end{lstlisting}
+\begin{itemize}
+\item Compare characters from both ends of the string.
+\item Output the result.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Finding Pythagorean Triplets}
+\vspace{20pt}
+\begin{columns}[t]
+\begin{column}{0.3\textwidth}
+\begin{itemize}
+\item Searches for Pythagorean triplets (a, b, c) such that \(a^2 + b^2 = c^2\) and \(a + b + c = 1000\).
+\item Uses nested loops to explore possible values for \(a\), \(b\), and \(c\).
+\item Prints the triplet and terminates the program once found.
+\end{itemize}
+\end{column}
+
+\begin{column}{0.7\textwidth}
+\begin{lstlisting}[language=Rust]
+// Iterate over possible values of a, b, and c
+for a in 1..=1000 {
+	for b in a + 1..1000 {
+		for c in b + 1..1000 {
+			if a * a + b * b == c * c && a + b + c == 1000 {
+				println!("The Pythagorean triplet is ({}, {}, {})", a, b, c);
+				return;
+			}
+		}
+	}
+}
+\end{lstlisting}
+\end{column}
+\end{columns}
+\end{frame}
+
+
+\end{document}

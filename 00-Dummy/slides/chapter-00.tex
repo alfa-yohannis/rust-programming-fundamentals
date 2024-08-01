@@ -7,7 +7,7 @@
 
 \subtitle{IF120203-Programming Fundamentals}
 
-\title{Session-10:\\\LARGE{Hash Maps in Rust}\\ \vspace{10pt}}
+\title{Session-17:\\\LARGE{Iterators: Set Operations}\\ \vspace{10pt}}
 \date[Serial]{\scriptsize {PRU/SPMI/FR-BM-18/0222}}
 \author[Pradita]{\small{\textbf{Alfa Yohannis}}}
 
@@ -38,76 +38,65 @@
 	\frame{\titlepage}
 	
 	\begin{frame}[fragile]
-		\frametitle{Hash Maps: Basic Operations}
+		\frametitle{Set Operations: Union and Intersection with Different Values}
 		\begin{lstlisting}[language=Rust]
-			use std::collections::HashMap;
+			fn main() {
+				let mut set1: Vec<u32> = vec![2, 7, 8, 11, 14];
+				let mut set2: Vec<u32> = vec![2, 6, 8, 10, 13, 18, 22];
+				
+				let common_elements = find_intersection(&set1, &set2);
+				println!("\n\n The intersection of the two sets is {:?}", common_elements);
+				
+				let union_set = compute_union(&mut set1, &mut set2, &common_elements);
+				println!("\n\n The union of the sets is {:?}", union_set);
+				
+				// Alternative method for intersection
+				let set1_copy = set1.clone();
+				
+				// Alternative way to find common elements
+				let common_elements: Vec<u32> = set1.into_iter()
+				.filter(|&x| set2.iter().any(|&y| y == x))
+				.collect();
+				println!("The common values are {:?}", common_elements);
+				// This approach will consume set1
+				
+				println!("The uncommon values are {:?}", uncommon_elements);
+			}
 			
-			fn main() {
-				let mut people_ages: HashMap<&str, i32> = HashMap::new();
-				people_ages.insert("Alice", 30);
-				people_ages.insert("Bob", 25);
-				people_ages.insert("Charlie", 35);
+			// Function to find the intersection of two sets
+			fn find_intersection(set1: &Vec<u32>, set2: &Vec<u32>) -> Vec<u32> {
+				let mut common_elements: Vec<u32> = Vec::new();
 				
-				println!("Alice's age is {:?}", people_ages.get("Alice").unwrap());
-				
-				if people_ages.contains_key("Alice") {
-					println!("The key 'Alice' is present.");
-				} else {
-					println!("The key 'Alice' is not found.");
+				for item in set1 {
+					if set2.iter().any(|&x| x == *item) {
+						common_elements.push(*item);
+					}
 				}
-				
-				match people_ages.get("Alice") {
-					Some(age) => println!("Alice's age: {}", age),
-					None => println!("No entry for Alice."),
+				common_elements
+			}
+			
+			// Function to compute the union of two sets, excluding common elements
+			fn compute_union<'a>(set1: &'a mut Vec<u32>, set2: &'a mut Vec<u32>, common_elements: &'a Vec<u32>) -> Vec<&'a u32> {
+				for item in common_elements {
+					if let Some(pos1) = set1.iter().position(|&x| x == *item) {
+						set1.remove(pos1);
+					}
+					if let Some(pos2) = set2.iter().position(|&x| x == *item) {
+						set2.remove(pos2);
+					}
 				}
-				
-				for (name, age) in &people_ages {
-					println!("{} is {} years old", name, age);
-				}
+				let union_set = set1.iter()
+				.chain(set2.iter())
+				.chain(common_elements.iter())
+				.collect::<Vec<_>>();
+				union_set
 			}
 		\end{lstlisting}
 		\begin{itemize}
-			\item Creating and using a `HashMap` for storing key-value pairs.
-			\item Methods for adding, retrieving, and checking entries.
-		\end{itemize}
-	\end{frame}
-	
-	\begin{frame}[fragile]
-		\frametitle{Hash Maps: Using `entry` API}
-		\begin{lstlisting}[language=Rust]
-			fn main() {
-				let mut favorite_fruits: HashMap<&str, &str> = HashMap::new();
-				
-				favorite_fruits.entry("Alice").or_insert("banana");
-				favorite_fruits.entry("Alice").or_insert("cherry");
-				
-				println!("Alice's favorite fruits: {:?}", favorite_fruits);
-			}
-		\end{lstlisting}
-		\begin{itemize}
-			\item Demonstrates the `entry` API for updating or inserting values.
-			\item Useful for setting default values or updating existing entries.
-		\end{itemize}
-	\end{frame}
-	
-	\begin{frame}[fragile]
-		\frametitle{Hash Maps: Frequency Counting}
-		\begin{lstlisting}[language=Rust]
-			fn main() {
-				let numbers: Vec<i32> = vec![1, 2, 2, 3, 3, 3, 4, 4, 4, 4];
-				let mut counts: HashMap<i32, u32> = HashMap::new();
-				
-				for number in &numbers {
-					let counter: &mut u32 = counts.entry(*number).or_insert(0);
-					*counter += 1;
-				}
-				
-				println!("Number frequencies: {:?}", counts);
-			}
-		\end{lstlisting}
-		\begin{itemize}
-			\item Counts occurrences of elements in a vector.
-			\item Utilizes \texttt{entry} and \texttt{or\_insert} to manage counts.
+			\item Initializes two vectors with different values.
+			\item Computes the intersection of the two vectors.
+			\item Calculates the union of the vectors while excluding the intersection.
+			\item Includes an alternative method for finding common elements.
 		\end{itemize}
 	\end{frame}
 	

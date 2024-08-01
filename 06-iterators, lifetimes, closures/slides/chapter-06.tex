@@ -1,0 +1,745 @@
+\documentclass[aspectratio=169, table]{beamer}
+
+\usepackage[utf8]{inputenc}
+\usepackage{listings} 
+
+\usetheme{Pradita}
+
+\subtitle{IF120203-Programming Fundamentals}
+
+\title{Session-06:\\\LARGE{Lifetimes in Rust}\\ \vspace{10pt}}
+\date[Serial]{\scriptsize {PRU/SPMI/FR-BM-18/0222}}
+\author[Pradita]{\small{\textbf{Alfa Yohannis}}}
+
+\lstdefinelanguage{Rust} {
+keywords={MAX, std, print, fn, let, mut, println, true, false, u8, u16, u32, u64, u128, i8, i16, i32, i64, i128, f32, f64, char, bool, if, else, for, while, loop, match, return},
+basicstyle=\ttfamily\small,
+keywordstyle=\color{blue}\bfseries,
+ndkeywords={self, String, Option, Some, None, Result, Ok, Err},
+ndkeywordstyle=\color{purple}\bfseries,
+sensitive=true,
+commentstyle=\color{gray},
+stringstyle=\color{red},
+numbers=left,
+numberstyle=\tiny\color{gray},
+breaklines=true,
+frame=lines,
+backgroundcolor=\color{lightgray!10},
+tabsize=2,
+comment=[l]{//},
+morecomment=[s]{/*}{*/},
+commentstyle=\color{gray}\ttfamily,
+stringstyle=\color{purple}\ttfamily,
+showstringspaces=false
+}
+
+\begin{document}
+
+\frame{\titlepage}
+
+\begin{frame}[fragile]
+\frametitle{Invalid References Example}
+\begin{lstlisting}[language=Rust]
+fn main() {
+	let ref_to_int: &i32;
+	{
+		let local_int = 42;
+		ref_to_int = &local_int;
+	}
+	println!("The referenced value is {}", ref_to_int);
+}
+\end{lstlisting}
+\begin{itemize}
+\item Demonstrates \texttt{invalid reference} due to \texttt{scope}.
+\item \texttt{local\_int} goes out of \texttt{scope}, causing \texttt{ref\_to\_int} to be \texttt{invalid}.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Function Returning Reference}
+\begin{lstlisting}[language=Rust]
+fn main() {
+	let number = 20;
+	let result = my_function(number);
+	println!("{}", result);
+}
+
+fn my_function(num: i32) -> &i32 {
+	&num
+}
+\end{lstlisting}
+\begin{itemize}
+\item Demonstrates returning a \texttt{reference} to a \texttt{local variable}.
+\item Causes a \texttt{compile-time error} due to \texttt{invalid reference}.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Comparing References}
+\begin{lstlisting}[language=Rust]
+fn main() {
+	let num1 = 15;
+	let num2 = 30;
+	let max_num = max_value(&num1, &num2);
+}
+
+fn max_value(x: &i32, y: &i32) -> &i32 {
+	if x > y {
+		x
+	} else {
+		y
+	}
+}
+\end{lstlisting}
+\begin{itemize}
+\item Compares two \texttt{integer references} and returns the \texttt{greater one}.
+\item Demonstrates basic \texttt{lifetime} usage in \texttt{function return}.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{String References}
+\begin{lstlisting}[language=Rust]
+fn main() {
+	let greeting = "Hi";
+	
+	let message;
+	{
+		let word = String::from("Rust");
+		message = combine_strings(greeting, word.as_str());
+	}
+	println!("\n\n{} \n\n", message);
+}
+
+fn combine_strings(str1: &str, str2: &str) -> &str {
+	str1
+}
+\end{lstlisting}
+\begin{itemize}
+\item Demonstrates returning one of the \texttt{string references}.
+\item \texttt{combine\_strings} returns the \texttt{first string reference}.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Dangling Reference Example}
+\begin{lstlisting}[language=Rust]
+fn main() {
+	let greeting = "Hello";
+	let message;
+	{
+		let world = String::from("World");
+		message = concatenate(greeting, world.as_str());
+	}
+	println!("{}", message);
+}
+
+fn concatenate<'a, 'b>(str1: &'a str, str2: &'b str) -> &'a str {
+	str1
+}
+\end{lstlisting}
+\begin{itemize}
+\item Demonstrates \texttt{dangling\ reference} due to \texttt{scope}.
+\item \texttt{world} goes out of \texttt{scope}, causing \texttt{message} to be \texttt{invalid}.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Function with Lifetimes}
+\begin{lstlisting}[language=Rust]
+fn main() {
+	let num1 = 5;
+	let num2 = 10;
+	let result = max_value(&num1, &num2);
+}
+
+fn max_value(x: &i32, y: &i32) -> i32 {
+	if x > y {
+		*x
+	} else {
+		*y
+	}
+}
+\end{lstlisting}
+\begin{itemize}
+\item Compares two \texttt{integer\ references} and returns the \texttt{larger\ value}.
+\item \texttt{max\_value} function dereferences and returns the larger value.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Lifetime Parameters Example}
+\begin{lstlisting}[language=Rust]
+fn main() {
+	let num1 = 5;
+	let num2 = 10;
+	let result = max_value(&num1, num2);
+}
+
+fn max_value<'a>(x: &'a i32, y: i32) -> &'a i32 {
+	x
+}
+\end{lstlisting}
+\begin{itemize}
+\item Returns a \texttt{reference} to the \texttt{first\ parameter}.
+\item Demonstrates basic usage of \texttt{lifetime\ parameters}.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Multiple Lifetimes Example}
+\begin{lstlisting}[language=Rust]
+fn main() {
+	let num1 = 5;
+	let num2 = 10;
+	let result = max_value(&num1, &num2);
+}
+
+fn max_value<'a, 'b>(x: &'a i32, y: &'b i32) -> &'a i32 {
+	if x > y {
+		x
+	} else {
+		y
+	}
+}
+\end{lstlisting}
+\begin{itemize}
+\item Compares two \texttt{integer\ references} with different \texttt{lifetimes}.
+\item Returns the \texttt{larger\ reference} based on \texttt{comparison}.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Scoped References Example}
+\begin{lstlisting}[language=Rust]
+fn main() {
+	let num1 = 5;
+	{
+		let num2 = 10;
+		let result = max_value(&num1, &num2);
+		println!("The larger value is {}", result);
+	}
+}
+
+fn max_value<'a, 'b>(x: &'a i32, y: &'a i32) -> &'a i32 {
+	if x > y {
+		x
+	} else {
+		y
+	}
+}
+\end{lstlisting}
+\begin{itemize}
+\item Compares two \texttt{integer\ references} within a \texttt{scoped\ block}.
+\item Prints the \texttt{larger\ value} within the \texttt{scope}.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Struct with Lifetime Example}
+\begin{lstlisting}[language=Rust]
+
+struct Individual<'a> {
+	name: &'a str,
+	age: i32,
+}
+
+fn main() {
+	let first_name = "John";
+	let mut person = Individual {
+		name: first_name,
+		age: 40,
+	};
+	
+	{
+		let last_name = String::from("Doe");
+		person.name = &last_name;
+	}
+	
+	println!("\n\nThe name of the person is {} and their age is {}\n\n", person.name, person.age);
+}
+\end{lstlisting}
+\begin{itemize}
+\item Demonstrates struct with a \texttt{lifetime\ parameter}.
+\item Shows updating the struct's field within a \texttt{scoped\ block}.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Processing Vector References}
+\begin{lstlisting}[language=Rust]
+fn main() {
+	let numbers: Vec<i32> = vec![5, 8, 9, 8, 7, 5, 2];
+	let returned_vec = process_vec(&numbers, &numbers);
+}
+
+fn process_vec<'a>(vec1: &'a [i32], vec2: &'a [i32]) -> &'a [i32] {
+	if 3 > 5 {
+		vec1
+	} else {
+		vec2
+	}
+}
+\end{lstlisting}
+\begin{itemize}
+\item Function takes two \texttt{vector\ references} and returns one of them.
+\item Demonstrates usage of \texttt{lifetime\ parameters} with vectors.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}[fragile]
+\frametitle{Basic Closure Syntax}
+\begin{lstlisting}[language=Rust]
+fn main() {
+	let a = 5;
+	let calculate_square = || println!("\n\n Square of a is {} \n\n", a * a);
+	calculate_square();
+}
+\end{lstlisting}
+\begin{itemize}
+\item Simple \texttt{closure} without parameters.
+\item Captures the variable \texttt{a} from the environment.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Closure with Parameters}
+\begin{lstlisting}[language=Rust]
+fn main() {
+	let a = 5;
+	let compute_square = |value: i32| println!("\n\n Square of {} is {} \n\n", value, value * value);
+	compute_square(a);
+	
+	let b = 15;
+	compute_square(b);
+}
+\end{lstlisting}
+\begin{itemize}
+\item Closure that takes an \texttt{input\ parameter}.
+\item Reuse the same closure with different \texttt{values}.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Multiple Closures with Same Variable Name}
+\begin{lstlisting}[language=Rust]
+fn main() {
+	let a = 5;
+	let compute_square = |value: i32| println!("\n\n Square is {}", value * value);
+	let compute_cube = |value: i32| println!("\n\n Cube is {} \n\n", value * value * value);
+	compute_cube(a);
+	
+	let b = 15;
+	compute_cube(b);
+}
+\end{lstlisting}
+\begin{itemize}
+\item Redefining \texttt{closure} with the same name.
+\item Demonstrates shadowing with different \texttt{closure\ logic}.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Ownership and Closures}
+\begin{lstlisting}[language=Rust]
+fn main() {
+	let display_user_info = |info: String, name: &str, age| println!("{}\n\t{}: {}", info, name, age);
+	let info = String::from("User Information:");
+	let (name, age) = (String::from("Alex"), 30);
+	
+	display_user_info(info, &name, age);
+	println!("Variable after move: {}", name);
+}
+\end{lstlisting}
+\begin{itemize}
+\item Passing ownership and references to \texttt{closure}.
+\item Demonstrates how variables are moved or borrowed.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Inferring Inputs and Outputs}
+\begin{lstlisting}[language=Rust]
+fn main() {
+	let compute_square = |value| value * value;
+	
+	let a = 5;
+	compute_square(a);
+	
+	let b = 105.5;
+	compute_square(b);
+}
+\end{lstlisting}
+\begin{itemize}
+\item Inference of input and output types in \texttt{closure}.
+\item Demonstrates usage with \texttt{integer\ and\ floating-point\ values}.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Passing Closure as Function Argument}
+\begin{lstlisting}[language=Rust]
+fn divide<F: Fn(f32) -> bool>(numerator: f32, denominator: f32, is_valid: F) {
+	if is_valid(denominator) {
+		println!("\n\n Result is {} \n\n", numerator / denominator);
+	} else {
+		println!("\n\n Division by zero is not allowed \n\n");
+	}
+}
+
+fn main() {
+	let check_denominator = |denom: f32| denom != 0.0;
+	divide(5.0, 10.0, check_denominator);
+	divide(54.0, 0.0, check_denominator);
+}
+\end{lstlisting}
+\begin{itemize}
+\item Function that takes a \texttt{closure\ as\ an\ argument}.
+\item Demonstrates checking validity of input before performing division.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}[fragile]
+\frametitle{Basic Closure Syntax}
+\begin{lstlisting}[language=Rust]
+fn main() {
+	let increment_1 = |x: u32| -> u32 { x + 1 };
+	let increment_2 = |x| { x + 1 };
+	let increment_3 = |x| x + 1;
+}
+\end{lstlisting}
+\begin{itemize}
+\item Defines three closures to increment a value.
+\item Demonstrates various ways of specifying closure syntax.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Borrowing by Immutable Reference}
+\begin{lstlisting}[language=Rust]
+fn main() {
+	let mut numbers = vec![1, 2, 3];
+	let display_numbers = || {
+		// Accessing numbers by reference.
+		println!("Numbers: {:?}", numbers);
+	};
+	
+	println!("Numbers: {:?}", numbers);
+	display_numbers();
+	
+	numbers[1] = 15;
+}
+\end{lstlisting}
+\begin{itemize}
+\item Closure accessing \texttt{numbers} immutably.
+\item Changes to \texttt{numbers} after closure invocation.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Borrowing by Mutable Reference}
+\begin{lstlisting}[language=Rust]
+fn main() {
+	let mut numbers = vec![4, 5, 6];
+	let mut add_to_numbers = || {
+		numbers.push(35);
+	};
+	
+	// Displaying numbers is commented out.
+	// numbers[1] = 15;
+	add_to_numbers();
+	
+	// Modifying numbers is commented out.
+	// numbers[2] = 15;
+}
+\end{lstlisting}
+\begin{itemize}
+\item Mutable closure modifying \texttt{numbers}.
+\item Demonstrates the effect of mutable borrowing.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Moving a Value into a Closure}
+\begin{lstlisting}[language=Rust]
+fn main() {
+	let mut numbers_1 = vec![1, 2, 3];
+	let handle_numbers = || {
+		let numbers_2 = numbers_1;
+	};
+	
+	handle_numbers();
+	// Accessing numbers_1 after moving is not possible.
+	// println!("Numbers 1 = {:?}", numbers_1);
+	// println!("Numbers 2 = {:?}", numbers_2);
+}
+\end{lstlisting}
+\begin{itemize}
+\item Moving \texttt{numbers\_1} into the closure.
+\item Shows that \texttt{numbers\_1} is no longer accessible.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}[fragile]
+\frametitle{Function Types: Basic Syntax}
+\begin{lstlisting}[language=Rust]
+fn maximum(x: i32, y: i32) -> i32 {
+	if x > y {
+		x
+	} else {
+		y
+	}
+}
+
+fn minimum(x: i32, y: i32) -> i32 {
+	if x < y {
+		x
+	} else {
+		y
+	}
+}
+
+fn main() {
+	let mut chosen_function = maximum;
+	println!("The minimum of the two values is {}", chosen_function(2, 3));
+}
+\end{lstlisting}
+\begin{itemize}
+\item Shows how to define and use functions as values.
+\item Demonstrates storing and invoking a function.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Function Types as Parameters}
+\begin{lstlisting}[language=Rust]
+fn display_name(name: &str) {
+	print!("The name is {}", name); 
+}
+
+fn show_details(func: fn(&str), person: &str, age: i32) {
+	func(person); 
+	println!(" and my age is {}", age);
+}
+
+fn main() {
+	let (name, age) = (String::from("Nouman"), 40); 
+	show_details(display_name, &name, age);
+}
+\end{lstlisting}
+\begin{itemize}
+\item Passing functions as arguments to other functions.
+\item Function \texttt{show\_details} uses a function pointer to print details.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Function Types: Applying Twice}
+\begin{lstlisting}[language=Rust]
+fn increment(x: i32) -> i32 {
+	x + 1
+}
+
+fn apply_twice(func: fn(i32) -> i32, value: i32) -> i32 {
+	func(value) + func(value)
+}
+
+fn main() {
+	let result = apply_twice(increment, 5);
+	println!("The result is: {}", result);
+}
+\end{lstlisting}
+\begin{itemize}
+\item Demonstrates passing a function as a parameter and applying it multiple times.
+\item Shows how functions can be used as first-class citizens in Rust.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}[fragile]
+\frametitle{Iterators: Basics}
+\begin{lstlisting}[language=Rust]
+fn main() {
+	let numbers = vec![1, 2, 3, 4, 5, 6, 7];
+	let mut iterator = numbers.iter();
+	
+	println!("The iterator: {:?}", iterator); 
+	println!("{:?}", iterator.next());
+	println!("{:?}", iterator.next());
+	println!("{:?}", iterator.next());
+	println!("{:?}", iterator.next());
+	println!("{:?}", iterator.next());
+	println!("{:?}", iterator.next());
+	println!("{:?}", iterator.next());
+	println!("{:?}", iterator.next());
+}
+\end{lstlisting}
+\begin{itemize}
+\item Introduction to iterators and their basic usage.
+\item Demonstrates creating and using an iterator with `vec`.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Useful Functions for Iterators}
+\begin{lstlisting}[language=Rust]
+fn main() {
+	let values: Vec<u32> = vec![0, 1, 2, 4, 5, 6, 9, 8, 7];
+	
+	let any_check = values.iter().any(|&x| x > 0);
+	println!("The result of the any function is {}", any_check);
+	
+	let all_check = values.iter().all(|&x| x > 0);
+	println!("The result of the all function is {}", all_check);
+	
+	let find_check = values.iter().find(|&&x| x > 0);
+	println!("The result of the find function is {}", find_check.unwrap());
+	
+	let position_check = values.iter().position(|&x| x > 4);
+	println!("The result of the position function is {}", position_check.unwrap());
+	
+	let rposition_check = values.iter().rposition(|&x| x > 4);
+	println!("The result of the rposition function is {}", rposition_check.unwrap());
+	
+	let max_check = values.iter().max();
+	println!("The result of the max function is {}", max_check.unwrap());
+	
+	let min_check = values.iter().min();
+	println!("The result of the min function is {}", min_check.unwrap());
+	
+	let sum_check: u32 = values.iter().sum();
+	let product_check: u32 = values.iter().product(); 
+	println!("Sum and product: {} {}", sum_check, product_check);
+	
+	let mut reversed_iter = values.iter().rev();
+	println!("The result of applying the rev function {:?}", reversed_iter.collect::<Vec<_>>());
+	println!("Original vector: {:?}", values);
+}
+\end{lstlisting}
+\begin{itemize}
+\item Utilizes common iterator functions such as `any`, `all`, `find`, `position`, and `rposition`.
+\item Shows how to compute maximum, minimum, sum, and product using iterators.
+\item Demonstrates reversing an iterator with `rev`.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}[fragile]
+\frametitle{Iterators: Basics}
+\begin{lstlisting}[language=Rust]
+fn main() {
+	let numbers = vec![0, 1, 2, 3, 4, 5, 6, 7];
+	
+	let filtered_refs = numbers.iter().filter(|&x| *x >= 5).collect::<Vec<&u32>>();
+	println!("Filtered references: {:?}", filtered_refs);
+	
+	let cloned_numbers = numbers.clone();
+	let filtered_values = cloned_numbers.into_iter().filter(|x| *x >= 5).collect::<Vec<u32>>();
+	println!("Filtered values: {:?}", filtered_values);
+	
+	let mapped_values = cloned_numbers.iter().map(|x| 2 * *x).collect::<Vec<u32>>();
+	println!("Mapped values: {:?}", mapped_values);
+	
+	let filtered_mapped_values = cloned_numbers.iter().map(|x| 2 * x).filter(|x| *x > 10).collect::<Vec<u32>>();
+	println!("Filtered and mapped values: {:?}", filtered_mapped_values);
+}
+\end{lstlisting}
+\begin{itemize}
+\item Demonstrates basic usage of iterators with `filter` and `map` functions.
+\item Shows how to collect filtered and mapped values into vectors.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Iterators: Example of Summing Multiples}
+\begin{lstlisting}[language=Rust]
+fn main() {
+	let mut input = String::new();
+	std::io::stdin()
+	.read_line(&mut input)
+	.expect("Failed to read input.");
+	let limit: u32 = input.trim().parse().expect("Invalid input");
+	
+	let multiples = (1..limit)
+	.filter(|&x| x % 3 == 0 || x % 5 == 0)
+	.collect::<Vec<u32>>();
+	
+	println!("Multiples of 3 or 5: {:?}", multiples);
+	println!("Sum of multiples: {:?}", multiples.iter().sum::<u32>());
+}
+\end{lstlisting}
+\begin{itemize}
+\item Reads an integer from user input.
+\item Filters numbers less than the input that are multiples of 3 or 5.
+\item Collects these numbers into a vector.
+\item Prints the filtered numbers and their sum.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Set Operations: Union and Intersection with Different Values}
+\begin{lstlisting}[language=Rust]
+fn main() {
+	let mut set1: Vec<u32> = vec![2, 7, 8, 11, 14];
+	let mut set2: Vec<u32> = vec![2, 6, 8, 10, 13, 18, 22];
+	
+	let common_elements = find_intersection(&set1, &set2);
+	println!("\n\n The intersection of the two sets is {:?}", common_elements);
+	
+	let union_set = compute_union(&mut set1, &mut set2, &common_elements);
+	println!("\n\n The union of the sets is {:?}", union_set);
+	
+	// Alternative method for intersection
+	let set1_copy = set1.clone();
+	
+	// Alternative way to find common elements
+	let common_elements: Vec<u32> = set1.into_iter()
+	.filter(|&x| set2.iter().any(|&y| y == x))
+	.collect();
+	println!("The common values are {:?}", common_elements);
+	// This approach will consume set1
+	
+	println!("The uncommon values are {:?}", uncommon_elements);
+}
+
+// Function to find the intersection of two sets
+fn find_intersection(set1: &Vec<u32>, set2: &Vec<u32>) -> Vec<u32> {
+	let mut common_elements: Vec<u32> = Vec::new();
+	
+	for item in set1 {
+		if set2.iter().any(|&x| x == *item) {
+			common_elements.push(*item);
+		}
+	}
+	common_elements
+}
+
+// Function to compute the union of two sets, excluding common elements
+fn compute_union<'a>(set1: &'a mut Vec<u32>, set2: &'a mut Vec<u32>, common_elements: &'a Vec<u32>) -> Vec<&'a u32> {
+	for item in common_elements {
+		if let Some(pos1) = set1.iter().position(|&x| x == *item) {
+			set1.remove(pos1);
+		}
+		if let Some(pos2) = set2.iter().position(|&x| x == *item) {
+			set2.remove(pos2);
+		}
+	}
+	let union_set = set1.iter()
+	.chain(set2.iter())
+	.chain(common_elements.iter())
+	.collect::<Vec<_>>();
+	union_set
+}
+\end{lstlisting}
+\begin{itemize}
+\item Initializes two vectors with different values.
+\item Computes the intersection of the two vectors.
+\item Calculates the union of the vectors while excluding the intersection.
+\item Includes an alternative method for finding common elements.
+\end{itemize}
+\end{frame}
+
+\end{document}

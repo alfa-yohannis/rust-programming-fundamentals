@@ -39,476 +39,546 @@ showstringspaces=false
 
 % Add table of contents slide
 \begin{frame}{Contents}
-	\vspace{15pt}
-	\begin{columns}[t]
-		\begin{column}{.5\textwidth}
-			\tableofcontents[sections={1-12}]
-		\end{column}
-		\begin{column}{.5\textwidth}
-			\tableofcontents[sections={13-24}]
-		\end{column}
-	\end{columns}
+\vspace{15pt}
+\begin{columns}[t]
+\begin{column}{.5\textwidth}
+	\tableofcontents[sections={1-12}]
+\end{column}
+\begin{column}{.5\textwidth}
+	\tableofcontents[sections={13-24}]
+\end{column}
+\end{columns}
 \end{frame}
 
-	\section{Example 1}
-	\begin{frame}[fragile]
-	\frametitle{Module Definition: \texttt{module\_a.rs}}
-	\begin{lstlisting}[language=Rust]
-		pub fn hello() {
-			println!("Hello from A"); 
-		}
-	\end{lstlisting}
-	\begin{itemize}
-		\item Defines a function \texttt{hello} in \texttt{module\_a}.
-		\item This function prints "Hello from A".
-	\end{itemize}
+\section{Example 1}
+\begin{frame}[fragile]
+\frametitle{Module Definition: \texttt{module\_a.rs}}
+\begin{lstlisting}[language=Rust]
+pub fn hello() {
+	println!("Hello from A"); 
+}
+\end{lstlisting}
+\begin{itemize}
+\item Defines a function \texttt{hello} in \texttt{module\_a}.
+\item This function prints "Hello from A".
+\end{itemize}
 \end{frame}
 
 \begin{frame}[fragile]
-	\frametitle{Module Definition: \texttt{module\_b.rs}}
-	\begin{lstlisting}[language=Rust]
-		pub fn hello() {
-			println!("Hello from B");
-		}
-	\end{lstlisting}
-	\begin{itemize}
-		\item Defines a function \texttt{hello} in \texttt{module\_b}.
-		\item This function prints "Hello from B".
-	\end{itemize}
+\frametitle{Module Definition: \texttt{module\_b.rs}}
+\begin{lstlisting}[language=Rust]
+pub fn hello() {
+	println!("Hello from B");
+}
+\end{lstlisting}
+\begin{itemize}
+\item Defines a function \texttt{hello} in \texttt{module\_b}.
+\item This function prints "Hello from B".
+\end{itemize}
 \end{frame}
 
 \begin{frame}[fragile]
-	\frametitle{Library Module Declaration: \texttt{lib.rs}}
-	\begin{lstlisting}[language=Rust]
-		pub mod module_a; 
-		pub mod module_b; 
-	\end{lstlisting}
-	\begin{itemize}
-		\item Declares the modules \texttt{module\_a} and \texttt{module\_b}.
-		\item These modules are included in the library crate.
-	\end{itemize}
+\frametitle{Library Module Declaration: \texttt{lib.rs}}
+\begin{lstlisting}[language=Rust]
+pub mod module_a; 
+pub mod module_b; 
+\end{lstlisting}
+\begin{itemize}
+\item Declares the modules \texttt{module\_a} and \texttt{module\_b}.
+\item These modules are included in the library crate.
+\end{itemize}
 \end{frame}
 
 \begin{frame}[fragile]
-	\frametitle{Main Function Usage: \texttt{main.rs}}
-	\begin{lstlisting}[language=Rust]
-		fn main() { 
-			code_01::module_a::hello();
-			code_01::module_b::hello(); 
-		}
-	\end{lstlisting}
-	\begin{itemize}
-		\item Calls the \texttt{hello} function from \texttt{module\_a} and \texttt{module\_b}.
-		\item Outputs:
-		\begin{itemize}
-			\item "Hello from A"
-			\item "Hello from B"
-		\end{itemize}
-	\end{itemize}
+\frametitle{Main Function Usage: \texttt{main.rs}}
+\begin{lstlisting}[language=Rust]
+fn main() { 
+	code_01::module_a::hello();
+	code_01::module_b::hello(); 
+}
+\end{lstlisting}
+\begin{itemize}
+\item Calls the \texttt{hello} function from \texttt{module\_a} and \texttt{module\_b}.
+\item Outputs:
+\begin{itemize}
+	\item "Hello from A"
+	\item "Hello from B"
+\end{itemize}
+\end{itemize}
 \end{frame}
 
 \section{Module Definition: module\_a.rs}
 \begin{frame}[fragile]
-	\frametitle{Module Definition: \texttt{module\_a.rs}}
-	\begin{lstlisting}[language=Rust]
-		pub mod arithmetic {
-			pub mod core_operations {
-				pub fn multiply(x: &i32, y: &i32) -> i32 {
-					let product = x * y;
-					show_result(&product);
-					product
-				}
-				fn show_result(product: &i32) {
-					println!("The computed result is {}", product);
-					crate::component_a::display_message();
-				}
-			}
-		}
-	\end{lstlisting}
-	\begin{itemize}
-		\item Defines the \texttt{arithmetic} module with \texttt{core\_operations}.
-		\item Includes a function \texttt{multiply} and a helper function \texttt{show\_result}.
-		\item \texttt{show\_result} prints the result and calls \texttt{display\_message} (commented out).
-	\end{itemize}
+\frametitle{Module Definition: \texttt{module\_a.rs}}
+\vspace{15pt}
+\begin{lstlisting}[language=Rust]
+pub mod arithmetic {
+pub mod core_operations {
+	pub fn multiply(x: &i32, y: &i32) -> i32 {
+		let product = x * y;
+		show_result(&product);
+		product
+	}
+	fn show_result(product: &i32) {
+		println!("The computed result is {}", product);
+		crate::component_a::display_message();
+	} } }
+\end{lstlisting}
+\begin{itemize}
+\item Defines the \texttt{arithmetic} module with \texttt{core\_operations}.
+\item Includes a function \texttt{multiply} and a helper function \texttt{show\_result}.
+\item \texttt{show\_result} prints the result and calls \texttt{display\_message} (commented out).
+\end{itemize}
 \end{frame}
 
 \section{Module Definition: module\_b.rs}
+
 \begin{frame}[fragile]
-	\frametitle{Module Definition: \texttt{module\_b.rs}}
-	\begin{lstlisting}[language=Rust]
-		mod animal {
-			pub struct Characteristics {
-				pub height: u8,
-				pub species: String,
+\frametitle{Module Definition: Struct and Method}
+\vspace{15pt}
+\begin{lstlisting}[language=Rust]
+mod animal {
+	pub struct Characteristics {
+		pub height: u8,
+		pub species: String,
+	}
+	impl Characteristics {
+		pub fn create(new_species: &str) -> Self {
+			Self {
+				species: String::from(new_species),
+				height: 30,
 			}
-			
-			impl Characteristics {
-				pub fn create(new_species: &str) -> Self {
-					Self {
-						species: String::from(new_species),
-						height: 30,
-					}
-				}
-			}
-		}
-		
-		pub fn create_animals() {
-			let mut animal1 = animal::Characteristics::create("Feline");
-			animal1.species = String::from("Canine");
-			
-			let animal2 = animal::Characteristics {
-				height: 50,
-				species: String::from("Avian"),
-			};
-		}
-	\end{lstlisting}
-	\begin{itemize}
-		\item Defines a struct \texttt{Characteristics} in \texttt{module\_b}.
-		\item Includes a method \texttt{create} to instantiate \texttt{Characteristics}.
-		\item Modifies and creates instances of \texttt{Characteristics}.
-	\end{itemize}
+		} } }
+\end{lstlisting}
+\begin{itemize}
+\item Defines a struct \texttt{Characteristics} within the \texttt{animal} module.
+\item Includes a method \texttt{create} to instantiate \texttt{Characteristics}.
+\end{itemize}
 \end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Module Definition: Function \texttt{create\_animals}}
+\begin{lstlisting}[language=Rust]
+pub fn create_animals() {
+	let mut animal1 = animal::Characteristics::create("Feline");
+	animal1.species = String::from("Canine");
+\end{lstlisting}
+\begin{itemize}
+	\item Shows the usage of \texttt{Characteristics::create} in the \texttt{create\_animals} function.
+	\item Demonstrates modification of an instance's fields.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Module Definition: Additional Instance Creation}
+\begin{lstlisting}[language=Rust]
+	let animal2 = animal::Characteristics {
+		height: 50,
+		species: String::from("Avian"),
+	};
+}
+\end{lstlisting}
+\begin{itemize}
+\item Creates another instance of \texttt{Characteristics} with specified values.
+\end{itemize}
+\end{frame}
+
 
 \section{Module Definition: module\_c.rs}
 \begin{frame}[fragile]
-	\frametitle{Module Definition: \texttt{module\_c.rs}}
-	\begin{lstlisting}[language=Rust]
-		mod job_history {
-			pub(crate) enum Employment {
-				FullTime,
-				PartTime,
-				Freelance,
-			}
-		}
-		
-		pub fn calculate_salary() {
-			let job1 = job_history::Employment::FullTime;
-			let job2 = job_history::Employment::PartTime;
-		}
-	\end{lstlisting}
-	\begin{itemize}
-		\item Defines an enum \texttt{Employment} in \texttt{module\_c}.
-		\item Includes a function \texttt{calculate\_salary} that uses the enum.
-	\end{itemize}
+\frametitle{Module Definition: \texttt{module\_c.rs}}
+\begin{lstlisting}[language=Rust]
+mod job_history {
+	pub(crate) enum Employment {
+		FullTime,
+		PartTime,
+		Freelance,
+	}
+}
+pub fn calculate_salary() {
+	let job1 = job_history::Employment::FullTime;
+	let job2 = job_history::Employment::PartTime;
+}
+\end{lstlisting}
+\begin{itemize}
+\item Defines an enum \texttt{Employment} in \texttt{module\_c}.
+\item Includes a function \texttt{calculate\_salary} that uses the enum.
+\end{itemize}
 \end{frame}
 
 \section{Library Modules}
 \begin{frame}[fragile]
-	\frametitle{Library Modules: \texttt{lib.rs}}
-	\begin{lstlisting}[language=Rust]
-		pub mod module_a;
-		pub mod module_b;
-		pub mod module_c;
-	\end{lstlisting}
-	\begin{itemize}
-		\item Defines the public modules \texttt{module\_a}, \texttt{module\_b}, and \texttt{module\_c}.
-		\item These modules contain functions and structs used in the main program.
-	\end{itemize}
+\frametitle{Library Modules: \texttt{lib.rs}}
+\begin{lstlisting}[language=Rust]
+pub mod module_a;
+pub mod module_b;
+pub mod module_c;
+\end{lstlisting}
+\begin{itemize}
+\item Defines the public modules \texttt{module\_a}, \texttt{module\_b}, and \texttt{module\_c}.
+\item These modules contain functions and structs used in the main program.
+\end{itemize}
 \end{frame}
 
 \section{Main Function}
+
 \begin{frame}[fragile]
-	\frametitle{Main Function: \texttt{main.rs}}
-	\begin{lstlisting}[language=Rust]
-		use code::module_a::arithmetic::core_operations::multiply;
-		
-		fn main() {
-			let rectangle = Rectangle {
-				height: 5,
-				breadth: 10,
-			};
-			let rectangle_area = calculate_area(&rectangle.height, &rectangle.breadth);
-		}
-		
-		struct Rectangle {
-			height: i32,
-			breadth: i32,
-		}
-		
-		pub fn calculate_area(height: &i32, breadth: &i32) -> i32 {
-			multiply(height, breadth)
-		}
-	\end{lstlisting}
-	\begin{itemize}
-		\item Imports the \texttt{multiply} function from \texttt{module\_a}.
-		\item Defines a \texttt{Rectangle} struct.
-		\item Includes a \texttt{calculate\_area} function that uses \texttt{multiply}.
-	\end{itemize}
+\frametitle{Main Function: Imports and Struct}
+\begin{lstlisting}[language=Rust]
+use code::module_a::arithmetic::core_operations::multiply;
+
+fn main() {
+	let rectangle = Rectangle {
+		height: 5,
+		breadth: 10,
+	};
+\end{lstlisting}
+\begin{itemize}
+	\item Imports the \texttt{multiply} function from \texttt{module\_a}.
+	\item Defines a \texttt{Rectangle} struct and initializes it in \texttt{main}.
+\end{itemize}
 \end{frame}
 
-\section{Commented Code}
 \begin{frame}[fragile]
-	\frametitle{Commented Code: Previous and Alternative Implementations}
-	\begin{lstlisting}[language=Rust]
-		// fn display_message() {
-			//     println!("This is a message from the primary_module crate");
-			// }
-		
-		// primary_module
-		//         - arithmetic
-		//             - core_operations
-		//         area_of_rectangle()
-		//         display_message()
-		
-		// pub mod arithmetic {
-			//     pub mod core_operations {
-				//         pub fn multiply(x: &i32, y: &i32) -> i32 {
-					//             let product = x * y;
-					//             show_result(&product);
-					//             product
-					//         }
-				//         fn show_result(product: &i32) {
-					//             println!("The computed result is {}", product);
-					//             crate::component_a::display_message();
-					//         }
-				//     }
-			// }
-		
-		// pub fn area_of_rectangle(length: &i32, width: &i32) -> i32 {
-			//     use arithmetic::core_operations::multiply;
-			//     multiply(length, width)
-			// }
-		
-		// mod module_b;
-		// fn main() {
-			//     module_b::create_animals();
-			// }
-		
-		// mod module_c;
-		// fn main() {
-			//     module_c::calculate_salary();
-			// }
-	\end{lstlisting}
-	\begin{itemize}
-		\item Previous function \texttt{display\_message} and module structure.
-		\item Includes an alternative definition of \texttt{arithmetic} and \texttt{core\_operations}.
-		\item Defines the \texttt{area\_of\_rectangle} function using the \texttt{multiply} function.
-		\item Demonstrates how \texttt{module\_b} and \texttt{module\_c} were used previously.
-	\end{itemize}
+\frametitle{Main Function: Area Calculation}
+\begin{lstlisting}[language=Rust]
+	let rectangle_area = calculate_area(&rectangle.height, &rectangle.breadth);
+}
+
+struct Rectangle {
+	height: i32,
+	breadth: i32,
+}
+\end{lstlisting}
+\begin{itemize}
+\item Shows the calculation of the area using the \texttt{calculate\_area} function.
+\item Defines the \texttt{Rectangle} struct.
+\end{itemize}
 \end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Main Function: Calculate Area Function}
+\begin{lstlisting}[language=Rust]
+pub fn calculate_area(height: &i32, breadth: &i32) -> i32 {
+	multiply(height, breadth)
+}
+\end{lstlisting}
+\begin{itemize}
+\item Includes the \texttt{calculate\_area} function which uses \texttt{multiply} to compute the area.
+\end{itemize}
+\end{frame}
+
+
+\section{Commented Code}
+
+\begin{frame}[fragile]
+\frametitle{Commented Code: Previous Implementations}
+\begin{lstlisting}[language=Rust]
+// fn display_message() {
+	//     println!("This is a message from the primary_module crate");
+	// }
+
+// primary_module
+//         - arithmetic
+//             - core_operations
+//         area_of_rectangle()
+//         display_message()
+\end{lstlisting}
+\begin{itemize}
+\item Shows the previous function \texttt{display\_message} and module structure.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Commented Code: Alternative Implementations}
+\begin{lstlisting}[language=Rust]
+// pub mod arithmetic {
+	//     pub mod core_operations {
+		//         pub fn multiply(x: &i32, y: &i32) -> i32 {
+			//             let product = x * y;
+			//             show_result(&product);
+			//             product
+			//         }
+		//         fn show_result(product: &i32) {
+			//             println!("The computed result is {}", product);
+			//             crate::component_a::display_message();
+			//         }
+		//     }
+	// }
+\end{lstlisting}
+\begin{itemize}
+\item Includes an alternative definition of \texttt{arithmetic} and \texttt{core\_operations}.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Commented Code: Function Definitions}
+\begin{lstlisting}[language=Rust]
+// pub fn area_of_rectangle(length: &i32, width: &i32) -> i32 {
+	//     use arithmetic::core_operations::multiply;
+	//     multiply(length, width)
+	// }
+
+// mod module_b;
+// fn main() {
+	//     module_b::create_animals();
+	// }
+
+// mod module_c;
+// fn main() {
+	//     module_c::calculate_salary();
+	// }
+\end{lstlisting}
+\begin{itemize}
+\item Defines the \texttt{area\_of\_rectangle} function and shows usage of \texttt{module\_b} and \texttt{module\_c}.
+\end{itemize}
+\end{frame}
+
 
 \section{Cargo.toml}
 \begin{frame}[fragile]
-	\frametitle{Adding Dependencies: \texttt{Cargo.toml}}
-	\begin{lstlisting}
-		[dependencies]
-		array_tool = "1.0.3"
-	\end{lstlisting}
-	\begin{itemize}
-		\item Add the \texttt{array\_tool} library to your dependencies in \texttt{Cargo.toml}.
-		\item This allows the use of additional vector manipulation functions.
-	\end{itemize}
+\frametitle{Adding Dependencies: \texttt{Cargo.toml}}
+\begin{lstlisting}
+[dependencies]
+array_tool = "1.0.3"
+\end{lstlisting}
+\begin{itemize}
+\item Add the \texttt{array\_tool} library to your dependencies in \texttt{Cargo.toml}.
+\item This allows the use of additional vector manipulation functions.
+\end{itemize}
 \end{frame}
 
 \section{Third-Party Library Usage}
+
 \begin{frame}[fragile]
-	\frametitle{Third-Party Library: \texttt{array\_tool}}
-	\begin{lstlisting}[language=Rust]
-		// -------------------------------------------
-		//          Third-Party Libraries
-		//              - Include in Cargo.toml under the dependencies array_tool = "1.0.3"
-		// -------------------------------------------
-		
-		use array_tool::vec::*;
-		
-		fn main() {
-			let list_a = vec![4, 4, 6, 8, 9, 10];
-			let list_b = vec![4, 5, 6];
-			
-			let overlap = list_a.intersect(list_b.clone());
-			println!("The overlap = {:?}", overlap);
-			
-			let combined_set = list_a.union(list_b.clone());
-			println!("The combined set = {:?}", combined_set);
-			
-			println!("List B repeated three times = {:?}", list_b.times(3));
-		}
-	\end{lstlisting}
-	\begin{itemize}
-		\item Demonstrates the use of the \texttt{array\_tool} library for vector operations.
-		\item Shows how to find the intersection and union of two vectors.
-		\item Illustrates how to repeat the elements of a vector.
-	\end{itemize}
+\frametitle{Third-Party Library: \texttt{array\_tool}}
+\begin{lstlisting}[language=Rust]
+// -------------------------------------------
+//          Third-Party Libraries
+//              - Include in Cargo.toml under the dependencies array_tool = "1.0.3"
+// -------------------------------------------
+\end{lstlisting}
+\begin{itemize}
+\item Includes third-party library \texttt{array\_tool}.
+\item Add to \texttt{Cargo.toml} under dependencies.
+\end{itemize}
 \end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Using \texttt{array\_tool}: Vector Operations}
+\begin{lstlisting}[language=Rust]
+use array_tool::vec::*;
+fn main() {
+	let list_a = vec![4, 4, 6, 8, 9, 10];
+	let list_b = vec![4, 5, 6];
+	
+	let overlap = list_a.intersect(list_b.clone());
+	println!("The overlap = {:?}", overlap);
+	
+	let combined_set = list_a.union(list_b.clone());
+	println!("The combined set = {:?}", combined_set);
+}
+\end{lstlisting}
+\begin{itemize}
+\item Demonstrates vector operations with \texttt{array\_tool}.
+\item Finds the intersection and union of two vectors.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Using \texttt{array\_tool}: Repeating Vectors}
+\begin{lstlisting}[language=Rust]
+	println!("List B repeated three times = {:?}", list_b.times(3));
+}
+\end{lstlisting}
+\begin{itemize}
+\item Shows how to repeat elements of a vector using \texttt{array\_tool}.
+\end{itemize}
+\end{frame}
+
 
 \section{Vector Intersection}
 \begin{frame}[fragile]
-	\frametitle{Vector Intersection}
-	\begin{lstlisting}[language=Rust]
-		fn main() {
-			let list_a = vec![4, 4, 6, 8, 9, 10];
-			let list_b = vec![4, 5, 6];
-			
-			let overlap = list_a.intersect(list_b.clone());
-			println!("The overlap = {:?}", overlap);
-		}
-	\end{lstlisting}
-	\begin{itemize}
-		\item The \texttt{intersect} method finds common elements between \texttt{list\_a} and \texttt{list\_b}.
-		\item \texttt{list\_b} is cloned to avoid borrowing issues.
-	\end{itemize}
+\frametitle{Vector Intersection}
+\begin{lstlisting}[language=Rust]
+fn main() {
+	let list_a = vec![4, 4, 6, 8, 9, 10];
+	let list_b = vec![4, 5, 6];
+	
+	let overlap = list_a.intersect(list_b.clone());
+	println!("The overlap = {:?}", overlap);
+}
+\end{lstlisting}
+\begin{itemize}
+\item The \texttt{intersect} method finds common elements between \texttt{list\_a} and \texttt{list\_b}.
+\item \texttt{list\_b} is cloned to avoid borrowing issues.
+\end{itemize}
 \end{frame}
 
 \section{Vector Union}
 \begin{frame}[fragile]
-	\frametitle{Vector Union}
-	\begin{lstlisting}[language=Rust]
-		fn main() {
-			let list_a = vec![4, 4, 6, 8, 9, 10];
-			let list_b = vec![4, 5, 6];
-			
-			let combined_set = list_a.union(list_b.clone());
-			println!("The combined set = {:?}", combined_set);
-		}
-	\end{lstlisting}
-	\begin{itemize}
-		\item The \texttt{union} method combines unique elements from both vectors.
-		\item \texttt{list\_b} is cloned to avoid borrowing issues.
-	\end{itemize}
+\frametitle{Vector Union}
+\begin{lstlisting}[language=Rust]
+fn main() {
+	let list_a = vec![4, 4, 6, 8, 9, 10];
+	let list_b = vec![4, 5, 6];
+	
+	let combined_set = list_a.union(list_b.clone());
+	println!("The combined set = {:?}", combined_set);
+}
+\end{lstlisting}
+\begin{itemize}
+\item The \texttt{union} method combines unique elements from both vectors.
+\item \texttt{list\_b} is cloned to avoid borrowing issues.
+\end{itemize}
 \end{frame}
 
 \section{Repeating Elements in a Vector}
 \begin{frame}[fragile]
-	\frametitle{Repeating Elements in a Vector}
-	\begin{lstlisting}[language=Rust]
-		fn main() {
-			let list_a = vec![4, 4, 6, 8, 9, 10];
-			let list_b = vec![4, 5, 6];
-			
-			println!("List B repeated three times = {:?}", list_b.times(3));
-		}
-	\end{lstlisting}
-	\begin{itemize}
-		\item The \texttt{times} method repeats the elements of \texttt{list\_b} three times.
-		\item Useful for creating patterns or repeating sequences.
-	\end{itemize}
+\frametitle{Repeating Elements in a Vector}
+\begin{lstlisting}[language=Rust]
+fn main() {
+	let list_a = vec![4, 4, 6, 8, 9, 10];
+	let list_b = vec![4, 5, 6];
+	
+	println!("List B repeated three times = {:?}", list_b.times(3));
+}
+\end{lstlisting}
+\begin{itemize}
+\item The \texttt{times} method repeats the elements of \texttt{list\_b} three times.
+\item Useful for creating patterns or repeating sequences.
+\end{itemize}
 \end{frame}
 
-	\section{Documentation Comments}
+\section{Documentation Comments}
 \begin{frame}[fragile]
-	\frametitle{Documentation Comments}
-	\begin{lstlisting}[language=Rust]
-		/* 
-		These lines are not intended for documentation
-		// Documentation comments begin with three slashes. Ensure your code is error-free and well-documented before publishing.
-		
-		// Command to generate documentation: cargo doc --open
-		*/
-	\end{lstlisting}
-	\begin{itemize}
-		\item Regular comments using \texttt{/* */} and \texttt{//} are not included in documentation.
-		\item Documentation comments use \texttt{///}.
-		\item Generate documentation with \texttt{cargo doc --open}.
-	\end{itemize}
+\frametitle{Documentation Comments}
+\begin{lstlisting}[language=Rust]
+/* 
+These lines are not intended for documentation
+// Documentation comments begin with three slashes. Ensure your code is error-free and well-documented before publishing.
+
+// Command to generate documentation: cargo doc --open
+*/
+\end{lstlisting}
+\begin{itemize}
+\item Regular comments using \texttt{/* */} and \texttt{//} are not included in documentation.
+\item Documentation comments use \texttt{///}.
+\item Generate documentation with \texttt{cargo doc --open}.
+\end{itemize}
 \end{frame}
 
 \section{Module-Level Documentation}
 \begin{frame}[fragile]
-	\frametitle{Module-Level Documentation}
-	\begin{lstlisting}[language=Rust]
-		// The following lines will be included in the documentation 
-		// _______________________________________________
-		
-		//! # Fitness Tracker Crate
-		//! 
-		//! This crate provides utilities for basic fitness calculations and metrics.
-	\end{lstlisting}
-	\begin{itemize}
-		\item Use \texttt{//!} for module-level documentation.
-		\item Provides an overview of the crate and its purpose.
-	\end{itemize}
+\frametitle{Module-Level Documentation}
+\begin{lstlisting}[language=Rust]
+// The following lines will be included in the documentation 
+// _______________________________________________
+
+//! # Fitness Tracker Crate
+//! 
+//! This crate provides utilities for basic fitness calculations and metrics.
+\end{lstlisting}
+\begin{itemize}
+\item Use \texttt{//!} for module-level documentation.
+\item Provides an overview of the crate and its purpose.
+\end{itemize}
 \end{frame}
 
 \section{Function Documentation}
 \begin{frame}[fragile]
-	\frametitle{Function Documentation: \texttt{calculate\_bmi}}
-	\begin{lstlisting}[language=Rust]
-		/// Calculates the Body Mass Index (BMI) from weight and height
-		/// 
-		/// # Examples
-		/// ```  
-		/// let weight_kg = 70;
-		/// let height_m = 1.75;
-		/// let bmi = fitness_tracker::calculate_bmi(weight_kg, height_m);
-		/// assert_eq!(22.86, bmi); 
-		/// ``` 
-		/// # Panics
-		/// Panics if height is zero or negative.
-		/// 
-		/// # Additional Information
-		/// BMI is calculated using the formula weight (kg) / (height (m) * height (m)).
-		
-		pub fn calculate_bmi(weight: f32, height: f32) -> f32 {
-			weight / (height * height)
-		} 
-	\end{lstlisting}
-	\begin{itemize}
-		\item Documents the \texttt{calculate\_bmi} function.
-		\item Includes examples, panic conditions, and additional information.
-	\end{itemize}
+\frametitle{Function Doc: \texttt{calculate\_calories}}
+\begin{lstlisting}[language=Rust]
+/// Calculates daily calorie needs based on BMR and activity level
+/// 
+/// # Examples
+/// ``` 
+/// let bmr = 1500.0;
+/// let activity_factor = 1.2;
+/// let daily_calories = fitness_tracker::calculate_calories(bmr, activity_factor);
+/// assert_eq!(1800.0, daily_calories); 
+/// ```  
+pub fn calculate_calories(bmr: f32, activity_level: f32) -> f32 {
+	bmr * activity_level
+}
+\end{lstlisting}
 \end{frame}
 
-\section{Function Documentation}
 \begin{frame}[fragile]
-	\frametitle{Function Documentation: \texttt{calculate\_calories}}
-	\begin{lstlisting}[language=Rust]
-		/// Calculates the daily calorie needs based on basal metabolic rate (BMR) and activity level
-		/// 
-		/// # Examples
-		/// ``` 
-		/// let bmr = 1500.0;
-		/// let activity_factor = 1.2;
-		/// let daily_calories = fitness_tracker::calculate_calories(bmr, activity_factor);
-		/// assert_eq!(1800.0, daily_calories); 
-		/// ```  
-		pub fn calculate_calories(bmr: f32, activity_level: f32) -> f32 {
-			bmr * activity_level
-		}
-	\end{lstlisting}
-	\begin{itemize}
-		\item Documents the \texttt{calculate\_calories} function.
-		\item Includes examples to demonstrate usage.
-	\end{itemize}
+\frametitle{Discussion: \texttt{calculate\_calories}}
+\begin{itemize}
+\item Documents the \texttt{calculate\_calories} function.
+\item Includes examples to demonstrate usage.
+\end{itemize}
 \end{frame}
 
 \section{Publishing Your Crate}
+
 \begin{frame}[fragile]
-	\frametitle{Publishing Your Crate}
+	\frametitle{Publishing Your Crate: Steps 1-4}
 	\begin{lstlisting}[language=Rust]
 		// Steps for publishing your crate
 		// 1. Create a GitHub account and log in to crates.io.
 		// 2. Navigate to the crates.io dashboard, access API tokens, and create a new token.
 		// 3. Copy the token.
 		// 4. In the terminal, execute cargo login followed by the token from crates.io.
+	\end{lstlisting}
+	\begin{itemize}
+		\item Steps for creating an account and obtaining an API token.
+		\item Logging in to \texttt{crates.io} using the token.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{Publishing Your Crate: Steps 5-7}
+	\begin{lstlisting}[language=Rust]
 		// 5. Go back to crates.io, verify your email in Account Settings -> Profile -> Email -> Save.
-		// 6. Ensure your Cargo.toml includes: version = "0.1.1", edition = "2021", authors = ["Your Name"], description = "Fitness calculation utilities", license = "MIT".
+		// 6. Ensure your Cargo.toml includes:
+		// version = "0.1.1", edition = "2021",
+		// authors = ["Your Name"],
+		// description = "Fitness calculation utilities",
+		// license = "MIT".
 		// 7. Run cargo publish --allow-dirty to publish your crate.
+	\end{lstlisting}
+	\begin{itemize}
+		\item Verifying your email on \texttt{crates.io}.
+		\item Setting up the necessary fields in \texttt{Cargo.toml}.
+		\item Publishing your crate using \texttt{cargo publish --allow-dirty}.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{Publishing Your Crate: Steps 8-11}
+	\begin{lstlisting}[language=Rust]
 		// 8. To update, modify the version number in Cargo.toml and run the publish command again.
 		// 9. Your crate will appear on your dashboard.
 		// 10. From your dashboard, you can yank or unyank versions to control downloads.
 		// 11. Your crate will also be searchable.
 	\end{lstlisting}
 	\begin{itemize}
-		\item Step-by-step guide for publishing your crate to \texttt{crates.io}.
-		\item Important to ensure all fields in \texttt{Cargo.toml} are correctly filled out.
+		\item Updating the crate by modifying the version number and republishing.
+		\item Managing your crate from the \texttt{crates.io} dashboard.
+		\item Yank or unyank versions to control availability.
+		\item Your crate becomes searchable on \texttt{crates.io}.
 	\end{itemize}
 \end{frame}
 
+
 \section{Demonstrating Crate Usage}
 \begin{frame}[fragile]
-	\frametitle{Demonstrating Crate Usage}
-	\begin{lstlisting}[language=Rust]
-		// To demonstrate usage, create a new project and include the following crate:
-		use my_bmi_crate_01::calculate_bmi; 
-		fn main() {
-			println!("BMI for 70kg and 1.75m height: {}", calculate_bmi(70.0, 1.75));
-			println!("Daily calories needed: {}", calculate_calories(1500.0, 1.2));
-		}
-	\end{lstlisting}
-	\begin{itemize}
-		\item Shows how to use the \texttt{calculate\_bmi} and \texttt{calculate\_calories} functions from the crate.
-		\item Practical example of including and using a custom crate in a new project.
-	\end{itemize}
+\frametitle{Demonstrating Crate Usage}
+\begin{lstlisting}[language=Rust]
+// To demonstrate usage, create a new project and include the following crate:
+use my_bmi_crate_01::calculate_bmi; 
+fn main() {
+	println!("BMI for 70kg and 1.75m height: {}", calculate_bmi(70.0, 1.75));
+	println!("Daily calories needed: {}", calculate_calories(1500.0, 1.2));
+}
+\end{lstlisting}
+\begin{itemize}
+\item Shows how to use the \texttt{calculate\_bmi} and \texttt{calculate\_calories} functions from the crate.
+\item Practical example of including and using a custom crate in a new project.
+\end{itemize}
 \end{frame}
 
 \end{document}

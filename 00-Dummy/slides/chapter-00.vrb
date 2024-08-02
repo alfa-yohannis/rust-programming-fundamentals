@@ -1,60 +1,13 @@
-\frametitle{Set Operations: Union and Intersection with Different Values}
+\frametitle{Demonstrating Crate Usage}
 		\begin{lstlisting}[language=Rust]
+			// To demonstrate usage, create a new project and include the following crate:
+			use my_bmi_crate_01::calculate_bmi;
 			fn main() {
-				let mut set1: Vec<u32> = vec![2, 7, 8, 11, 14];
-				let mut set2: Vec<u32> = vec![2, 6, 8, 10, 13, 18, 22];
-				
-				let common_elements = find_intersection(&set1, &set2);
-				println!("\n\n The intersection of the two sets is {:?}", common_elements);
-				
-				let union_set = compute_union(&mut set1, &mut set2, &common_elements);
-				println!("\n\n The union of the sets is {:?}", union_set);
-				
-				// Alternative method for intersection
-				let set1_copy = set1.clone();
-				
-				// Alternative way to find common elements
-				let common_elements: Vec<u32> = set1.into_iter()
-				.filter(|&x| set2.iter().any(|&y| y == x))
-				.collect();
-				println!("The common values are {:?}", common_elements);
-				// This approach will consume set1
-				
-				println!("The uncommon values are {:?}", uncommon_elements);
-			}
-			
-			// Function to find the intersection of two sets
-			fn find_intersection(set1: &Vec<u32>, set2: &Vec<u32>) -> Vec<u32> {
-				let mut common_elements: Vec<u32> = Vec::new();
-				
-				for item in set1 {
-					if set2.iter().any(|&x| x == *item) {
-						common_elements.push(*item);
-					}
-				}
-				common_elements
-			}
-			
-			// Function to compute the union of two sets, excluding common elements
-			fn compute_union<'a>(set1: &'a mut Vec<u32>, set2: &'a mut Vec<u32>, common_elements: &'a Vec<u32>) -> Vec<&'a u32> {
-				for item in common_elements {
-					if let Some(pos1) = set1.iter().position(|&x| x == *item) {
-						set1.remove(pos1);
-					}
-					if let Some(pos2) = set2.iter().position(|&x| x == *item) {
-						set2.remove(pos2);
-					}
-				}
-				let union_set = set1.iter()
-				.chain(set2.iter())
-				.chain(common_elements.iter())
-				.collect::<Vec<_>>();
-				union_set
+				println!("BMI for 70kg and 1.75m height: {}", calculate_bmi(70.0, 1.75));
+				println!("Daily calories needed: {}", calculate_calories(1500.0, 1.2));
 			}
 		\end{lstlisting}
 		\begin{itemize}
-			\item Initializes two vectors with different values.
-			\item Computes the intersection of the two vectors.
-			\item Calculates the union of the vectors while excluding the intersection.
-			\item Includes an alternative method for finding common elements.
+			\item Shows how to use the \texttt{calculate\_bmi} and \texttt{calculate\_calories} functions from the crate.
+			\item Practical example of including and using a custom crate in a new project.
 		\end{itemize}

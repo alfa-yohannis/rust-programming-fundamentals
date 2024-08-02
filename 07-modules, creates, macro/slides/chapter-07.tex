@@ -37,858 +37,478 @@ showstringspaces=false
 
 \frame{\titlepage}
 
-\begin{frame}[fragile]
-\frametitle{Invalid References Example}
-\begin{lstlisting}[language=Rust]
-fn main() {
-	let ref_to_int: &i32;
-	{
-		let local_int = 42;
-		ref_to_int = &local_int;
-	}
-	println!("The referenced value is {}", ref_to_int);
-}
-\end{lstlisting}
-\begin{itemize}
-\item Demonstrates \texttt{invalid reference} due to \texttt{scope}.
-\item \texttt{local\_int} goes out of \texttt{scope}, causing \texttt{ref\_to\_int} to be \texttt{invalid}.
-\end{itemize}
-\end{frame}
-
-\begin{frame}[fragile]
-\frametitle{Function Returning Reference}
-\begin{lstlisting}[language=Rust]
-fn main() {
-	let number = 20;
-	let result = my_function(number);
-	println!("{}", result);
-}
-
-fn my_function(num: i32) -> &i32 {
-	&num
-}
-\end{lstlisting}
-\begin{itemize}
-\item Demonstrates returning a \texttt{reference} to a \texttt{local variable}.
-\item Causes a \texttt{compile-time error} due to \texttt{invalid reference}.
-\end{itemize}
-\end{frame}
-
-\begin{frame}[fragile]
-\frametitle{Comparing References}
-\vspace{15pt}
-\begin{lstlisting}[language=Rust]
-fn main() {
-	let num1 = 15;
-	let num2 = 30;
-	let max_num = max_value(&num1, &num2);
-}
-fn max_value(x: &i32, y: &i32) -> &i32 {
-	if x > y {
-		x
-	} else {
-		y
-	}
-}
-\end{lstlisting}
-\begin{itemize}
-\item Compares two \texttt{integer references} and returns the \texttt{greater one}.
-\item Demonstrates basic \texttt{lifetime} usage in \texttt{function return}.
-\end{itemize}
-\end{frame}
-
-\begin{frame}[fragile]
-\frametitle{String References}
-\vspace{15pt}
-\begin{lstlisting}[language=Rust]
-fn main() {
-	let greeting = "Hi";
-	let message;
-	{
-		let word = String::from("Rust");
-		message = combine_strings(greeting, word.as_str());
-	}
-	println!("\n\n{} \n\n", message);
-}
-fn combine_strings(str1: &str, str2: &str) -> &str {
-	str1
-}
-\end{lstlisting}
-\begin{itemize}
-\item Demonstrates returning one of the \texttt{string references}.
-\item \texttt{combine\_strings} returns the \texttt{first string reference}.
-\end{itemize}
-\end{frame}
-
-\begin{frame}[fragile]
-\frametitle{Dangling Reference Example}
-\vspace{15pt}
-\begin{lstlisting}[language=Rust]
-fn main() {
-	let greeting = "Hello";
-	let message;
-	{
-		let world = String::from("World");
-		message = concatenate(greeting, world.as_str());
-	}
-	println!("{}", message);
-}
-fn concatenate<'a, 'b>(str1: &'a str, str2: &'b str) -> &'a str {
-	str1
-}
-\end{lstlisting}
-\begin{itemize}
-\item Demonstrates \texttt{dangling\ reference} due to \texttt{scope}.
-\item \texttt{world} goes out of \texttt{scope}, causing \texttt{message} to be \texttt{invalid}.
-\end{itemize}
-\end{frame}
-
-\begin{frame}[fragile]
-\frametitle{Function with Lifetimes}
-\vspace{15pt}
-\begin{lstlisting}[language=Rust]
-fn main() {
-	let num1 = 5;
-	let num2 = 10;
-	let result = max_value(&num1, &num2);
-}
-fn max_value(x: &i32, y: &i32) -> i32 {
-	if x > y {
-		*x
-	} else {
-		*y
-	}
-}
-\end{lstlisting}
-\begin{itemize}
-\item Compares two \texttt{integer\ references} and returns the \texttt{larger\ value}.
-\item \texttt{max\_value} function dereferences and returns the larger value.
-\end{itemize}
-\end{frame}
-
-\begin{frame}[fragile]
-\frametitle{Lifetime Parameters Example}
-\begin{lstlisting}[language=Rust]
-fn main() {
-	let num1 = 5;
-	let num2 = 10;
-	let result = max_value(&num1, num2);
-}
-
-fn max_value<'a>(x: &'a i32, y: i32) -> &'a i32 {
-	x
-}
-\end{lstlisting}
-\begin{itemize}
-\item Returns a \texttt{reference} to the \texttt{first\ parameter}.
-\item Demonstrates basic usage of \texttt{lifetime\ parameters}.
-\end{itemize}
-\end{frame}
-
-\begin{frame}[fragile]
-\frametitle{Multiple Lifetimes Example}
-\vspace{15pt}
-\begin{lstlisting}[language=Rust]
-fn main() {
-	let num1 = 5;
-	let num2 = 10;
-	let result = max_value(&num1, &num2);
-}
-fn max_value<'a, 'b>(x: &'a i32, y: &'b i32) -> &'a i32 {
-	if x > y {
-		x
-	} else {
-		y
-	}
-}
-\end{lstlisting}
-\begin{itemize}
-\item Compares two \texttt{integer\ references} with different \texttt{lifetimes}.
-\item Returns the \texttt{larger\ reference} based on \texttt{comparison}.
-\end{itemize}
-\end{frame}
-
-\begin{frame}[fragile]
-	\frametitle{Scoped References Example (Part 1)}
-	\begin{lstlisting}[language=Rust]
-		fn main() {
-			let num1 = 5;
-			{
-				let num2 = 10;
-				let result = max_value(&num1, &num2);
-				println!("The larger value is {}", result);
-			}
-		}
-	\end{lstlisting}
-	\begin{itemize}
-		\item Compares two integer references within a scoped block.
-		\item Prints the larger value within the scope.
-	\end{itemize}
-\end{frame}
-
-\begin{frame}[fragile]
-	\frametitle{Scoped References Example (Part 2)}
-	\begin{lstlisting}[language=Rust]
-		fn max_value<'a, 'b>(x: &'a i32, y: &'a i32) -> &'a i32 {
-			if x > y {
-				x
-			} else {
-				y
-			}
-		}
-	\end{lstlisting}
-	\begin{itemize}
-		\item Defines a function to compare two integer references.
-		\item Returns the larger of the two references.
-	\end{itemize}
-\end{frame}
-
-\begin{frame}[fragile]
-	\frametitle{Struct with Lifetime Example (Part 1)}
+% Add table of contents slide
+\begin{frame}{Contents}
 	\vspace{15pt}
+	\begin{columns}[t]
+		\begin{column}{.5\textwidth}
+			\tableofcontents[sections={1-12}]
+		\end{column}
+		\begin{column}{.5\textwidth}
+			\tableofcontents[sections={13-24}]
+		\end{column}
+	\end{columns}
+\end{frame}
+
+	\section{Example 1}
+	\begin{frame}[fragile]
+	\frametitle{Module Definition: \texttt{module\_a.rs}}
 	\begin{lstlisting}[language=Rust]
-		struct Individual<'a> {
-			name: &'a str,
-			age: i32,
+		pub fn hello() {
+			println!("Hello from A"); 
+		}
+	\end{lstlisting}
+	\begin{itemize}
+		\item Defines a function \texttt{hello} in \texttt{module\_a}.
+		\item This function prints "Hello from A".
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{Module Definition: \texttt{module\_b.rs}}
+	\begin{lstlisting}[language=Rust]
+		pub fn hello() {
+			println!("Hello from B");
+		}
+	\end{lstlisting}
+	\begin{itemize}
+		\item Defines a function \texttt{hello} in \texttt{module\_b}.
+		\item This function prints "Hello from B".
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{Library Module Declaration: \texttt{lib.rs}}
+	\begin{lstlisting}[language=Rust]
+		pub mod module_a; 
+		pub mod module_b; 
+	\end{lstlisting}
+	\begin{itemize}
+		\item Declares the modules \texttt{module\_a} and \texttt{module\_b}.
+		\item These modules are included in the library crate.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{Main Function Usage: \texttt{main.rs}}
+	\begin{lstlisting}[language=Rust]
+		fn main() { 
+			code_01::module_a::hello();
+			code_01::module_b::hello(); 
+		}
+	\end{lstlisting}
+	\begin{itemize}
+		\item Calls the \texttt{hello} function from \texttt{module\_a} and \texttt{module\_b}.
+		\item Outputs:
+		\begin{itemize}
+			\item "Hello from A"
+			\item "Hello from B"
+		\end{itemize}
+	\end{itemize}
+\end{frame}
+
+\section{Module Definition: module\_a.rs}
+\begin{frame}[fragile]
+	\frametitle{Module Definition: \texttt{module\_a.rs}}
+	\begin{lstlisting}[language=Rust]
+		pub mod arithmetic {
+			pub mod core_operations {
+				pub fn multiply(x: &i32, y: &i32) -> i32 {
+					let product = x * y;
+					show_result(&product);
+					product
+				}
+				fn show_result(product: &i32) {
+					println!("The computed result is {}", product);
+					crate::component_a::display_message();
+				}
+			}
+		}
+	\end{lstlisting}
+	\begin{itemize}
+		\item Defines the \texttt{arithmetic} module with \texttt{core\_operations}.
+		\item Includes a function \texttt{multiply} and a helper function \texttt{show\_result}.
+		\item \texttt{show\_result} prints the result and calls \texttt{display\_message} (commented out).
+	\end{itemize}
+\end{frame}
+
+\section{Module Definition: module\_b.rs}
+\begin{frame}[fragile]
+	\frametitle{Module Definition: \texttt{module\_b.rs}}
+	\begin{lstlisting}[language=Rust]
+		mod animal {
+			pub struct Characteristics {
+				pub height: u8,
+				pub species: String,
+			}
+			
+			impl Characteristics {
+				pub fn create(new_species: &str) -> Self {
+					Self {
+						species: String::from(new_species),
+						height: 30,
+					}
+				}
+			}
 		}
 		
-		fn main() {
-			let first_name = "John";
-			let mut person = Individual {
-				name: first_name,
-				age: 40,
+		pub fn create_animals() {
+			let mut animal1 = animal::Characteristics::create("Feline");
+			animal1.species = String::from("Canine");
+			
+			let animal2 = animal::Characteristics {
+				height: 50,
+				species: String::from("Avian"),
 			};
 		}
 	\end{lstlisting}
 	\begin{itemize}
-		\item Defines a struct `Individual` with a lifetime parameter.
-		\item Initializes an instance of `Individual`.
+		\item Defines a struct \texttt{Characteristics} in \texttt{module\_b}.
+		\item Includes a method \texttt{create} to instantiate \texttt{Characteristics}.
+		\item Modifies and creates instances of \texttt{Characteristics}.
 	\end{itemize}
 \end{frame}
 
+\section{Module Definition: module\_c.rs}
 \begin{frame}[fragile]
-	\frametitle{Struct with Lifetime Example (Part 2)}
+	\frametitle{Module Definition: \texttt{module\_c.rs}}
 	\begin{lstlisting}[language=Rust]
-		{
-			let last_name = String::from("Doe");
-			person.name = &last_name;
-		}
-		
-		println!("\n\nThe name of the person is {} and their age is {}\n\n", person.name, person.age);
-	}
-\end{lstlisting}
-\begin{itemize}
-	\item Updates the struct's field within a scoped block.
-	\item Prints the updated struct fields.
-\end{itemize}
-\end{frame}
-
-
-\begin{frame}[fragile]
-\frametitle{Processing Vector References}
-\vspace{15pt}
-\begin{lstlisting}[language=Rust]
-fn main() {
-	let numbers: Vec<i32> = vec![5, 8, 9, 8, 7, 5, 2];
-	let returned_vec = process_vec(&numbers, &numbers);
-}
-fn process_vec<'a>(vec1: &'a [i32], vec2: &'a [i32]) -> &'a [i32] {
-	if 3 > 5 {
-		vec1
-	} else {
-		vec2
-	}
-}
-\end{lstlisting}
-\begin{itemize}
-\item Function takes two \texttt{vector\ references} and returns one of them.
-\item Demonstrates usage of \texttt{lifetime\ parameters} with vectors.
-\end{itemize}
-\end{frame}
-
-
-\begin{frame}[fragile]
-\frametitle{Basic Closure Syntax}
-\begin{lstlisting}[language=Rust]
-fn main() {
-	let a = 5;
-	let calculate_square = || println!("\n\n Square of a is {} \n\n", a * a);
-	calculate_square();
-}
-\end{lstlisting}
-\begin{itemize}
-\item Simple \texttt{closure} without parameters.
-\item Captures the variable \texttt{a} from the environment.
-\end{itemize}
-\end{frame}
-
-\begin{frame}[fragile]
-\frametitle{Closure with Parameters}
-\begin{lstlisting}[language=Rust]
-fn main() {
-	let a = 5;
-	let compute_square = |value: i32| println!("\n\n Square of {} is {} \n\n", value, value * value);
-	compute_square(a);
-	
-	let b = 15;
-	compute_square(b);
-}
-\end{lstlisting}
-\begin{itemize}
-\item Closure that takes an \texttt{input\ parameter}.
-\item Reuse the same closure with different \texttt{values}.
-\end{itemize}
-\end{frame}
-
-\begin{frame}[fragile]
-\frametitle{Multiple Closures with Same Variable Name}
-\vspace{15pt}
-\begin{lstlisting}[language=Rust]
-fn main() {
-	let a = 5;
-	let compute_square = |value: i32| println!("\n\n Square is {}", value * value);
-	let compute_cube = |value: i32| println!("\n\n Cube is {} \n\n", value * value * value);
-	compute_cube(a);
-	
-	let b = 15;
-	compute_cube(b);
-}
-\end{lstlisting}
-\begin{itemize}
-\item Redefining \texttt{closure} with the same name.
-\item Demonstrates shadowing with different \texttt{closure\ logic}.
-\end{itemize}
-\end{frame}
-
-\begin{frame}[fragile]
-\frametitle{Ownership and Closures}
-\begin{lstlisting}[language=Rust]
-fn main() {
-	let display_user_info = |info: String, name: &str, age| println!("{}\n\t{}: {}", info, name, age);
-	let info = String::from("User Information:");
-	let (name, age) = (String::from("Alex"), 30);
-	
-	display_user_info(info, &name, age);
-	println!("Variable after move: {}", name);
-}
-\end{lstlisting}
-\begin{itemize}
-\item Passing ownership and references to \texttt{closure}.
-\item Demonstrates how variables are moved or borrowed.
-\end{itemize}
-\end{frame}
-
-\begin{frame}[fragile]
-\frametitle{Inferring Inputs and Outputs}
-\begin{lstlisting}[language=Rust]
-fn main() {
-	let compute_square = |value| value * value;
-	
-	let a = 5;
-	compute_square(a);
-	
-	let b = 105.5;
-	compute_square(b);
-}
-\end{lstlisting}
-\begin{itemize}
-\item Inference of input and output types in \texttt{closure}.
-\item Demonstrates usage with \texttt{integer\ and\ floating-point\ values}.
-\end{itemize}
-\end{frame}
-
-\begin{frame}[fragile]
-	\frametitle{Passing Closure as Function Argument (1)}
-	\begin{lstlisting}[language=Rust]
-		fn divide<F: Fn(f32) -> bool>(numerator: f32, denominator: f32, is_valid: F) {
-			if is_valid(denominator) {
-				println!("\n\n Result is {} \n\n", numerator / denominator);
-			} else {
-				println!("\n\n Division by zero is not allowed \n\n");
+		mod job_history {
+			pub(crate) enum Employment {
+				FullTime,
+				PartTime,
+				Freelance,
 			}
 		}
+		
+		pub fn calculate_salary() {
+			let job1 = job_history::Employment::FullTime;
+			let job2 = job_history::Employment::PartTime;
+		}
 	\end{lstlisting}
 	\begin{itemize}
-		\item Defines a function `divide` that takes a closure as an argument.
-		\item Uses the closure to check if the denominator is valid before performing division.
+		\item Defines an enum \texttt{Employment} in \texttt{module\_c}.
+		\item Includes a function \texttt{calculate\_salary} that uses the enum.
 	\end{itemize}
 \end{frame}
 
+\section{Library Modules}
 \begin{frame}[fragile]
-	\frametitle{Passing Closure as Function Argument (2)}
+	\frametitle{Library Modules: \texttt{lib.rs}}
+	\begin{lstlisting}[language=Rust]
+		pub mod module_a;
+		pub mod module_b;
+		pub mod module_c;
+	\end{lstlisting}
+	\begin{itemize}
+		\item Defines the public modules \texttt{module\_a}, \texttt{module\_b}, and \texttt{module\_c}.
+		\item These modules contain functions and structs used in the main program.
+	\end{itemize}
+\end{frame}
+
+\section{Main Function}
+\begin{frame}[fragile]
+	\frametitle{Main Function: \texttt{main.rs}}
+	\begin{lstlisting}[language=Rust]
+		use code::module_a::arithmetic::core_operations::multiply;
+		
+		fn main() {
+			let rectangle = Rectangle {
+				height: 5,
+				breadth: 10,
+			};
+			let rectangle_area = calculate_area(&rectangle.height, &rectangle.breadth);
+		}
+		
+		struct Rectangle {
+			height: i32,
+			breadth: i32,
+		}
+		
+		pub fn calculate_area(height: &i32, breadth: &i32) -> i32 {
+			multiply(height, breadth)
+		}
+	\end{lstlisting}
+	\begin{itemize}
+		\item Imports the \texttt{multiply} function from \texttt{module\_a}.
+		\item Defines a \texttt{Rectangle} struct.
+		\item Includes a \texttt{calculate\_area} function that uses \texttt{multiply}.
+	\end{itemize}
+\end{frame}
+
+\section{Commented Code}
+\begin{frame}[fragile]
+	\frametitle{Commented Code: Previous and Alternative Implementations}
+	\begin{lstlisting}[language=Rust]
+		// fn display_message() {
+			//     println!("This is a message from the primary_module crate");
+			// }
+		
+		// primary_module
+		//         - arithmetic
+		//             - core_operations
+		//         area_of_rectangle()
+		//         display_message()
+		
+		// pub mod arithmetic {
+			//     pub mod core_operations {
+				//         pub fn multiply(x: &i32, y: &i32) -> i32 {
+					//             let product = x * y;
+					//             show_result(&product);
+					//             product
+					//         }
+				//         fn show_result(product: &i32) {
+					//             println!("The computed result is {}", product);
+					//             crate::component_a::display_message();
+					//         }
+				//     }
+			// }
+		
+		// pub fn area_of_rectangle(length: &i32, width: &i32) -> i32 {
+			//     use arithmetic::core_operations::multiply;
+			//     multiply(length, width)
+			// }
+		
+		// mod module_b;
+		// fn main() {
+			//     module_b::create_animals();
+			// }
+		
+		// mod module_c;
+		// fn main() {
+			//     module_c::calculate_salary();
+			// }
+	\end{lstlisting}
+	\begin{itemize}
+		\item Previous function \texttt{display\_message} and module structure.
+		\item Includes an alternative definition of \texttt{arithmetic} and \texttt{core\_operations}.
+		\item Defines the \texttt{area\_of\_rectangle} function using the \texttt{multiply} function.
+		\item Demonstrates how \texttt{module\_b} and \texttt{module\_c} were used previously.
+	\end{itemize}
+\end{frame}
+
+\section{Cargo.toml}
+\begin{frame}[fragile]
+	\frametitle{Adding Dependencies: \texttt{Cargo.toml}}
+	\begin{lstlisting}
+		[dependencies]
+		array_tool = "1.0.3"
+	\end{lstlisting}
+	\begin{itemize}
+		\item Add the \texttt{array\_tool} library to your dependencies in \texttt{Cargo.toml}.
+		\item This allows the use of additional vector manipulation functions.
+	\end{itemize}
+\end{frame}
+
+\section{Third-Party Library Usage}
+\begin{frame}[fragile]
+	\frametitle{Third-Party Library: \texttt{array\_tool}}
+	\begin{lstlisting}[language=Rust]
+		// -------------------------------------------
+		//          Third-Party Libraries
+		//              - Include in Cargo.toml under the dependencies array_tool = "1.0.3"
+		// -------------------------------------------
+		
+		use array_tool::vec::*;
+		
+		fn main() {
+			let list_a = vec![4, 4, 6, 8, 9, 10];
+			let list_b = vec![4, 5, 6];
+			
+			let overlap = list_a.intersect(list_b.clone());
+			println!("The overlap = {:?}", overlap);
+			
+			let combined_set = list_a.union(list_b.clone());
+			println!("The combined set = {:?}", combined_set);
+			
+			println!("List B repeated three times = {:?}", list_b.times(3));
+		}
+	\end{lstlisting}
+	\begin{itemize}
+		\item Demonstrates the use of the \texttt{array\_tool} library for vector operations.
+		\item Shows how to find the intersection and union of two vectors.
+		\item Illustrates how to repeat the elements of a vector.
+	\end{itemize}
+\end{frame}
+
+\section{Vector Intersection}
+\begin{frame}[fragile]
+	\frametitle{Vector Intersection}
 	\begin{lstlisting}[language=Rust]
 		fn main() {
-			let check_denominator = |denom: f32| denom != 0.0;
-			divide(5.0, 10.0, check_denominator);
-			divide(54.0, 0.0, check_denominator);
+			let list_a = vec![4, 4, 6, 8, 9, 10];
+			let list_b = vec![4, 5, 6];
+			
+			let overlap = list_a.intersect(list_b.clone());
+			println!("The overlap = {:?}", overlap);
 		}
 	\end{lstlisting}
 	\begin{itemize}
-		\item Demonstrates creating a closure to check for non-zero denominators.
-		\item Calls the `divide` function with different inputs to show how the closure works.
+		\item The \texttt{intersect} method finds common elements between \texttt{list\_a} and \texttt{list\_b}.
+		\item \texttt{list\_b} is cloned to avoid borrowing issues.
 	\end{itemize}
 \end{frame}
 
-
-
+\section{Vector Union}
 \begin{frame}[fragile]
-\frametitle{Basic Closure Syntax}
-\begin{lstlisting}[language=Rust]
-fn main() {
-	let increment_1 = |x: u32| -> u32 { x + 1 };
-	let increment_2 = |x| { x + 1 };
-	let increment_3 = |x| x + 1;
-}
-\end{lstlisting}
-\begin{itemize}
-\item Defines three closures to increment a value.
-\item Demonstrates various ways of specifying closure syntax.
-\end{itemize}
-\end{frame}
-
-\begin{frame}[fragile]
-\frametitle{Borrowing by Immutable Reference}
-\vspace{15pt}
-\begin{lstlisting}[language=Rust]
-fn main() {
-	let mut numbers = vec![1, 2, 3];
-	let display_numbers = || {
-		// Accessing numbers by reference.
-		println!("Numbers: {:?}", numbers);
-	};
-	
-	println!("Numbers: {:?}", numbers);
-	display_numbers();
-	
-	numbers[1] = 15;
-}
-\end{lstlisting}
-\begin{itemize}
-\item Closure accessing \texttt{numbers} immutably.
-\item Changes to \texttt{numbers} after closure invocation.
-\end{itemize}
-\end{frame}
-
-\begin{frame}[fragile]
-\frametitle{Borrowing by Mutable Reference}
-\vspace{15pt}
-\begin{lstlisting}[language=Rust]
-fn main() {
-	let mut numbers = vec![4, 5, 6];
-	let mut add_to_numbers = || {
-		numbers.push(35);
-	};
-	// Displaying numbers is commented out.
-	// numbers[1] = 15;
-	add_to_numbers();
-	// Modifying numbers is commented out.
-	// numbers[2] = 15;
-}
-\end{lstlisting}
-\begin{itemize}
-\item Mutable closure modifying \texttt{numbers}.
-\item Demonstrates the effect of mutable borrowing.
-\end{itemize}
-\end{frame}
-
-\begin{frame}[fragile]
-\frametitle{Moving a Value into a Closure}
-\begin{lstlisting}[language=Rust]
-fn main() {
-	let mut numbers_1 = vec![1, 2, 3];
-	let handle_numbers = || {
-		let numbers_2 = numbers_1;
-	};
-	
-	handle_numbers();
-	// Accessing numbers_1 after moving is not possible.
-	// println!("Numbers 1 = {:?}", numbers_1);
-	// println!("Numbers 2 = {:?}", numbers_2);
-}
-\end{lstlisting}
-\begin{itemize}
-\item Moving \texttt{numbers\_1} into the closure.
-\item Shows that \texttt{numbers\_1} is no longer accessible.
-\end{itemize}
-\end{frame}
-
-
-\begin{frame}[fragile]
-	\frametitle{Function Types: Basic Syntax (Part 1)}
-	\vspace{15pt}
-	\begin{lstlisting}[language=Rust]
-fn maximum(x: i32, y: i32) -> i32 {
-	if x > y {
-		x
-	} else {
-		y
-	}}
-fn minimum(x: i32, y: i32) -> i32 {
-	if x < y {
-		x
-	} else {
-		y
-	}}
-\end{lstlisting}
-	\begin{itemize}
-		\item Defines the `maximum` function to return the larger of two values.
-		\item Defines the `minimum` function to return the smaller of two values.
-	\end{itemize}
-\end{frame}
-
-\begin{frame}[fragile]
-	\frametitle{Function Types: Basic Syntax (Part 2)}
+	\frametitle{Vector Union}
 	\begin{lstlisting}[language=Rust]
 		fn main() {
-			let mut chosen_function = maximum;
-			println!("The minimum of the two values is {}", chosen_function(2, 3));
+			let list_a = vec![4, 4, 6, 8, 9, 10];
+			let list_b = vec![4, 5, 6];
+			
+			let combined_set = list_a.union(list_b.clone());
+			println!("The combined set = {:?}", combined_set);
 		}
 	\end{lstlisting}
 	\begin{itemize}
-		\item Shows how to assign a function to a variable.
-		\item Demonstrates invoking the assigned function through the variable.
+		\item The \texttt{union} method combines unique elements from both vectors.
+		\item \texttt{list\_b} is cloned to avoid borrowing issues.
 	\end{itemize}
 \end{frame}
 
-
+\section{Repeating Elements in a Vector}
 \begin{frame}[fragile]
-\frametitle{Function Types as Parameters}
-\begin{lstlisting}[language=Rust]
-fn display_name(name: &str) {
-	print!("The name is {}", name); 
-}
-fn show_details(func: fn(&str), person: &str, age: i32) {
-	func(person); 
-	println!(" and my age is {}", age);
-}
-fn main() {
-	let (name, age) = (String::from("Nouman"), 40); 
-	show_details(display_name, &name, age);
-}
-\end{lstlisting}
-\begin{itemize}
-\item Passing functions as arguments to other functions.
-\item Function \texttt{show\_details} uses a function pointer to print details.
-\end{itemize}
-\end{frame}
-
-\begin{frame}[fragile]
-\frametitle{Function Types: Applying Twice}
-\vspace{15pt}
-\begin{lstlisting}[language=Rust]
-fn increment(x: i32) -> i32 {
-	x + 1
-}
-
-fn apply_twice(func: fn(i32) -> i32, value: i32) -> i32 {
-	func(value) + func(value)
-}
-
-fn main() {
-	let result = apply_twice(increment, 5);
-	println!("The result is: {}", result);
-}
-\end{lstlisting}
-\begin{itemize}
-\item Demonstrates passing a function as a parameter and applying it multiple times.
-\item Shows how functions can be used as first-class citizens in Rust.
-\end{itemize}
-\end{frame}
-
-
-\begin{frame}[fragile]
-\frametitle{Iterators: Basics}
-\vspace{15pt}
-\begin{lstlisting}[language=Rust]
-let numbers = vec![1, 2, 3, 4, 5, 6, 7];
-let mut iterator = numbers.iter();
-
-println!("The iterator: {:?}", iterator); 
-println!("{:?}", iterator.next());
-println!("{:?}", iterator.next());
-println!("{:?}", iterator.next());
-println!("{:?}", iterator.next());
-println!("{:?}", iterator.next());
-println!("{:?}", iterator.next());
-println!("{:?}", iterator.next());
-println!("{:?}", iterator.next());
-\end{lstlisting}
-\begin{itemize}
-\item Introduction to iterators and their basic usage.
-\item Demonstrates creating and using an iterator with `vec`.
-\end{itemize}
-\end{frame}
-
-\begin{frame}[fragile]
-\frametitle{Useful Functions for Iterators (Part 1)}
-\begin{lstlisting}[language=Rust]
-fn main() {
-	let values: Vec<u32> = vec![0, 1, 2, 4, 5, 6, 9, 8, 7];
-	
-	let any_check = values.iter().any(|&x| x > 0);
-	println!("The result of the any function is {}", any_check);
-	
-	let all_check = values.iter().all(|&x| x > 0);
-	println!("The result of the all function is {}", all_check);
-\end{lstlisting}
-\begin{itemize}
-	\item Uses the `any` function to check if any value is greater than 0.
-	\item Uses the `all` function to check if all values are greater than 0.
-\end{itemize}
-\end{frame}
-
-\begin{frame}[fragile]
-\frametitle{Useful Functions for Iterators (Part 2)}
-\vspace{15pt}
-\begin{lstlisting}[language=Rust]
-	let find_check = values.iter().find(|&&x| x > 0);
-	println!("The result of the find function is {}", find_check.unwrap());
-	
-	let position_check = values.iter().position(|&x| x > 4);
-	println!("The result of the position function is {}", position_check.unwrap());
-	
-	let rposition_check = values.iter().rposition(|&x| x > 4);
-	println!("The result of the rposition function is {}", rposition_check.unwrap());
-\end{lstlisting}
-\begin{itemize}
-	\item Uses the `find` function to locate the first value greater than 0.
-	\item Uses the `position` function to find the position of the first value greater than 4.
-	\item Uses the `rposition` function to find the position of the last value greater than 4.
-\end{itemize}
-\end{frame}
-
-\begin{frame}[fragile]
-\frametitle{Useful Functions for Iterators (Part 3)}
-\vspace{15pt}
-\begin{lstlisting}[language=Rust]
-	let max_check = values.iter().max();
-	println!("The result of the max function is {}", max_check.unwrap());
-	
-	let min_check = values.iter().min();
-	println!("The result of the min function is {}", min_check.unwrap());
-	
-	let sum_check: u32 = values.iter().sum();
-	let product_check: u32 = values.iter().product(); 
-	println!("Sum and product: {} {}", sum_check, product_check);
-\end{lstlisting}
-\begin{itemize}
-	\item Uses the `max` function to find the maximum value.
-	\item Uses the `min` function to find the minimum value.
-	\item Computes the sum and product of all values.
-\end{itemize}
-\end{frame}
-
-\begin{frame}[fragile]
-\frametitle{Useful Functions for Iterators (Part 4)}
-\begin{lstlisting}[language=Rust]
-	let mut reversed_iter = values.iter().rev();
-	println!("The result of applying the rev function {:?}", reversed_iter.collect::<Vec<_>>());
-	println!("Original vector: {:?}", values);
-}
-\end{lstlisting}
-\begin{itemize}
-\item Reverses the iterator using `rev`.
-\item Prints the reversed iterator and the original vector.
-\end{itemize}
-\end{frame}
-
-
-
-\begin{frame}[fragile]
-\frametitle{Iterators: Basics (Part 1)}
-\begin{lstlisting}[language=Rust]
-fn main() {
-	let numbers = vec![0, 1, 2, 3, 4, 5, 6, 7];
-	
-	let filtered_refs = numbers.iter()
-	.filter(|&x| *x >= 5)
-	.collect::<Vec<&u32>>();
-	println!("Filtered references: {:?}", filtered_refs);
-\end{lstlisting}
-\begin{itemize}
-	\item Demonstrates basic usage of iterators with `filter`.
-	\item Shows how to collect filtered references into a vector.
-\end{itemize}
-\end{frame}
-
-\begin{frame}[fragile]
-\frametitle{Iterators: Basics (Part 2)}
-\begin{lstlisting}[language=Rust]
-	let cloned_numbers = numbers.clone();
-	let filtered_values = cloned_numbers.into_iter()
-	.filter(|x| *x >= 5)
-	.collect::<Vec<u32>>();
-	println!("Filtered values: {:?}", filtered_values);
-\end{lstlisting}
-\begin{itemize}
-	\item Clones the original vector.
-	\item Filters values and collects them into a vector.
-\end{itemize}
-\end{frame}
-
-\begin{frame}[fragile]
-\frametitle{Iterators: Basics (Part 3)}
-\begin{lstlisting}[language=Rust]
-	let mapped_values = cloned_numbers.iter()
-	.map(|x| 2 * *x)
-	.collect::<Vec<u32>>();
-	println!("Mapped values: {:?}", mapped_values);
-\end{lstlisting}
-\begin{itemize}
-	\item Maps values to double their original value.
-	\item Collects the mapped values into a vector.
-\end{itemize}
-\end{frame}
-
-\begin{frame}[fragile]
-\frametitle{Iterators: Basics (Part 4)}
-\begin{lstlisting}[language=Rust]
-	let filtered_mapped_values = cloned_numbers.iter()
-	.map(|x| 2 * x)
-	.filter(|x| *x > 10)
-	.collect::<Vec<u32>>();
-	println!("Filtered and mapped values: {:?}", filtered_mapped_values);
-}
-\end{lstlisting}
-\begin{itemize}
-\item Maps values to double their original value.
-\item Filters the mapped values and collects them into a vector.
-\end{itemize}
-\end{frame}
-
-
-\begin{frame}[fragile]
-\frametitle{Iterators: Example of Summing Multiples (1)}
-\begin{lstlisting}[language=Rust]
-fn main() {
-	let mut input = String::new();
-	std::io::stdin()
-	.read_line(&mut input)
-	.expect("Failed to read input.");
-	let limit: u32 = input.trim().parse().expect("Invalid input");
-	
-	let multiples = (1..limit)
-	.filter(|&x| x % 3 == 0 || x % 5 == 0)
-	.collect::<Vec<u32>>();
-\end{lstlisting}
-\begin{itemize}
-	\item Reads an integer from user input.
-	\item Filters numbers less than the input that are multiples of 3 or 5.
-	\item Collects these numbers into a vector.
-\end{itemize}
-\end{frame}
-
-\begin{frame}[fragile]
-\frametitle{Iterators: Example of Summing Multiples (2)}
-\begin{lstlisting}[language=Rust]
-	println!("Multiples of 3 or 5: {:?}", multiples);
-	println!("Sum of multiples: {:?}", multiples.iter().sum::<u32>());
-}
-\end{lstlisting}
-\begin{itemize}
-\item Prints the filtered numbers.
-\item Prints the sum of the filtered numbers.
-\end{itemize}
-\end{frame}
-
-
-\begin{frame}[fragile]
-\frametitle{Set Operations: Initialization and Intersection}
-\begin{lstlisting}[language=Rust]
-fn main() {
-let mut set1: Vec<u32> = vec![2, 7, 8, 11, 14];
-let mut set2: Vec<u32> = vec![2, 6, 8, 10, 13, 18, 22];
-
-let common_elements = find_intersection(&set1, &set2);
-println!("\n\n The intersection of the two sets is {:?}", common_elements);
-\end{lstlisting}
-\begin{itemize}
-\item Initializes two vectors with different values.
-\item Computes the intersection of the two vectors.
-\end{itemize}
-\end{frame}
-
-\begin{frame}[fragile]
-\frametitle{\Large{Union Computation and Alternative Intersection}}
-\vspace{10pt}
-\begin{lstlisting}[language=Rust]
-let union_set = compute_union(&mut set1, &mut set2, &common_elements);
-println!("\n\n The union of the sets is {:?}", union_set);
-
-// Alternative method for intersection
-let set1_copy = set1.clone();
-
-// Alternative way to find common elements
-let common_elements: Vec<u32> = set1.into_iter()
-.filter(|&x| set2.iter().any(|&y| y == x))
-.collect();
-println!("The common values are {:?}", common_elements);
-\end{lstlisting}
-\begin{itemize}
-\item Calculates the union of the vectors while excluding the intersection.
-\item Shows an alternative method for finding common elements.
-\end{itemize}
-\end{frame}
-
-\begin{frame}[fragile]
-\frametitle{Function: Find Intersection}
-\vspace{10pt}
-\begin{lstlisting}[language=Rust]
-// Function to find the intersection of two sets
-fn find_intersection(set1: &Vec<u32>, set2: &Vec<u32>) -> Vec<u32> {
-	let mut common_elements: Vec<u32> = Vec::new();
-	
-	for item in set1 {
-		if set2.iter().any(|&x| x == *item) {
-			common_elements.push(*item);
+	\frametitle{Repeating Elements in a Vector}
+	\begin{lstlisting}[language=Rust]
+		fn main() {
+			let list_a = vec![4, 4, 6, 8, 9, 10];
+			let list_b = vec![4, 5, 6];
+			
+			println!("List B repeated three times = {:?}", list_b.times(3));
 		}
-	}
-	common_elements
-}
-\end{lstlisting}
-\begin{itemize}
-\item Defines the function to find the intersection of two sets.
-\item Collects common elements into a vector.
-\end{itemize}
-\end{frame}
-
-\begin{frame}[fragile]
-\frametitle{Function: Compute Union (Part 1)}
-\vspace{10pt}
-\begin{lstlisting}[language=Rust]
-// Function to compute the union of two sets, excluding common elements
-fn compute_union<'a>(set1: &'a mut Vec<u32>, set2: &'a mut Vec<u32>, common_elements: &'a Vec<u32>) -> Vec<&'a u32> {
-	for item in common_elements {
-		if let Some(pos1) = set1.iter().position(|&x| x == *item) {
-			set1.remove(pos1);
-		}
-		if let Some(pos2) = set2.iter().position(|&x| x == *item) {
-			set2.remove(pos2);
-		}
-	}
-\end{lstlisting}
-\begin{itemize}
-	\item The function to compute the union of two sets, excluding common elements.
-	\item Removes common elements from the original sets.
-\end{itemize}
-\end{frame}
-
-\begin{frame}[fragile]
-\frametitle{Function: Compute Union (Part 2)}
-\begin{lstlisting}[language=Rust]
-	let union_set = set1.iter()
-	.chain(set2.iter())
-	.chain(common_elements.iter())
-	.collect::<Vec<_>>();
-	union_set
-}
-\end{lstlisting}
-\begin{itemize}
-		\item Merges the remaining elements from both sets into a union set.
-		\item Returns the union set.
+	\end{lstlisting}
+	\begin{itemize}
+		\item The \texttt{times} method repeats the elements of \texttt{list\_b} three times.
+		\item Useful for creating patterns or repeating sequences.
 	\end{itemize}
 \end{frame}
 
+	\section{Documentation Comments}
+\begin{frame}[fragile]
+	\frametitle{Documentation Comments}
+	\begin{lstlisting}[language=Rust]
+		/* 
+		These lines are not intended for documentation
+		// Documentation comments begin with three slashes. Ensure your code is error-free and well-documented before publishing.
+		
+		// Command to generate documentation: cargo doc --open
+		*/
+	\end{lstlisting}
+	\begin{itemize}
+		\item Regular comments using \texttt{/* */} and \texttt{//} are not included in documentation.
+		\item Documentation comments use \texttt{///}.
+		\item Generate documentation with \texttt{cargo doc --open}.
+	\end{itemize}
+\end{frame}
 
+\section{Module-Level Documentation}
+\begin{frame}[fragile]
+	\frametitle{Module-Level Documentation}
+	\begin{lstlisting}[language=Rust]
+		// The following lines will be included in the documentation 
+		// _______________________________________________
+		
+		//! # Fitness Tracker Crate
+		//! 
+		//! This crate provides utilities for basic fitness calculations and metrics.
+	\end{lstlisting}
+	\begin{itemize}
+		\item Use \texttt{//!} for module-level documentation.
+		\item Provides an overview of the crate and its purpose.
+	\end{itemize}
+\end{frame}
+
+\section{Function Documentation}
+\begin{frame}[fragile]
+	\frametitle{Function Documentation: \texttt{calculate\_bmi}}
+	\begin{lstlisting}[language=Rust]
+		/// Calculates the Body Mass Index (BMI) from weight and height
+		/// 
+		/// # Examples
+		/// ```  
+		/// let weight_kg = 70;
+		/// let height_m = 1.75;
+		/// let bmi = fitness_tracker::calculate_bmi(weight_kg, height_m);
+		/// assert_eq!(22.86, bmi); 
+		/// ``` 
+		/// # Panics
+		/// Panics if height is zero or negative.
+		/// 
+		/// # Additional Information
+		/// BMI is calculated using the formula weight (kg) / (height (m) * height (m)).
+		
+		pub fn calculate_bmi(weight: f32, height: f32) -> f32 {
+			weight / (height * height)
+		} 
+	\end{lstlisting}
+	\begin{itemize}
+		\item Documents the \texttt{calculate\_bmi} function.
+		\item Includes examples, panic conditions, and additional information.
+	\end{itemize}
+\end{frame}
+
+\section{Function Documentation}
+\begin{frame}[fragile]
+	\frametitle{Function Documentation: \texttt{calculate\_calories}}
+	\begin{lstlisting}[language=Rust]
+		/// Calculates the daily calorie needs based on basal metabolic rate (BMR) and activity level
+		/// 
+		/// # Examples
+		/// ``` 
+		/// let bmr = 1500.0;
+		/// let activity_factor = 1.2;
+		/// let daily_calories = fitness_tracker::calculate_calories(bmr, activity_factor);
+		/// assert_eq!(1800.0, daily_calories); 
+		/// ```  
+		pub fn calculate_calories(bmr: f32, activity_level: f32) -> f32 {
+			bmr * activity_level
+		}
+	\end{lstlisting}
+	\begin{itemize}
+		\item Documents the \texttt{calculate\_calories} function.
+		\item Includes examples to demonstrate usage.
+	\end{itemize}
+\end{frame}
+
+\section{Publishing Your Crate}
+\begin{frame}[fragile]
+	\frametitle{Publishing Your Crate}
+	\begin{lstlisting}[language=Rust]
+		// Steps for publishing your crate
+		// 1. Create a GitHub account and log in to crates.io.
+		// 2. Navigate to the crates.io dashboard, access API tokens, and create a new token.
+		// 3. Copy the token.
+		// 4. In the terminal, execute cargo login followed by the token from crates.io.
+		// 5. Go back to crates.io, verify your email in Account Settings -> Profile -> Email -> Save.
+		// 6. Ensure your Cargo.toml includes: version = "0.1.1", edition = "2021", authors = ["Your Name"], description = "Fitness calculation utilities", license = "MIT".
+		// 7. Run cargo publish --allow-dirty to publish your crate.
+		// 8. To update, modify the version number in Cargo.toml and run the publish command again.
+		// 9. Your crate will appear on your dashboard.
+		// 10. From your dashboard, you can yank or unyank versions to control downloads.
+		// 11. Your crate will also be searchable.
+	\end{lstlisting}
+	\begin{itemize}
+		\item Step-by-step guide for publishing your crate to \texttt{crates.io}.
+		\item Important to ensure all fields in \texttt{Cargo.toml} are correctly filled out.
+	\end{itemize}
+\end{frame}
+
+\section{Demonstrating Crate Usage}
+\begin{frame}[fragile]
+	\frametitle{Demonstrating Crate Usage}
+	\begin{lstlisting}[language=Rust]
+		// To demonstrate usage, create a new project and include the following crate:
+		use my_bmi_crate_01::calculate_bmi; 
+		fn main() {
+			println!("BMI for 70kg and 1.75m height: {}", calculate_bmi(70.0, 1.75));
+			println!("Daily calories needed: {}", calculate_calories(1500.0, 1.2));
+		}
+	\end{lstlisting}
+	\begin{itemize}
+		\item Shows how to use the \texttt{calculate\_bmi} and \texttt{calculate\_calories} functions from the crate.
+		\item Practical example of including and using a custom crate in a new project.
+	\end{itemize}
+\end{frame}
 
 \end{document}

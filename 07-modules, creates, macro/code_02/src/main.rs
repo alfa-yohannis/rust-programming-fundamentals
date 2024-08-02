@@ -1,4 +1,6 @@
-mod module_a;
+use code::module_a::arithmetic::core_operations::multiply;
+
+
 fn main() {
     let rectangle = Rectangle {
         height: 5,
@@ -13,7 +15,6 @@ struct Rectangle {
 }
 
 pub fn calculate_area(height: &i32, breadth: &i32) -> i32 {
-    use module_a::arithmetic::core_operations::multiply;
     multiply(height, breadth)
 }
 

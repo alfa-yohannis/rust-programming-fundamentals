@@ -1,13 +1,13 @@
-\frametitle{Function: Compute Union (Part 2)}
-\begin{lstlisting}[language=Rust]
-	let union_set = set1.iter()
-	.chain(set2.iter())
-	.chain(common_elements.iter())
-	.collect::<Vec<_>>();
-	union_set
-}
-\end{lstlisting}
-\begin{itemize}
-		\item Merges the remaining elements from both sets into a union set.
-		\item Returns the union set.
+\frametitle{Demonstrating Crate Usage}
+	\begin{lstlisting}[language=Rust]
+		// To demonstrate usage, create a new project and include the following crate:
+		use my_bmi_crate_01::calculate_bmi;
+		fn main() {
+			println!("BMI for 70kg and 1.75m height: {}", calculate_bmi(70.0, 1.75));
+			println!("Daily calories needed: {}", calculate_calories(1500.0, 1.2));
+		}
+	\end{lstlisting}
+	\begin{itemize}
+		\item Shows how to use the \texttt{calculate\_bmi} and \texttt{calculate\_calories} functions from the crate.
+		\item Practical example of including and using a custom crate in a new project.
 	\end{itemize}

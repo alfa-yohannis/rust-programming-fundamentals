@@ -8,9 +8,15 @@ use fltk::{
     table::{self, Table},
     window::Window,
 };
+use lazy_static::lazy_static;
+use std::fs::File;
+use std::io::{BufRead, BufReader, Write};
+use std::sync::Mutex;
+use std::thread;
 
 const DEFAULT_USERNAME: &str = "admin";
 const DEFAULT_PASSWORD: &str = "1234";
+const CSV_FILE_PATH: &str = "users.csv";
 
 #[derive(Clone)]
 struct User {
@@ -18,35 +24,14 @@ struct User {
     password: String,
 }
 
-// Global list of users
-lazy_static::lazy_static! {
-    static ref USERS: std::sync::Mutex<Vec<User>> = std::sync::Mutex::new(vec![
-        User {
-            username: "user1".to_string(),
-            password: "pass1".to_string(),
-        },
-        User {
-            username: "user2".to_string(),
-            password: "pass2".to_string(),
-        },
-        User {
-            username: "user3".to_string(),
-            password: "pass3".to_string(),
-        },
-        User {
-            username: "user4".to_string(),
-            password: "pass4".to_string(),
-        },
-        User {
-            username: "user5".to_string(),
-            password: "pass5".to_string(),
-        },
-    ]);
+lazy_static! {
+    static ref USERS: Mutex<Vec<User>> = Mutex::new(Vec::new());
 }
 
 fn main() {
-    let app = app::App::default();
+    load_users_from_csv();
 
+    let app = app::App::default();
     let (screen_width, screen_height) = app::screen_size();
 
     // Main window (login form)
@@ -86,7 +71,8 @@ fn main() {
         move |_| {
             let username = username_input.value();
             let password = password_input.value();
-            if username == DEFAULT_USERNAME && password == DEFAULT_PASSWORD {
+            let users = USERS.lock().unwrap();
+            if users.iter().any(|user| user.username == username && user.password == password) {
                 login_window.hide();
 
                 // User List window created after successful login
@@ -102,14 +88,14 @@ fn main() {
                 let edit_username_input = Input::new(50, 50, 140, 30, "Username:");
                 let mut edit_password_input = Input::new(50, 100, 140, 30, "Password:");
 
-                let mut add_button = Button::new(200, 50, 80, 40, "Add");
-                let mut update_button = Button::new(200, 100, 80, 40, "Update");
-                let mut delete_button = Button::new(200, 150, 80, 40, "Delete");
+                let mut add_button = Button::new(50, 150, 80, 40, "Add");
+                let mut update_button = Button::new(150, 150, 80, 40, "Update");
+                let mut delete_button = Button::new(250, 150, 80, 40, "Delete");
 
                 let mut user_table = Table::new(50, 200, 300, 150, "");
 
                 // Initial table setup
-                user_table.set_rows(USERS.lock().unwrap().len() as i32);
+                user_table.set_rows(users.len() as i32);
                 user_table.set_cols(2);
                 user_table.set_col_header(true);
                 user_table.set_row_header(true);
@@ -165,13 +151,14 @@ fn main() {
                         let new_password = edit_password_input.value();
                         if !new_username.is_empty() && !new_password.is_empty() {
                             users.push(User {
-                                username: new_username,
-                                password: new_password,
+                                username: new_username.clone(),
+                                password: new_password.clone(),
                             });
                             user_table.set_rows(users.len() as i32);
                             user_table.redraw();
                             edit_username_input.set_value("");
                             edit_password_input.set_value("");
+                            thread::spawn(|| persist_users_to_csv());
                         }
                     }
                 });
@@ -186,11 +173,11 @@ fn main() {
                         if let Some(pos) =
                             users.iter().position(|u| u.username == username_to_update)
                         {
-                            users[pos].username = edit_username_input.value();
-                            users[pos].password = edit_password_input.value();
+                            users[pos].password = edit_password_input.value(); // Only update the password
                             user_table.redraw(); // Refresh the table
                             edit_username_input.set_value("");
                             edit_password_input.set_value("");
+                            thread::spawn(|| persist_users_to_csv());
                         }
                     }
                 });
@@ -209,6 +196,7 @@ fn main() {
                             user_table.redraw(); // Refresh the table
                             edit_username_input.set_value("");
                             edit_password_input.set_value("");
+                            thread::spawn(|| persist_users_to_csv());
                         }
                     }
                 });
@@ -274,4 +262,36 @@ fn draw_data(txt: &str, x: i32, y: i32, w: i32, h: i32, selected: bool) {
     draw::draw_text2(txt, x, y, w, h, enums::Align::Center);
     draw::draw_rect(x, y, w, h);
     draw::pop_clip();
+}
+
+fn load_users_from_csv() {
+    let file = File::open(CSV_FILE_PATH).unwrap_or_else(|_| {
+        let mut file = File::create(CSV_FILE_PATH).unwrap();
+        writeln!(file, "username,password").unwrap();
+        file
+    });
+
+    let reader = BufReader::new(file);
+    let mut users = USERS.lock().unwrap();
+    users.clear(); // Clear the existing users list before loading new data
+    for line in reader.lines().skip(1) {
+        if let Ok(line) = line {
+            let mut parts = line.split(',');
+            if let (Some(username), Some(password)) = (parts.next(), parts.next()) {
+                users.push(User {
+                    username: username.to_string(),
+                    password: password.to_string(),
+                });
+            }
+        }
+    }
+}
+
+fn persist_users_to_csv() {
+    let users = USERS.lock().unwrap();
+    let mut file = File::create(CSV_FILE_PATH).unwrap();
+    writeln!(file, "username,password").unwrap(); // Write the header
+    for user in users.iter() {
+        writeln!(file, "{},{}", user.username, user.password).unwrap();
+    }
 }

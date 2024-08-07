@@ -5,7 +5,7 @@ use fltk::{
     frame::Frame,
     input::Input,
     prelude::*,
-    table::{self, Table, TableContext},
+    table::{self, Table},
     window::Window,
 };
 
@@ -73,14 +73,14 @@ fn main() {
     let mut login_button = Button::new(150, 150, 80, 40, "Login");
     let mut clear_button = Button::new(250, 150, 80, 40, "Clear");
 
-    let mut message_frame = Frame::new(150, 200, 200, 40, "");
+    let message_frame = Frame::new(150, 200, 200, 40, "");
 
     login_window.end();
     login_window.show();
 
     login_button.set_callback({
-        let mut username_input = username_input.clone();
-        let mut password_input = password_input.clone();
+        let username_input = username_input.clone();
+        let password_input = password_input.clone();
         let mut message_frame = message_frame.clone();
         let mut login_window = login_window.clone();
         move |_| {
@@ -99,7 +99,7 @@ fn main() {
                 );
                 user_list_window.make_resizable(true);
 
-                let mut edit_username_input = Input::new(50, 50, 140, 30, "Username:");
+                let edit_username_input = Input::new(50, 50, 140, 30, "Username:");
                 let mut edit_password_input = Input::new(50, 100, 140, 30, "Password:");
 
                 let mut add_button = Button::new(200, 50, 80, 40, "Add");
@@ -115,8 +115,6 @@ fn main() {
                 user_table.set_row_header(true);
                 user_table.end();
 
-                let mut selected_row: Option<usize> = None;
-
                 user_table.draw_cell(move |t, ctx, row, col, x, y, w, h| match ctx {
                     table::TableContext::StartPage => draw::set_font(enums::Font::Helvetica, 14),
                     table::TableContext::ColHeader => {
@@ -129,7 +127,11 @@ fn main() {
                     table::TableContext::Cell => {
                         let users = USERS.lock().unwrap();
                         let user = &users[row as usize];
-                        let data = if col == 0 { &user.username } else { &user.password };
+                        let data = if col == 0 {
+                            &user.username
+                        } else {
+                            &user.password
+                        };
                         draw_data(data, x, y, w, h, t.is_selected(row, col));
                     }
                     _ => (),
@@ -181,7 +183,9 @@ fn main() {
                     move |_| {
                         let username_to_update = edit_username_input.value();
                         let mut users = USERS.lock().unwrap();
-                        if let Some(pos) = users.iter().position(|u| u.username == username_to_update) {
+                        if let Some(pos) =
+                            users.iter().position(|u| u.username == username_to_update)
+                        {
                             users[pos].username = edit_username_input.value();
                             users[pos].password = edit_password_input.value();
                             user_table.redraw(); // Refresh the table
@@ -197,7 +201,9 @@ fn main() {
                     move |_| {
                         let username_to_delete = edit_username_input.value();
                         let mut users = USERS.lock().unwrap();
-                        if let Some(pos) = users.iter().position(|u| u.username == username_to_delete) {
+                        if let Some(pos) =
+                            users.iter().position(|u| u.username == username_to_delete)
+                        {
                             users.remove(pos);
                             user_table.set_rows(users.len() as i32);
                             user_table.redraw(); // Refresh the table

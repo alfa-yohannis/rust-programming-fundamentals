@@ -72,7 +72,10 @@ fn main() {
             let username = username_input.value();
             let password = password_input.value();
             let users = USERS.lock().unwrap();
-            if users.iter().any(|user| user.username == username && user.password == password) {
+            if users
+                .iter()
+                .any(|user| user.username == username && user.password == password)
+            {
                 login_window.hide();
 
                 // User List window created after successful login

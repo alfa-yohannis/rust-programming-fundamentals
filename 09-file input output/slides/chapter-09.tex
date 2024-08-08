@@ -38,13 +38,305 @@ showstringspaces=false
 \frame{\titlepage}
 
 % Add table of contents slide
-\begin{frame}
-\tableofcontents
+\begin{frame}{Contents}
+	\vspace{15pt}
+	\begin{columns}[t]
+		\begin{column}{.5\textwidth}
+			\tableofcontents[sections={1-12}]
+		\end{column}
+		\begin{column}{.5\textwidth}
+			\tableofcontents[sections={13-24}]
+		\end{column}
+	\end{columns}
 \end{frame}
 
-\section{Introduction}
+\section{Console-based App - Introduction}
 \begin{frame}
-\frametitle{Introduction}
+	\frametitle{Console-based App - Introduction}
+	\vspace{15pt}
+	This Rust application is a \textbf{console-based} program designed for user management.
+	\begin{itemize}
+		\item It handles user authentication, including login functionality.
+		\item Users can view, add, update, and delete other users.
+		\item User data is stored in and read from a CSV file.
+	\end{itemize}
+\end{frame}
+
+\section{Imports and Constants}
+\begin{frame}[fragile]
+	\frametitle{Imports and Constants}
+	\begin{lstlisting}[language=Rust]
+		use std::fs::File;
+		use std::io::{self, BufRead, BufReader, Write};
+		use std::process;
+		
+		const CSV_FILE_PATH: &str = "users.csv";
+	\end{lstlisting}
+	\begin{itemize}
+		\item Imports necessary modules for file handling, I/O operations, and process management.
+		\item Defines a constant `CSV\_FILE\_PATH` for the path of the CSV file.
+	\end{itemize}
+\end{frame}
+
+\section{User Structure}
+\begin{frame}[fragile]
+	\frametitle{User Structure}
+	\begin{lstlisting}[language=Rust]
+		#[derive(Clone)]
+		struct User {
+			username: String,
+			password: String,
+		}
+	\end{lstlisting}
+	\begin{itemize}
+		\item Defines a `User` structure with `username` and `password` fields.
+		\item The `Clone` trait is derived to allow cloning of `User` instances.
+	\end{itemize}
+\end{frame}
+
+\section{Main Function}
+\begin{frame}[fragile]
+	\frametitle{Main Function}
+	\begin{lstlisting}[language=Rust]
+		fn main() {
+			let mut users = load_users_from_csv();
+			loop {
+				println!("Login Screen");
+				println!("Enter Username:");
+				let username = read_input();
+				println!("Enter Password:");
+				let password = read_input();
+				
+				if users
+				.iter()
+				.any(|user| user.username == username && user.password == password)
+				{
+					println!("Login successful!");
+					user_list_screen(&mut users);
+				} else {
+					println!("Login failed. Incorrect username or password.");
+				}
+			}
+		}
+	\end{lstlisting}
+	\begin{itemize}
+		\item The `main` function initiates the user login loop.
+		\item Prompts for username and password, then validates against the user list.
+		\item On successful login, transitions to the user list screen.
+	\end{itemize}
+\end{frame}
+
+\section{User List Screen}
+\begin{frame}[fragile]
+	\frametitle{User List Screen}
+	\begin{lstlisting}[language=Rust]
+		fn user_list_screen(users: &mut Vec<User>) {
+			loop {
+				println!("User List Screen");
+				println!("1. Add User");
+				println!("2. Update User");
+				println!("3. Delete User");
+				println!("4. List Users");
+				println!("5. Logout");
+				println!("6. Exit Application");
+				
+				let choice = read_input();
+				match choice.as_str() {
+					"1" => add_user(users),
+					"2" => update_user(users),
+					"3" => delete_user(users),
+					"4" => list_users(users),
+					"5" => break, // Return to the login screen
+					"6" => {
+						println!("Exiting application...");
+						process::exit(0); // Terminate the process
+					}
+					_ => println!("Invalid choice, please try again."),
+				}
+			}
+		}
+	\end{lstlisting}
+	\begin{itemize}
+		\item Displays a menu for user management options.
+		\item Handles user choices to add, update, delete users, list users, log out, or exit.
+	\end{itemize}
+\end{frame}
+
+\section{Add User Function}
+\begin{frame}[fragile]
+	\frametitle{Add User Function}
+	\begin{lstlisting}[language=Rust]
+		fn add_user(users: &mut Vec<User>) {
+			println!("Enter new username:");
+			let username = read_input();
+			println!("Enter new password:");
+			let password = read_input();
+			
+			users.push(User {
+				username: username.clone(),
+				password: password.clone(),
+			});
+			
+			persist_users_to_csv(users);
+			println!("User added successfully.");
+		}
+	\end{lstlisting}
+	\begin{itemize}
+		\item Adds a new user to the `users` vector.
+		\item Reads the username and password, then saves the new user.
+		\item Updates the CSV file with the new user list.
+	\end{itemize}
+\end{frame}
+
+\section{Update User Function}
+\begin{frame}[fragile]
+	\frametitle{Update User Function}
+	\begin{lstlisting}[language=Rust]
+		fn update_user(users: &mut Vec<User>) {
+			println!("Enter username to update:");
+			let username = read_input();
+			let mut updated = false;
+			
+			if let Some(pos) = users.iter().position(|u| u.username == username) {
+				println!("Enter new password:");
+				let new_password = read_input();
+				users[pos].password = new_password;
+				updated = true;
+			}
+			
+			if updated {
+				persist_users_to_csv(users);
+				println!("User updated successfully.");
+			} else {
+				println!("User not found.");
+			}
+		}
+	\end{lstlisting}
+	\begin{itemize}
+		\item Updates the password of an existing user.
+		\item Finds the user by username and updates their password if found.
+		\item Saves the changes to the CSV file.
+	\end{itemize}
+\end{frame}
+
+\section{Delete User Function}
+\begin{frame}[fragile]
+	\frametitle{Delete User Function}
+	\begin{lstlisting}[language=Rust]
+		fn delete_user(users: &mut Vec<User>) {
+			println!("Enter username to delete:");
+			let username = read_input();
+			let mut deleted = false;
+			
+			if let Some(pos) = users.iter().position(|u| u.username == username) {
+				users.remove(pos);
+				deleted = true;
+			}
+			
+			if deleted {
+				persist_users_to_csv(users);
+				println!("User deleted successfully.");
+			} else {
+				println!("User not found.");
+			}
+		}
+	\end{lstlisting}
+	\begin{itemize}
+		\item Deletes a user from the `users` vector.
+		\item Finds the user by username and removes them if found.
+		\item Updates the CSV file to reflect the changes.
+	\end{itemize}
+\end{frame}
+
+\section{List User Function}
+\begin{frame}[fragile]
+	\frametitle{List Users Function}
+	\begin{lstlisting}[language=Rust]
+		fn list_users(users: &Vec<User>) {
+			println!("Current Users:");
+			for user in users.iter() {
+				println!("Username: {}, Password: {}", user.username, user.password);
+			}
+		}
+	\end{lstlisting}
+	\begin{itemize}
+		\item Lists all users with their usernames and passwords.
+		\item Iterates over the `users` vector and prints each user's details.
+	\end{itemize}
+\end{frame}
+
+\section{Read Input Function}
+\begin{frame}[fragile]
+	\frametitle{Read Input Function}
+	\begin{lstlisting}[language=Rust]
+		fn read_input() -> String {
+			let mut input = String::new();
+			io::stdin().read_line(&mut input).unwrap();
+			input.trim().to_string()
+		}
+	\end{lstlisting}
+	\begin{itemize}
+		\item Reads a line of input from the user.
+		\item Trims whitespace and returns the input as a `String`.
+	\end{itemize}
+\end{frame}
+
+\section{Load User from CSV}
+\begin{frame}[fragile]
+	\frametitle{Load Users from CSV}
+	\begin{lstlisting}[language=Rust]
+		fn load_users_from_csv() -> Vec<User> {
+			let file = File::open(CSV_FILE_PATH).unwrap_or_else(|_| {
+				let mut file = File::create(CSV_FILE_PATH).unwrap();
+				writeln!(file, "username,password").unwrap();
+				file
+			});
+			
+			let reader = BufReader::new(file);
+			let mut users = Vec::new();
+			for line in reader.lines().skip(1) {
+				if let Ok(line) = line {
+					let mut parts = line.split(',');
+					if let (Some(username), Some(password)) = (parts.next(), parts.next()) {
+						users.push(User {
+							username: username.to_string(),
+							password: password.to_string(),
+						});
+					}
+				}
+			}
+			users
+		}
+	\end{lstlisting}
+	\begin{itemize}
+		\item Loads users from a CSV file.
+		\item Creates the file if it does not exist and writes a header.
+		\item Reads user data and populates the `users` vector.
+	\end{itemize}
+\end{frame}
+
+
+\section{Persist Users to CSV}
+\begin{frame}[fragile]
+	\frametitle{Persist Users to CSV}
+	\begin{lstlisting}[language=Rust]
+		fn persist_users_to_csv(users: &Vec<User>) {
+			let mut file = File::create(CSV_FILE_PATH).unwrap();
+			writeln!(file, "username,password").unwrap(); // Write the header
+			for user in users.iter() {
+				writeln!(file, "{},{}", user.username, user.password).unwrap();
+			}
+		}
+	\end{lstlisting}
+	\begin{itemize}
+		\item Saves the current users to the CSV file.
+		\item Writes the header and user details to the file.
+	\end{itemize}
+\end{frame}
+
+\section{GUI-based App - Introduction}
+\begin{frame}
+\frametitle{GUI-based App - Introduction}
 \begin{itemize}
 \item Creating a simple GUI application using FLTK in Rust.
 \item The application includes a login screen and a user list management screen.
@@ -324,7 +616,7 @@ app.run().unwrap();
 \end{itemize}
 \end{frame}
 
-\section{Utility Functions}
+c
 \begin{frame}[fragile]
 \frametitle{Utility Functions}
 \begin{lstlisting}[language=Rust]

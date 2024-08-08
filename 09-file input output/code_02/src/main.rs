@@ -3,7 +3,7 @@ use fltk::{
     button::Button,
     draw, enums,
     frame::Frame,
-    input::Input,
+    input::{Input, SecretInput},
     prelude::*,
     table::{self, Table},
     window::Window,
@@ -49,7 +49,7 @@ fn main() {
     login_window.make_resizable(true);
 
     let mut username_input = Input::new(150, 50, 200, 30, "Username:");
-    let mut password_input = Input::new(150, 100, 200, 30, "Password:");
+    let mut password_input = SecretInput::new(150, 100, 200, 30, "Password:");
 
     // Set default values
     username_input.set_value(DEFAULT_USERNAME);

@@ -7,166 +7,415 @@
 
 \subtitle{IF120203-Programming Fundamentals}
 
-\title{Session-21:\\\LARGE{Creating and Publishing a Rust Crate}\\ \vspace{10pt}}
-\date[Serial]{\scriptsize {PRU/SPMI/FR-BM-18/0225}}
+\title{Session-22:\\\LARGE{FLTK GUI Application in Rust}\\ \vspace{10pt}}
+\date[Serial]{\scriptsize {PRU/SPMI/FR-BM-18/0226}}
 \author[Pradita]{\small{\textbf{Alfa Yohannis}}}
 
 \lstdefinelanguage{Rust} {
-	keywords={MAX, std, print, fn, let, mut, println, true, false, u8, u16, u32, u64, u128, i8, i16, i32, i64, i128, f32, f64, char, bool, if, else, for, while, loop, match, return},
-	basicstyle=\ttfamily\small,
-	keywordstyle=\color{blue}\bfseries,
-	ndkeywords={self, String, HashMap, Entry, or_insert},
-	ndkeywordstyle=\color{purple}\bfseries,
-	sensitive=true,
-	commentstyle=\color{gray},
-	stringstyle=\color{red},
-	numbers=left,
-	numberstyle=\tiny\color{gray},
-	breaklines=true,
-	frame=lines,
-	backgroundcolor=\color{lightgray!10},
-	tabsize=2,
-	comment=[l]{//},
-	morecomment=[s]{/*}{*/},
-	commentstyle=\color{gray}\ttfamily,
-	stringstyle=\color{purple}\ttfamily,
-	showstringspaces=false
+keywords={::, use, const, struct, fn, let, mut, move, pub, str, i32, if, else, true, false, enum, match, impl, for, while, loop, return, mod, crate, super, Self, self, break, continue, extern, ref, static, type, unsafe, as, async, await, dyn, macro_rules},
+basicstyle=\ttfamily\footnotesize,
+keywordstyle=\color{blue}\bfseries,
+ndkeywords={app, button, draw, enums, frame, input, prelude, table, window, Window, Button, Input, SecretInput, Table, Frame, Lazy, Mutex, new},
+ndkeywordstyle=\color{purple}\bfseries,
+sensitive=true,
+commentstyle=\color{gray},
+stringstyle=\color{red},
+numbers=left,
+numberstyle=\tiny\color{gray},
+breaklines=true,
+frame=lines,
+backgroundcolor=\color{lightgray!10},
+tabsize=2,
+comment=[l]{//},
+morecomment=[s]{/*}{*/},
+commentstyle=\color{gray}\ttfamily,
+stringstyle=\color{purple}\ttfamily,
+showstringspaces=false
 }
 
 \begin{document}
-	
-	\frame{\titlepage}
-	
-	% Add table of contents slide
-	\begin{frame}
-		\tableofcontents
+
+\frame{\titlepage}
+
+% Add table of contents slide
+\begin{frame}
+\tableofcontents
+\end{frame}
+
+\section{Introduction}
+\begin{frame}
+\frametitle{Introduction}
+\begin{itemize}
+\item Creating a simple GUI application using FLTK in Rust.
+\item The application includes a login screen and a user list management screen.
+\item User data is persisted in a CSV file.
+\end{itemize}
+\end{frame}
+
+\section{Dependencies}
+\begin{frame}[fragile]
+\frametitle{Dependencies}
+\begin{lstlisting}[language=Rust]
+use fltk::{
+app, button::Button, draw, enums,
+frame::Frame, input::{Input, SecretInput},
+prelude::*, table::{self, Table},
+window::Window,
+};
+\end{lstlisting}
+\begin{itemize}
+\item FLTK crate for GUI components.
+\item Provides basic components like `Button`, `Input`, `Table`, and `Window`.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Dependencies (cont.)}
+\begin{lstlisting}[language=Rust]
+use lazy_static::lazy_static;
+use std::fs::File;
+use std::io::{BufRead, BufReader, Write};
+use std::sync::Mutex;
+use std::thread;
+\end{lstlisting}
+\begin{itemize}
+\item LazyStatic for global static data.
+\item Standard library modules for file I/O and threading.
+\end{itemize}
+\end{frame}
+
+\section{Constants and User Struct}
+\begin{frame}[fragile]
+\frametitle{Constants and User Struct}
+\begin{lstlisting}[language=Rust]
+const DEFAULT_USERNAME: &str = "admin";
+const DEFAULT_PASSWORD: &str = "1234";
+const CSV_FILE_PATH: &str = "users.csv";
+
+#[derive(Clone)]
+struct User {
+username: String,
+password: String,
+}
+\end{lstlisting}
+\begin{itemize}
+\item Default username and password.
+\item Path to the CSV file for storing user data.
+\item User struct to represent user data.
+\end{itemize}
+\end{frame}
+
+\section{Global Static Users}
+\begin{frame}[fragile]
+\frametitle{Global Static Users}
+\begin{lstlisting}[language=Rust]
+lazy_static! {
+static ref USERS: Mutex<Vec<User>> = Mutex::new(Vec::new());
+}
+\end{lstlisting}
+\begin{itemize}
+\item Use LazyStatic to create a globally accessible list of users.
+\item Mutex to ensure thread-safe access to the user list.
+\end{itemize}
+\end{frame}
+
+\section{Main Function}
+\begin{frame}[fragile]
+\frametitle{Main Function}
+\begin{lstlisting}[language=Rust]
+fn main() {
+load_users_from_csv();
+let app = app::App::default();
+let (screen_width, screen_height) = app::screen_size();
+
+// Main window (login form)
+let window_width = 400;
+let window_height = 300;
+\end{lstlisting}
+\begin{itemize}
+\item Load users from CSV file.
+\item Create the main application.
+\item Define window dimensions.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Main Function (cont.)}
+\vspace{15pt}
+\begin{lstlisting}[language=Rust]
+let mut login_window = Window::new(
+	(screen_width as i32 - window_width) / 2,
+	(screen_height as i32 - window_height) / 2,
+	window_width,
+	window_height,
+	"Login Screen",
+);
+login_window.make_resizable(true);
+let mut username_input = Input::new(150, 50, 200, 30, "Username:");
+let mut password_input = SecretInput::new(150, 100, 200, 30, "Password:");
+\end{lstlisting}
+\begin{itemize}
+\item Create and center the login window.
+\item Make the window resizable.
+\item Add username and password input fields.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Main Function (cont.)}
+\vspace{15pt}
+\begin{lstlisting}[language=Rust]
+// Set default values
+username_input.set_value(DEFAULT_USERNAME);
+password_input.set_value(DEFAULT_PASSWORD);
+
+let mut login_button = Button::new(150, 150, 80, 40, "Login");
+let mut clear_button = Button::new(250, 150, 80, 40, "Clear");
+let message_frame = Frame::new(150, 200, 200, 40, "");
+
+login_window.end();
+login_window.show();
+\end{lstlisting}
+\begin{itemize}
+\item Set default values for inputs.
+\item Add login and clear buttons.
+\item Add a message frame for displaying messages.
+\item Show the login window.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Main Function (cont.)}
+\begin{lstlisting}[language=Rust]
+login_button.set_callback({
+	let username_input = username_input.clone();
+	let password_input = password_input.clone();
+	let mut message_frame = message_frame.clone();
+	let mut login_window = login_window.clone();
+	move |_| {
+		let username = username_input.value();
+		let password = password_input.value();
+	\end{lstlisting}
+	\begin{itemize}
+		\item Set callback for login button.
+		\item Clone input fields and message frame for use in callback.
+		\item Get values from input fields on button click.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{Main Function (cont.)}
+	\vspace{15pt}
+	\begin{lstlisting}[language=Rust]
+let users = USERS.lock().unwrap();
+if users.iter().any(|user| user.username == username && user.password == password) {
+	login_window.hide();
+	let mut user_list_window = Window::new(
+		(screen_width as i32 - window_width) / 2,
+		(screen_height as i32 - window_height) / 2,
+		window_width,
+		window_height,
+		"User List", );
+	user_list_window.make_resizable(true);
+		\end{lstlisting}
+		\begin{itemize}
+			\item Check if username and password are valid.
+			\item Hide login window on successful login.
+			\item Create and show user list window.
+		\end{itemize}
 	\end{frame}
 	
-	\section{Documentation Comments}
+\begin{frame}[fragile]
+	\frametitle{Main Function (cont.)}
+	\begin{lstlisting}[language=Rust]
+let mut user_table = Table::new(10, 10, 380, 280, "");
+user_table.set_rows(users.len() as i32);
+user_table.set_cols(2);
+user_table.set_col_header(true);
+user_table.set_col_width(0, 180);
+user_table.set_col_width(1, 180);
+		\end{lstlisting}
+		\begin{itemize}
+			\item Create user table in user list window.
+			\item Set table dimensions and headers.
+		\end{itemize}
+	\end{frame}
+	
 	\begin{frame}[fragile]
-		\frametitle{Documentation Comments}
+		\frametitle{Main Function (cont.)}
 		\begin{lstlisting}[language=Rust]
-			/* 
-			These lines are not intended for documentation
-			// Documentation comments begin with three slashes. Ensure your code is error-free and well-documented before publishing.
+user_table.set_cell_draw(move |t, ctx, row, col, x, y, w, h| {
+	if ctx == table::TableContext::Cell {
+		let data = match col {
+			0 => users[row as usize].username.clone(),
+			1 => users[row as usize].password.clone(),
+			_ => String::new(),
+		};
+		draw_data(&data, x, y, w, h, t.is_selected(row, col));
+	} 
+	else if ctx == table::TableContext::ColHeader {
+	}
+});
+	\end{lstlisting}
+	\begin{itemize}
+		\item Define cell draw function to display user data.
+		\item Handle column header context in cell draw function.
+	\end{itemize}
+\end{frame}
+
 			
-			// Command to generate documentation: cargo doc --open
-			*/
-		\end{lstlisting}
-		\begin{itemize}
-			\item Regular comments using \texttt{/* */} and \texttt{//} are not included in documentation.
-			\item Documentation comments use \texttt{///}.
-			\item Generate documentation with \texttt{cargo doc --open}.
-		\end{itemize}
-	\end{frame}
-	
-	\section{Module-Level Documentation}
-	\begin{frame}[fragile]
-		\frametitle{Module-Level Documentation}
-		\begin{lstlisting}[language=Rust]
-			// The following lines will be included in the documentation 
-			// _______________________________________________
-			
-			//! # Fitness Tracker Crate
-			//! 
-			//! This crate provides utilities for basic fitness calculations and metrics.
-		\end{lstlisting}
-		\begin{itemize}
-			\item Use \texttt{//!} for module-level documentation.
-			\item Provides an overview of the crate and its purpose.
-		\end{itemize}
-	\end{frame}
-	
-	\section{Function Documentation}
-	\begin{frame}[fragile]
-		\frametitle{Function Documentation: \texttt{calculate\_bmi}}
-		\begin{lstlisting}[language=Rust]
-			/// Calculates the Body Mass Index (BMI) from weight and height
-			/// 
-			/// # Examples
-			/// ```  
-			/// let weight_kg = 70;
-			/// let height_m = 1.75;
-			/// let bmi = fitness_tracker::calculate_bmi(weight_kg, height_m);
-			/// assert_eq!(22.86, bmi); 
-			/// ``` 
-			/// # Panics
-			/// Panics if height is zero or negative.
-			/// 
-			/// # Additional Information
-			/// BMI is calculated using the formula weight (kg) / (height (m) * height (m)).
-			
-			pub fn calculate_bmi(weight: f32, height: f32) -> f32 {
-				weight / (height * height)
-			} 
-		\end{lstlisting}
-		\begin{itemize}
-			\item Documents the \texttt{calculate\_bmi} function.
-			\item Includes examples, panic conditions, and additional information.
-		\end{itemize}
-	\end{frame}
-	
-	\section{Function Documentation}
-	\begin{frame}[fragile]
-		\frametitle{Function Documentation: \texttt{calculate\_calories}}
-		\begin{lstlisting}[language=Rust]
-			/// Calculates the daily calorie needs based on basal metabolic rate (BMR) and activity level
-			/// 
-			/// # Examples
-			/// ``` 
-			/// let bmr = 1500.0;
-			/// let activity_factor = 1.2;
-			/// let daily_calories = fitness_tracker::calculate_calories(bmr, activity_factor);
-			/// assert_eq!(1800.0, daily_calories); 
-			/// ```  
-			pub fn calculate_calories(bmr: f32, activity_level: f32) -> f32 {
-				bmr * activity_level
-			}
-		\end{lstlisting}
-		\begin{itemize}
-			\item Documents the \texttt{calculate\_calories} function.
-			\item Includes examples to demonstrate usage.
-		\end{itemize}
-	\end{frame}
-	
-	\section{Publishing Your Crate}
-	\begin{frame}[fragile]
-		\frametitle{Publishing Your Crate}
-		\begin{lstlisting}[language=Rust]
-			// Steps for publishing your crate
-			// 1. Create a GitHub account and log in to crates.io.
-			// 2. Navigate to the crates.io dashboard, access API tokens, and create a new token.
-			// 3. Copy the token.
-			// 4. In the terminal, execute cargo login followed by the token from crates.io.
-			// 5. Go back to crates.io, verify your email in Account Settings -> Profile -> Email -> Save.
-			// 6. Ensure your Cargo.toml includes: version = "0.1.1", edition = "2021", authors = ["Your Name"], description = "Fitness calculation utilities", license = "MIT".
-			// 7. Run cargo publish --allow-dirty to publish your crate.
-			// 8. To update, modify the version number in Cargo.toml and run the publish command again.
-			// 9. Your crate will appear on your dashboard.
-			// 10. From your dashboard, you can yank or unyank versions to control downloads.
-			// 11. Your crate will also be searchable.
-		\end{lstlisting}
-		\begin{itemize}
-			\item Step-by-step guide for publishing your crate to \texttt{crates.io}.
-			\item Important to ensure all fields in \texttt{Cargo.toml} are correctly filled out.
-		\end{itemize}
-	\end{frame}
-	
-	\section{Demonstrating Crate Usage}
-	\begin{frame}[fragile]
-		\frametitle{Demonstrating Crate Usage}
-		\begin{lstlisting}[language=Rust]
-			// To demonstrate usage, create a new project and include the following crate:
-			use my_bmi_crate_01::calculate_bmi; 
-			fn main() {
-				println!("BMI for 70kg and 1.75m height: {}", calculate_bmi(70.0, 1.75));
-				println!("Daily calories needed: {}", calculate_calories(1500.0, 1.2));
-			}
-		\end{lstlisting}
-		\begin{itemize}
-			\item Shows how to use the \texttt{calculate\_bmi} and \texttt{calculate\_calories} functions from the crate.
-			\item Practical example of including and using a custom crate in a new project.
-		\end{itemize}
-	\end{frame}
-	
+\begin{frame}[fragile]
+	\frametitle{Main Function (cont.)}
+	\begin{lstlisting}[language=Rust]
+		let header = match col {
+			0 => "Username",
+			1 => "Password",
+			_ => "",
+		};
+		draw_header(header, x, y, w, h);
+	}
+});
+user_table.set_selection(0, 0);
+user_table.select_all_rows(true);
+user_table.end();
+\end{lstlisting}
+\begin{itemize}
+\item Draw headers for table columns.
+\item Set initial selection for table.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Main Function (cont.)}
+\begin{lstlisting}[language=Rust]
+user_list_window.end();
+user_list_window.show();
+} else {
+message_frame.set_label("Invalid username or password");
+}
+});
+\end{lstlisting}
+\begin{itemize}
+\item Show user list window on successful login.
+\item Display error message on failed login.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Main Function (cont.)}
+\vspace{15pt}
+\begin{lstlisting}[language=Rust]
+clear_button.set_callback({
+	let username_input = username_input.clone();
+	let password_input = password_input.clone();
+	let mut message_frame = message_frame.clone();
+	move |_| {
+		username_input.set_value(DEFAULT_USERNAME);
+		password_input.set_value(DEFAULT_PASSWORD);
+		message_frame.set_label("");
+	}
+});
+app.run().unwrap();
+\end{lstlisting}
+\begin{itemize}
+\item Set callback for clear button.
+\item Reset input fields and clear message on button click.
+\item Run the application.
+\end{itemize}
+\end{frame}
+
+\section{Utility Functions}
+\begin{frame}[fragile]
+\frametitle{Utility Functions}
+\begin{lstlisting}[language=Rust]
+fn load_users_from_csv() {
+let file = File::open(CSV_FILE_PATH).expect("Failed to open CSV file");
+let reader = BufReader::new(file);
+let mut users = USERS.lock().unwrap();
+for line in reader.lines() {
+	let line = line.expect("Failed to read line");
+	let parts: Vec<&str> = line.split(',').collect();
+\end{lstlisting}
+\begin{itemize}
+	\item Load user data from CSV file.
+	\item Use BufReader for efficient reading.
+	\item Lock the user list for thread-safe access.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Utility Functions (cont.)}
+\begin{lstlisting}[language=Rust]
+	if parts.len() == 2 {
+		let user = User {
+			username: parts[0].to_string(),
+			password: parts[1].to_string(),
+		};
+		users.push(user);
+	}
+}
+}
+
+
+\end{lstlisting}
+\begin{itemize}
+\item Parse CSV lines into user data.
+\item Append parsed users to the global list.
+
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Utility Functions (cont.)}
+\begin{lstlisting}[language=Rust]
+fn save_users_to_csv() {
+let file = File::create(CSV_FILE_PATH).expect("Failed to create CSV file");
+let mut writer = std::io::BufWriter::new(file);
+let users = USERS.lock().unwrap();
+for user in users.iter() {
+	writeln!(writer, "{},{}", user.username, user.password)
+	.expect("Failed to write to CSV file");
+}
+\end{lstlisting}
+\begin{itemize}
+\item Save users to CSV file using BufWriter.
+\item Write user data to CSV file.
+\item Ensure data is written securely.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Utility Functions (cont.)}
+\begin{lstlisting}[language=Rust]
+fn draw_header(header: &str, x: i32, y: i32, w: i32, h: i32) {
+	draw::draw_box(enums::FrameType::FlatBox, x, y, w, h, enums::Color::Dark3);
+	draw::set_draw_color(enums::Color::Black);
+	draw::draw_text2(header, x, y, w, h, enums::Align::Center);
+}
+\end{lstlisting}
+\begin{itemize}
+\item Draw table headers with specified styles.
+\item Enhance the visual appearance of headers.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}[fragile]
+\frametitle{Utility Functions (cont.)}
+\begin{lstlisting}[language=Rust]
+fn draw_data(data: &str, x: i32, y: i32, w: i32, h: i32, selected: bool) {
+	if selected {
+		draw::set_draw_color(enums::Color::Light2);
+		draw::draw_rectf(x, y, w, h);
+	}
+	draw::set_draw_color(enums::Color::Black);
+	draw::draw_text2(data, x, y, w, h, enums::Align::Center);
+}
+\end{lstlisting}
+\begin{itemize}
+\item Draw table data cells with specified styles.
+\item Highlight selected cells.
+\end{itemize}
+\end{frame}
+
 \end{document}

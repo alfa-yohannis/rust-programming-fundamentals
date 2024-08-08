@@ -95,40 +95,54 @@ showstringspaces=false
 \end{frame}
 
 \section{Main Function}
+
 \begin{frame}[fragile]
-	\frametitle{Main Function}
-	\begin{lstlisting}[language=Rust]
-		fn main() {
-			let mut users = load_users_from_csv();
-			loop {
-				println!("Login Screen");
-				println!("Enter Username:");
-				let username = read_input();
-				println!("Enter Password:");
-				let password = read_input();
-				
-				if users
-				.iter()
-				.any(|user| user.username == username && user.password == password)
-				{
-					println!("Login successful!");
-					user_list_screen(&mut users);
-				} else {
-					println!("Login failed. Incorrect username or password.");
-				}
-			}
+\frametitle{Main Function - Part 1}
+\begin{lstlisting}[language=Rust]
+fn main() {
+	let mut users = load_users_from_csv();
+	loop {
+		println!("Login Screen");
+		println!("Enter Username:");
+		let username = read_input();
+		println!("Enter Password:");
+		let password = read_input();
+		\end{lstlisting}
+		\begin{itemize}
+			\item The `main` function starts by loading users from the CSV file.
+			\item Prompts the user to enter their username and password.
+		\end{itemize}
+	\end{frame}
+	
+	\begin{frame}[fragile]
+		\vspace{15pt}
+		\frametitle{Main Function - Part 2}
+		\begin{lstlisting}[language=Rust]
+		if users.iter()
+		.any(|user| user.username == username && user.password == password)
+		{
+			println!("Login successful!");
+			user_list_screen(&mut users);
+		} else {
+			println!("Login failed. Incorrect username or password.");
 		}
-	\end{lstlisting}
-	\begin{itemize}
-		\item The `main` function initiates the user login loop.
-		\item Prompts for username and password, then validates against the user list.
-		\item On successful login, transitions to the user list screen.
-	\end{itemize}
+	}
+}
+\end{lstlisting}
+\begin{itemize}
+\item Validates credentials against the loaded user list.
+\item Displays a login failure message if credentials are incorrect.
+\item On successful login, transitions to the user list screen.
+\item Continues looping until the application is terminated.
+\end{itemize}
 \end{frame}
 
+
 \section{User List Screen}
+
 \begin{frame}[fragile]
-	\frametitle{User List Screen}
+	\frametitle{User List Screen - Part 1}
+	\vspace{15pt}
 	\begin{lstlisting}[language=Rust]
 		fn user_list_screen(users: &mut Vec<User>) {
 			loop {
@@ -142,6 +156,17 @@ showstringspaces=false
 				
 				let choice = read_input();
 				match choice.as_str() {
+				\end{lstlisting}
+				\begin{itemize}
+					\item Displays a menu for user management options.
+					\item Handles choices for adding, updating, deleting users, and listing users.
+				\end{itemize}
+			\end{frame}
+			
+			\begin{frame}[fragile]
+			\vspace{15pt}	
+				\frametitle{User List Screen - Part 2}
+				\begin{lstlisting}[language=Rust]
 					"1" => add_user(users),
 					"2" => update_user(users),
 					"3" => delete_user(users),
@@ -157,14 +182,16 @@ showstringspaces=false
 		}
 	\end{lstlisting}
 	\begin{itemize}
-		\item Displays a menu for user management options.
-		\item Handles user choices to add, update, delete users, list users, log out, or exit.
+		\item Handles user choices to log out or exit the application.
+		\item Terminates the process if the exit option is chosen.
 	\end{itemize}
 \end{frame}
 
+
 \section{Add User Function}
+
 \begin{frame}[fragile]
-	\frametitle{Add User Function}
+	\frametitle{Add User Function - Part 1}
 	\begin{lstlisting}[language=Rust]
 		fn add_user(users: &mut Vec<User>) {
 			println!("Enter new username:");
@@ -176,77 +203,109 @@ showstringspaces=false
 				username: username.clone(),
 				password: password.clone(),
 			});
-			
+		\end{lstlisting}
+		\begin{itemize}
+			\item Prompts for and reads the new username and password.
+			\item Adds the new user to the `users` vector.
+		\end{itemize}
+	\end{frame}
+	
+	\begin{frame}[fragile]
+		\frametitle{Add User Function - Part 2}
+		\begin{lstlisting}[language=Rust]
 			persist_users_to_csv(users);
 			println!("User added successfully.");
 		}
 	\end{lstlisting}
 	\begin{itemize}
-		\item Adds a new user to the `users` vector.
-		\item Reads the username and password, then saves the new user.
 		\item Updates the CSV file with the new user list.
+		\item Prints a confirmation message indicating the user was added successfully.
 	\end{itemize}
 \end{frame}
+
 
 \section{Update User Function}
+
 \begin{frame}[fragile]
-	\frametitle{Update User Function}
-	\begin{lstlisting}[language=Rust]
-		fn update_user(users: &mut Vec<User>) {
-			println!("Enter username to update:");
-			let username = read_input();
-			let mut updated = false;
-			
-			if let Some(pos) = users.iter().position(|u| u.username == username) {
-				println!("Enter new password:");
-				let new_password = read_input();
-				users[pos].password = new_password;
-				updated = true;
-			}
-			
-			if updated {
-				persist_users_to_csv(users);
-				println!("User updated successfully.");
-			} else {
-				println!("User not found.");
-			}
-		}
-	\end{lstlisting}
-	\begin{itemize}
-		\item Updates the password of an existing user.
-		\item Finds the user by username and updates their password if found.
-		\item Saves the changes to the CSV file.
-	\end{itemize}
+\frametitle{Update User Function - Part 1}
+\vspace{15pt}
+\begin{lstlisting}[language=Rust]
+fn update_user(users: &mut Vec<User>) {
+	println!("Enter username to update:");
+	let username = read_input();
+	let mut updated = false;
+	
+	if let Some(pos) = users.iter().position(|u| u.username == username) {
+		println!("Enter new password:");
+		let new_password = read_input();
+		users[pos].password = new_password;
+		updated = true;
+	}
+\end{lstlisting}
+\begin{itemize}
+	\item Prompts for the username to update.
+	\item Searches for the user in the `users` vector.
+	\item Prompts for a new password and updates it if the user is found.
+\end{itemize}
 \end{frame}
 
-\section{Delete User Function}
 \begin{frame}[fragile]
-	\frametitle{Delete User Function}
-	\begin{lstlisting}[language=Rust]
-		fn delete_user(users: &mut Vec<User>) {
-			println!("Enter username to delete:");
-			let username = read_input();
-			let mut deleted = false;
-			
-			if let Some(pos) = users.iter().position(|u| u.username == username) {
-				users.remove(pos);
-				deleted = true;
-			}
-			
-			if deleted {
-				persist_users_to_csv(users);
-				println!("User deleted successfully.");
-			} else {
-				println!("User not found.");
-			}
-		}
-	\end{lstlisting}
-	\begin{itemize}
-		\item Deletes a user from the `users` vector.
-		\item Finds the user by username and removes them if found.
-		\item Updates the CSV file to reflect the changes.
-	\end{itemize}
+\frametitle{Update User Function - Part 2}
+\begin{lstlisting}[language=Rust]
+	if updated {
+		persist_users_to_csv(users);
+		println!("User updated successfully.");
+	} else {
+		println!("User not found.");
+	}
+}
+\end{lstlisting}
+\begin{itemize}
+\item Saves the updated user information to the CSV file if the update was successful.
+\item Prints a success or failure message based on the outcome.
+\end{itemize}
 \end{frame}
+
+
+\section{Delete User Function}
+
+\begin{frame}[fragile]
+\frametitle{Delete User Function - Part 1}
+\begin{lstlisting}[language=Rust]
+fn delete_user(users: &mut Vec<User>) {
+	println!("Enter username to delete:");
+	let username = read_input();
+	let mut deleted = false;
+	
+	if let Some(pos) = users.iter().position(|u| u.username == username) {
+		users.remove(pos);
+		deleted = true;
+	}
+\end{lstlisting}
+\begin{itemize}
+	\item Prompts for the username to delete.
+	\item Searches for the user in the `users` vector.
+	\item Removes the user if found.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Delete User Function - Part 2}
+\begin{lstlisting}[language=Rust]
+	if deleted {
+		persist_users_to_csv(users);
+		println!("User deleted successfully.");
+	} else {
+		println!("User not found.");
+	}
+}
+\end{lstlisting}
+\begin{itemize}
+\item Updates the CSV file if the user was deleted.
+\item Prints a success or failure message based on the outcome.
+\end{itemize}
+\end{frame}
+
 
 \section{List User Function}
 \begin{frame}[fragile]
@@ -282,38 +341,48 @@ showstringspaces=false
 \end{frame}
 
 \section{Load User from CSV}
+
 \begin{frame}[fragile]
-	\frametitle{Load Users from CSV}
-	\begin{lstlisting}[language=Rust]
-		fn load_users_from_csv() -> Vec<User> {
-			let file = File::open(CSV_FILE_PATH).unwrap_or_else(|_| {
-				let mut file = File::create(CSV_FILE_PATH).unwrap();
-				writeln!(file, "username,password").unwrap();
-				file
-			});
-			
-			let reader = BufReader::new(file);
-			let mut users = Vec::new();
-			for line in reader.lines().skip(1) {
-				if let Ok(line) = line {
-					let mut parts = line.split(',');
-					if let (Some(username), Some(password)) = (parts.next(), parts.next()) {
-						users.push(User {
-							username: username.to_string(),
-							password: password.to_string(),
-						});
-					}
-				}
-			}
-			users
-		}
-	\end{lstlisting}
-	\begin{itemize}
-		\item Loads users from a CSV file.
-		\item Creates the file if it does not exist and writes a header.
-		\item Reads user data and populates the `users` vector.
-	\end{itemize}
+\frametitle{Loading Users from CSV - Part 1}
+\begin{lstlisting}[language=Rust]
+fn load_users_from_csv() -> Vec<User> {
+	let file = File::open(CSV_FILE_PATH).unwrap_or_else(|_| {
+		let mut file = File::create(CSV_FILE_PATH).unwrap();
+		writeln!(file, "username,password").unwrap();
+		file
+	});
+	
+	let reader = BufReader::new(file);
+	let mut users = Vec::new();
+\end{lstlisting}
+\begin{itemize}
+	\item Opens the CSV file or creates it if it does not exist.
+	\item Creates a `BufReader` and initializes an empty `users` vector.
+\end{itemize}
 \end{frame}
+	
+\begin{frame}[fragile]
+\frametitle{Loading Users from CSV - Part 2}
+\vspace{15pt}
+\begin{lstlisting}[language=Rust]
+for line in reader.lines().skip(1) {
+	if let Ok(line) = line {
+		let mut parts = line.split(',');
+		if let (Some(username), Some(password)) = (parts.next(), parts.next()) {
+			users.push(User {
+				username: username.to_string(),
+				password: password.to_string(),
+			}); } } }
+users
+}
+\end{lstlisting}
+\begin{itemize}
+\item Reads each line after the header.
+\item Splits the line into `username` and `password`, and creates `User` objects.
+\item Adds the `User` objects to the `users` vector and returns it.
+\end{itemize}
+\end{frame}
+
 
 
 \section{Persist Users to CSV}

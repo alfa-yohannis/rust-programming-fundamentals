@@ -7,15 +7,15 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Debug executable 'simple_gui'",
+            "name": "Debug executable 'calculator'",
             "cargo": {
                 "args": [
                     "build",
-                    "--bin=simple_gui",
-                    "--package=simple_gui"
+                    "--bin=calculator",
+                    "--package=calculator"
                 ],
                 "filter": {
-                    "name": "simple_gui",
+                    "name": "calculator",
                     "kind": "bin"
                 }
             },
@@ -25,16 +25,16 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Debug unit tests in executable 'simple_gui'",
+            "name": "Debug unit tests in executable 'calculator'",
             "cargo": {
                 "args": [
                     "test",
                     "--no-run",
-                    "--bin=simple_gui",
-                    "--package=simple_gui"
+                    "--bin=calculator",
+                    "--package=calculator"
                 ],
                 "filter": {
-                    "name": "simple_gui",
+                    "name": "calculator",
                     "kind": "bin"
                 }
             },

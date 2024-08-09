@@ -1,8 +1,7 @@
 [package]
-name = "simple_gui"
+name = "calculator"
 version = "0.1.0"
 edition = "2021"
 
 [dependencies]
 fltk = "1.4.33"
-

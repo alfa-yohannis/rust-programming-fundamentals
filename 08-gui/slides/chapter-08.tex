@@ -2,17 +2,17 @@
 
 \usepackage[utf8]{inputenc}
 \usepackage{listings} 
+\usepackage{color}
 
 \usetheme{Pradita}
 
 \subtitle{IF120203-Programming Fundamentals}
-
-\title{Session-07:\\\LARGE{Modules in Rust}\\ \vspace{10pt}}
+\title{Session-08:\\\LARGE{Simple GUI with FLTK and Rust\\\vspace{10pt}}}
 \date[Serial]{\scriptsize {PRU/SPMI/FR-BM-18/0222}}
 \author[Pradita]{\small{\textbf{Alfa Yohannis}}}
 
 \lstdefinelanguage{Rust} {
-keywords={MAX, std, print, fn, let, mut, println, true, false, u8, u16, u32, u64, u128, i8, i16, i32, i64, i128, f32, f64, char, bool, if, else, for, while, loop, match, return},
+keywords={let, mut, fn, pub, struct, impl, move, unwrap, true, false, u8, u16, u32, u64, u128, i8, i16, i32, i64, i128, f32, f64, char, bool, if, else, for, while, loop, match, return},
 basicstyle=\ttfamily\small,
 keywordstyle=\color{blue}\bfseries,
 ndkeywords={self, String, Option, Some, None, Result, Ok, Err},
@@ -37,7 +37,7 @@ showstringspaces=false
 
 \frame{\titlepage}
 
-% Add table of contents slide
+% Table of contents slide
 \begin{frame}{Contents}
 \vspace{15pt}
 \begin{columns}[t]
@@ -50,535 +50,326 @@ showstringspaces=false
 \end{columns}
 \end{frame}
 
-\section{Example 1}
+\section{Simple App - Setting Up the FLTK App}
 \begin{frame}[fragile]
-\frametitle{Module Definition: \texttt{module\_a.rs}}
+\frametitle{Simple App - Setting Up the FLTK App}
 \begin{lstlisting}[language=Rust]
-pub fn hello() {
-	println!("Hello from A"); 
-}
+use fltk::{app, button::Button, frame::Frame, input::Input, prelude::*, window::Window};
+
+fn main() {
+	let app = app::App::default();
+	let (screen_width, screen_height) = app::screen_size();
+	let win_width = 400;
+	let win_height = 300;
 \end{lstlisting}
 \begin{itemize}
-\item Defines a function \texttt{hello} in \texttt{module\_a}.
-\item This function prints "Hello from A".
+	\item Imports necessary modules from the \texttt{fltk} crate.
+	\item Creates an instance of the FLTK application and retrieves screen dimensions.
+	\item Defines the dimensions for the application window.
 \end{itemize}
 \end{frame}
 
+\section{Creating the Main Window}
 \begin{frame}[fragile]
-\frametitle{Module Definition: \texttt{module\_b.rs}}
+\frametitle{Creating the Main Window}
 \begin{lstlisting}[language=Rust]
-pub fn hello() {
-	println!("Hello from B");
-}
+	let mut win = Window::new(
+	(screen_width as i32 - win_width) / 2,
+	(screen_height as i32 - win_height) / 2,
+	win_width,
+	win_height,
+	"Greetings App",
+	);
+	win.make_resizable(true);
 \end{lstlisting}
 \begin{itemize}
-\item Defines a function \texttt{hello} in \texttt{module\_b}.
-\item This function prints "Hello from B".
+	\item Initializes the main application window centered on the screen.
+	\item The window is made resizable by the user.
+	\item The window title is set to "Greetings App".
 \end{itemize}
 \end{frame}
 
+\section{Adding Input Fields}
 \begin{frame}[fragile]
-\frametitle{Library Module Declaration: \texttt{lib.rs}}
+\frametitle{Adding Input Fields}
 \begin{lstlisting}[language=Rust]
-pub mod module_a; 
-pub mod module_b; 
+	let name_input = Input::new(160, 50, 200, 30, "Name:");
+	let mut age_input = Input::new(160, 90, 200, 30, "Age:");
 \end{lstlisting}
 \begin{itemize}
-\item Declares the modules \texttt{module\_a} and \texttt{module\_b}.
-\item These modules are included in the library crate.
+	\item Creates an input field for the user's name with a label.
+	\item Adds an input field for the user's age, also labeled.
 \end{itemize}
 \end{frame}
 
+\section{Filtering Numeric Input for Age}
 \begin{frame}[fragile]
-\frametitle{Main Function Usage: \texttt{main.rs}}
-\begin{lstlisting}[language=Rust]
-fn main() { 
-	code_01::module_a::hello();
-	code_01::module_b::hello(); 
-}
-\end{lstlisting}
-\begin{itemize}
-\item Calls the \texttt{hello} function from \texttt{module\_a} and \texttt{module\_b}.
-\item Outputs:
-\begin{itemize}
-	\item "Hello from A"
-	\item "Hello from B"
-\end{itemize}
-\end{itemize}
-\end{frame}
-
-\section{Module Definition: module\_a.rs}
-\begin{frame}[fragile]
-\frametitle{Module Definition: \texttt{module\_a.rs}}
+\frametitle{Filtering Numeric Input for Age}
 \vspace{15pt}
 \begin{lstlisting}[language=Rust]
-pub mod arithmetic {
-pub mod core_operations {
-	pub fn multiply(x: &i32, y: &i32) -> i32 {
-		let product = x * y;
-		show_result(&product);
-		product
-	}
-	fn show_result(product: &i32) {
-		println!("The computed result is {}", product);
-		crate::component_a::display_message();
-	} } }
-\end{lstlisting}
-\begin{itemize}
-\item Defines the \texttt{arithmetic} module with \texttt{core\_operations}.
-\item Includes a function \texttt{multiply} and a helper function \texttt{show\_result}.
-\item \texttt{show\_result} prints the result and calls \texttt{display\_message} (commented out).
-\end{itemize}
-\end{frame}
-
-\section{Module Definition: module\_b.rs}
-
-\begin{frame}[fragile]
-\frametitle{Module Definition: Struct and Method}
-\vspace{15pt}
-\begin{lstlisting}[language=Rust]
-mod animal {
-	pub struct Characteristics {
-		pub height: u8,
-		pub species: String,
-	}
-	impl Characteristics {
-		pub fn create(new_species: &str) -> Self {
-			Self {
-				species: String::from(new_species),
-				height: 30,
+	// Set input to allow only numeric values for the age field
+	age_input.set_callback({
+		let mut age_input = age_input.clone();
+		move |input| {
+			let text = input.value();
+			let filtered: String = text.chars().filter(|c| c.is_numeric()).collect();
+			if text != filtered {
+				age_input.set_value(&filtered);
 			}
-		} } }
+		}
+	});
 \end{lstlisting}
 \begin{itemize}
-\item Defines a struct \texttt{Characteristics} within the \texttt{animal} module.
-\item Includes a method \texttt{create} to instantiate \texttt{Characteristics}.
+	\item Restricts the age input field to accept only numeric values.
+	\item The callback filters out non-numeric characters in real-time.
 \end{itemize}
 \end{frame}
 
+\section{Adding a Button and Display Frame}
 \begin{frame}[fragile]
-\frametitle{Module Definition: Function \texttt{create\_animals}}
+\frametitle{Adding a Button and Display Frame}
 \begin{lstlisting}[language=Rust]
-pub fn create_animals() {
-	let mut animal1 = animal::Characteristics::create("Feline");
-	animal1.species = String::from("Canine");
+	let mut btn = Button::new(160, 130, 80, 40, "Say Hi!");
+	let mut frame = Frame::new(60, 170, 280, 40, "");
 \end{lstlisting}
 \begin{itemize}
-	\item Shows the usage of \texttt{Characteristics::create} in the \texttt{create\_animals} function.
-	\item Demonstrates modification of an instance's fields.
+	\item Creates a button labeled "Say Hi!" to trigger the greeting.
+	\item Adds a frame to display the greeting message.
 \end{itemize}
 \end{frame}
 
+\section{Button Callback}
 \begin{frame}[fragile]
-\frametitle{Module Definition: Additional Instance Creation}
+\frametitle{Button Callback}
 \begin{lstlisting}[language=Rust]
-	let animal2 = animal::Characteristics {
-		height: 50,
-		species: String::from("Avian"),
-	};
+	btn.set_callback(move |_| {
+		let name = name_input.value();
+		let age = age_input.value();
+		frame.set_label(&format!("Hello, {}! I'm {} years old.", name, age));
+	});
+\end{lstlisting}
+\begin{itemize}
+	\item Defines the button's callback function to display the greeting message.
+	\item Retrieves values from the name and age input fields.
+	\item Formats and sets the greeting text in the frame.
+\end{itemize}
+\end{frame}
+
+\section{Running the Application}
+\begin{frame}[fragile]
+\frametitle{Running the Application}
+\begin{lstlisting}[language=Rust]
+	win.end();
+	win.show();
+	
+	app.run().unwrap();
 }
 \end{lstlisting}
 \begin{itemize}
-\item Creates another instance of \texttt{Characteristics} with specified values.
+\item Finalizes the window and displays it to the user.
+\item Runs the FLTK application, ensuring the event loop executes.
 \end{itemize}
 \end{frame}
 
-
-\section{Module Definition: module\_c.rs}
+\section{Calculator - Setting Up the FLTK App}
 \begin{frame}[fragile]
-\frametitle{Module Definition: \texttt{module\_c.rs}}
+\frametitle{Calculator - Setting Up the FLTK App}
 \begin{lstlisting}[language=Rust]
-mod job_history {
-	pub(crate) enum Employment {
-		FullTime,
-		PartTime,
-		Freelance,
+use fltk::{app, button::Button, frame::Frame, prelude::*, window::Window};
+
+fn main() {
+	let app = app::App::default();
+	let (screen_width, screen_height) = app::screen_size();
+	let win_width = 220;
+	let win_height = 340;
+\end{lstlisting}
+\begin{itemize}
+	\item Imports necessary modules from the \texttt{fltk} crate.
+	\item Creates an instance of the FLTK application and retrieves screen dimensions.
+	\item Defines the dimensions for the application window.
+\end{itemize}
+\end{frame}
+
+\section{Creating the Main Window}
+\begin{frame}[fragile]
+\frametitle{Creating the Main Window}
+\begin{lstlisting}[language=Rust]
+	let mut win = Window::new(
+	(screen_width as i32 - win_width) / 2,
+	(screen_height as i32 - win_height) / 2,
+	win_width,
+	win_height,
+	"Simple Calculator",
+	);
+	win.make_resizable(true);
+\end{lstlisting}
+\begin{itemize}
+	\item Initializes the main application window centered on the screen.
+	\item The window is made resizable by the user.
+	\item The window title is set to "Simple Calculator".
+\end{itemize}
+\end{frame}
+
+\section{Adding the Display Frame}
+\begin{frame}[fragile]
+\frametitle{Adding the Display Frame}
+\begin{lstlisting}[language=Rust]
+	// Display frame
+	let mut display = Frame::new(20, 20, 200, 40, "");
+	display.set_label_size(24);
+\end{lstlisting}
+\begin{itemize}
+	\item Adds a display frame to show the calculator's input and output.
+	\item The label size of the display is set to 24 for better visibility.
+\end{itemize}
+\end{frame}
+
+\section{Creating Digit Buttons}
+\begin{frame}[fragile]
+\frametitle{Creating Digit Buttons}
+\begin{lstlisting}[language=Rust]
+	// Button creation
+	let mut buttons = vec![];
+	
+	// Digits 1-9
+	for i in 1..=9 {
+		let x = 20 + ((i - 1) % 3) * 60;
+		let y = 80 + ((i - 1) / 3) * 60;
+		let mut btn = Button::new(x, y, 50, 50, i.to_string().as_str());
+	\end{lstlisting}
+	\begin{itemize}
+		\item Creates buttons for digits 1 through 9.
+		\item The buttons are arranged in a 3x3 grid pattern.
+	\end{itemize}
+\end{frame}
+
+\section{Handling Button Clicks}
+\begin{frame}[fragile]
+	\frametitle{Handling Button Clicks}
+	\begin{lstlisting}[language=Rust]
+		btn.set_callback({
+			let mut display = display.clone();
+			move |_| {
+				let current_text = display.label();
+				display.set_label(&(current_text + &i.to_string()));
+			}
+		});
+		buttons.push(btn);
 	}
-}
-pub fn calculate_salary() {
-	let job1 = job_history::Employment::FullTime;
-	let job2 = job_history::Employment::PartTime;
-}
 \end{lstlisting}
 \begin{itemize}
-\item Defines an enum \texttt{Employment} in \texttt{module\_c}.
-\item Includes a function \texttt{calculate\_salary} that uses the enum.
+	\item Defines callbacks for the digit buttons.
+	\item Appends the digit to the display when the corresponding button is clicked.
 \end{itemize}
 \end{frame}
 
-\section{Library Modules}
+\section{Adding Function Buttons}
+
 \begin{frame}[fragile]
-\frametitle{Library Modules: \texttt{lib.rs}}
+\frametitle{Adding Plus Button}
+\vspace{15pt}
 \begin{lstlisting}[language=Rust]
-pub mod module_a;
-pub mod module_b;
-pub mod module_c;
+// Plus button
+let mut plus_btn = Button::new(20, 260, 50, 50, "+");
+plus_btn.set_callback({
+	let mut display = display.clone();
+	move |_| {
+		let current_text = display.label();
+		if !current_text.is_empty() && !current_text.ends_with('+') {
+			display.set_label(&(current_text + "+"));
+		}
+	}
+});
+buttons.push(plus_btn);
 \end{lstlisting}
 \begin{itemize}
-\item Defines the public modules \texttt{module\_a}, \texttt{module\_b}, and \texttt{module\_c}.
-\item These modules contain functions and structs used in the main program.
+\item Adds the plus button to the calculator.
+\item Prevents consecutive plus signs from being added.
 \end{itemize}
 \end{frame}
 
-\section{Main Function}
-
 \begin{frame}[fragile]
-\frametitle{Main Function: Imports and Struct}
+\frametitle{Adding Zero Button}
 \begin{lstlisting}[language=Rust]
-use code::module_a::arithmetic::core_operations::multiply;
-
-fn main() {
-	let rectangle = Rectangle {
-		height: 5,
-		breadth: 10,
-	};
+// Zero button
+let mut zero_btn = Button::new(80, 260, 50, 50, "0");
+zero_btn.set_callback({
+	let mut display = display.clone();
+	move |_| {
+		let current_text = display.label();
+		display.set_label(&(current_text + "0"));
+	}
+});
+buttons.push(zero_btn);
 \end{lstlisting}
 \begin{itemize}
-	\item Imports the \texttt{multiply} function from \texttt{module\_a}.
-	\item Defines a \texttt{Rectangle} struct and initializes it in \texttt{main}.
+\item Adds the zero button to the calculator.
+\item Appends a zero to the display when clicked.
 \end{itemize}
 \end{frame}
 
+\section{Adding the Equals Button}
 \begin{frame}[fragile]
-\frametitle{Main Function: Area Calculation}
+\frametitle{Adding the Equals Button}
+\vspace{15pt}
 \begin{lstlisting}[language=Rust]
-	let rectangle_area = calculate_area(&rectangle.height, &rectangle.breadth);
-}
-
-struct Rectangle {
-	height: i32,
-	breadth: i32,
-}
+// Equals button
+let mut equals_btn = Button::new(140, 260, 50, 50, "=");
+equals_btn.set_callback({
+	let mut display = display.clone();
+	move |_| {
+		let current_text = display.label();
+		if let Some(result) = calculate_expression(&current_text) {
+			display.set_label(&result.to_string());
+		}
+	}
+});
+buttons.push(equals_btn);
 \end{lstlisting}
 \begin{itemize}
-\item Shows the calculation of the area using the \texttt{calculate\_area} function.
-\item Defines the \texttt{Rectangle} struct.
+\item Adds the equals button to the calculator.
+\item Evaluates the expression and updates the display with the result.
 \end{itemize}
 \end{frame}
 
-\begin{frame}[fragile]
-\frametitle{Main Function: Calculate Area Function}
-\begin{lstlisting}[language=Rust]
-pub fn calculate_area(height: &i32, breadth: &i32) -> i32 {
-	multiply(height, breadth)
-}
-\end{lstlisting}
-\begin{itemize}
-\item Includes the \texttt{calculate\_area} function which uses \texttt{multiply} to compute the area.
-\end{itemize}
-\end{frame}
-
-
-\section{Commented Code}
+\section{Running the Application}
 
 \begin{frame}[fragile]
-\frametitle{Commented Code: Previous Implementations}
-\begin{lstlisting}[language=Rust]
-// fn display_message() {
-	//     println!("This is a message from the primary_module crate");
-	// }
-
-// primary_module
-//         - arithmetic
-//             - core_operations
-//         area_of_rectangle()
-//         display_message()
-\end{lstlisting}
-\begin{itemize}
-\item Shows the previous function \texttt{display\_message} and module structure.
-\end{itemize}
-\end{frame}
-
-\begin{frame}[fragile]
-\frametitle{Commented Code: Alternative Implementations}
-\begin{lstlisting}[language=Rust]
-// pub mod arithmetic {
-	//     pub mod core_operations {
-		//         pub fn multiply(x: &i32, y: &i32) -> i32 {
-			//             let product = x * y;
-			//             show_result(&product);
-			//             product
-			//         }
-		//         fn show_result(product: &i32) {
-			//             println!("The computed result is {}", product);
-			//             crate::component_a::display_message();
-			//         }
-		//     }
-	// }
-\end{lstlisting}
-\begin{itemize}
-\item Includes an alternative definition of \texttt{arithmetic} and \texttt{core\_operations}.
-\end{itemize}
-\end{frame}
-
-\begin{frame}[fragile]
-\frametitle{Commented Code: Function Definitions}
-\begin{lstlisting}[language=Rust]
-// pub fn area_of_rectangle(length: &i32, width: &i32) -> i32 {
-	//     use arithmetic::core_operations::multiply;
-	//     multiply(length, width)
-	// }
-
-// mod module_b;
-// fn main() {
-	//     module_b::create_animals();
-	// }
-
-// mod module_c;
-// fn main() {
-	//     module_c::calculate_salary();
-	// }
-\end{lstlisting}
-\begin{itemize}
-\item Defines the \texttt{area\_of\_rectangle} function and shows usage of \texttt{module\_b} and \texttt{module\_c}.
-\end{itemize}
-\end{frame}
-
-
-\section{Cargo.toml}
-\begin{frame}[fragile]
-\frametitle{Adding Dependencies: \texttt{Cargo.toml}}
-\begin{lstlisting}
-[dependencies]
-array_tool = "1.0.3"
-\end{lstlisting}
-\begin{itemize}
-\item Add the \texttt{array\_tool} library to your dependencies in \texttt{Cargo.toml}.
-\item This allows the use of additional vector manipulation functions.
-\end{itemize}
-\end{frame}
-
-\section{Third-Party Library Usage}
-
-\begin{frame}[fragile]
-\frametitle{Third-Party Library: \texttt{array\_tool}}
-\begin{lstlisting}[language=Rust]
-// -------------------------------------------
-//          Third-Party Libraries
-//              - Include in Cargo.toml under the dependencies array_tool = "1.0.3"
-// -------------------------------------------
-\end{lstlisting}
-\begin{itemize}
-\item Includes third-party library \texttt{array\_tool}.
-\item Add to \texttt{Cargo.toml} under dependencies.
-\end{itemize}
-\end{frame}
-
-\begin{frame}[fragile]
-\frametitle{Using \texttt{array\_tool}: Vector Operations}
-\begin{lstlisting}[language=Rust]
-use array_tool::vec::*;
-fn main() {
-	let list_a = vec![4, 4, 6, 8, 9, 10];
-	let list_b = vec![4, 5, 6];
-	
-	let overlap = list_a.intersect(list_b.clone());
-	println!("The overlap = {:?}", overlap);
-	
-	let combined_set = list_a.union(list_b.clone());
-	println!("The combined set = {:?}", combined_set);
-}
-\end{lstlisting}
-\begin{itemize}
-\item Demonstrates vector operations with \texttt{array\_tool}.
-\item Finds the intersection and union of two vectors.
-\end{itemize}
-\end{frame}
-
-\begin{frame}[fragile]
-\frametitle{Using \texttt{array\_tool}: Repeating Vectors}
-\begin{lstlisting}[language=Rust]
-	println!("List B repeated three times = {:?}", list_b.times(3));
-}
-\end{lstlisting}
-\begin{itemize}
-\item Shows how to repeat elements of a vector using \texttt{array\_tool}.
-\end{itemize}
-\end{frame}
-
-
-\section{Vector Intersection}
-\begin{frame}[fragile]
-\frametitle{Vector Intersection}
-\begin{lstlisting}[language=Rust]
-fn main() {
-	let list_a = vec![4, 4, 6, 8, 9, 10];
-	let list_b = vec![4, 5, 6];
-	
-	let overlap = list_a.intersect(list_b.clone());
-	println!("The overlap = {:?}", overlap);
-}
-\end{lstlisting}
-\begin{itemize}
-\item The \texttt{intersect} method finds common elements between \texttt{list\_a} and \texttt{list\_b}.
-\item \texttt{list\_b} is cloned to avoid borrowing issues.
-\end{itemize}
-\end{frame}
-
-\section{Vector Union}
-\begin{frame}[fragile]
-\frametitle{Vector Union}
-\begin{lstlisting}[language=Rust]
-fn main() {
-	let list_a = vec![4, 4, 6, 8, 9, 10];
-	let list_b = vec![4, 5, 6];
-	
-	let combined_set = list_a.union(list_b.clone());
-	println!("The combined set = {:?}", combined_set);
-}
-\end{lstlisting}
-\begin{itemize}
-\item The \texttt{union} method combines unique elements from both vectors.
-\item \texttt{list\_b} is cloned to avoid borrowing issues.
-\end{itemize}
-\end{frame}
-
-\section{Repeating Elements in a Vector}
-\begin{frame}[fragile]
-\frametitle{Repeating Elements in a Vector}
-\begin{lstlisting}[language=Rust]
-fn main() {
-	let list_a = vec![4, 4, 6, 8, 9, 10];
-	let list_b = vec![4, 5, 6];
-	
-	println!("List B repeated three times = {:?}", list_b.times(3));
-}
-\end{lstlisting}
-\begin{itemize}
-\item The \texttt{times} method repeats the elements of \texttt{list\_b} three times.
-\item Useful for creating patterns or repeating sequences.
-\end{itemize}
-\end{frame}
-
-\section{Documentation Comments}
-\begin{frame}[fragile]
-\frametitle{Documentation Comments}
-\begin{lstlisting}[language=Rust]
-/* 
-These lines are not intended for documentation
-// Documentation comments begin with three slashes. Ensure your code is error-free and well-documented before publishing.
-
-// Command to generate documentation: cargo doc --open
-*/
-\end{lstlisting}
-\begin{itemize}
-\item Regular comments using \texttt{/* */} and \texttt{//} are not included in documentation.
-\item Documentation comments use \texttt{///}.
-\item Generate documentation with \texttt{cargo doc --open}.
-\end{itemize}
-\end{frame}
-
-\section{Module-Level Documentation}
-\begin{frame}[fragile]
-\frametitle{Module-Level Documentation}
-\begin{lstlisting}[language=Rust]
-// The following lines will be included in the documentation 
-// _______________________________________________
-
-//! # Fitness Tracker Crate
-//! 
-//! This crate provides utilities for basic fitness calculations and metrics.
-\end{lstlisting}
-\begin{itemize}
-\item Use \texttt{//!} for module-level documentation.
-\item Provides an overview of the crate and its purpose.
-\end{itemize}
-\end{frame}
-
-\section{Function Documentation}
-\begin{frame}[fragile]
-\frametitle{Function Doc: \texttt{calculate\_calories}}
-\begin{lstlisting}[language=Rust]
-/// Calculates daily calorie needs based on BMR and activity level
-/// 
-/// # Examples
-/// ``` 
-/// let bmr = 1500.0;
-/// let activity_factor = 1.2;
-/// let daily_calories = fitness_tracker::calculate_calories(bmr, activity_factor);
-/// assert_eq!(1800.0, daily_calories); 
-/// ```  
-pub fn calculate_calories(bmr: f32, activity_level: f32) -> f32 {
-	bmr * activity_level
-}
-\end{lstlisting}
-\end{frame}
-
-\begin{frame}[fragile]
-\frametitle{Discussion: \texttt{calculate\_calories}}
-\begin{itemize}
-\item Documents the \texttt{calculate\_calories} function.
-\item Includes examples to demonstrate usage.
-\end{itemize}
-\end{frame}
-
-\section{Publishing Your Crate}
-
-\begin{frame}[fragile]
-	\frametitle{Publishing Your Crate: Steps 1-4}
+	\frametitle{Running the FLTK Application}
 	\begin{lstlisting}[language=Rust]
-		// Steps for publishing your crate
-		// 1. Create a GitHub account and log in to crates.io.
-		// 2. Navigate to the crates.io dashboard, access API tokens, and create a new token.
-		// 3. Copy the token.
-		// 4. In the terminal, execute cargo login followed by the token from crates.io.
+		win.end();
+		win.show();
+		
+		app.run().unwrap();
 	\end{lstlisting}
 	\begin{itemize}
-		\item Steps for creating an account and obtaining an API token.
-		\item Logging in to \texttt{crates.io} using the token.
+		\item Finalizes and displays the window.
+		\item Runs the FLTK application, entering the event loop.
 	\end{itemize}
 \end{frame}
 
 \begin{frame}[fragile]
-	\frametitle{Publishing Your Crate: Steps 5-7}
+	\frametitle{Expression Evaluation Function}
+	\vspace{15pt}
 	\begin{lstlisting}[language=Rust]
-		// 5. Go back to crates.io, verify your email in Account Settings -> Profile -> Email -> Save.
-		// 6. Ensure your Cargo.toml includes:
-		// version = "0.1.1", edition = "2021",
-		// authors = ["Your Name"],
-		// description = "Fitness calculation utilities",
-		// license = "MIT".
-		// 7. Run cargo publish --allow-dirty to publish your crate.
+		fn calculate_expression(expr: &str) -> Option<i32> {
+			let parts: Vec<&str> = expr.split('+').collect();
+			if parts.len() > 2 {
+				let sum: i32 = parts
+				.iter()
+				.map(|s| s.parse::<i32>().unwrap())
+				.sum();
+				Some(sum)
+			} else {
+				None
+			}
+		}
 	\end{lstlisting}
 	\begin{itemize}
-		\item Verifying your email on \texttt{crates.io}.
-		\item Setting up the necessary fields in \texttt{Cargo.toml}.
-		\item Publishing your crate using \texttt{cargo publish --allow-dirty}.
+		\item Implements a basic expression evaluator for addition.
+		\item Used to calculate the result when the equals button is clicked.
 	\end{itemize}
 \end{frame}
 
-\begin{frame}[fragile]
-	\frametitle{Publishing Your Crate: Steps 8-11}
-	\begin{lstlisting}[language=Rust]
-		// 8. To update, modify the version number in Cargo.toml and run the publish command again.
-		// 9. Your crate will appear on your dashboard.
-		// 10. From your dashboard, you can yank or unyank versions to control downloads.
-		// 11. Your crate will also be searchable.
-	\end{lstlisting}
-	\begin{itemize}
-		\item Updating the crate by modifying the version number and republishing.
-		\item Managing your crate from the \texttt{crates.io} dashboard.
-		\item Yank or unyank versions to control availability.
-		\item Your crate becomes searchable on \texttt{crates.io}.
-	\end{itemize}
-\end{frame}
-
-
-\section{Demonstrating Crate Usage}
-\begin{frame}[fragile]
-\frametitle{Demonstrating Crate Usage}
-\begin{lstlisting}[language=Rust]
-// To demonstrate usage, create a new project and include the following crate:
-use my_bmi_crate_01::calculate_bmi; 
-fn main() {
-	println!("BMI for 70kg and 1.75m height: {}", calculate_bmi(70.0, 1.75));
-	println!("Daily calories needed: {}", calculate_calories(1500.0, 1.2));
-}
-\end{lstlisting}
-\begin{itemize}
-\item Shows how to use the \texttt{calculate\_bmi} and \texttt{calculate\_calories} functions from the crate.
-\item Practical example of including and using a custom crate in a new project.
-\end{itemize}
-\end{frame}
 
 \end{document}

@@ -1,13 +1,14 @@
-\frametitle{Demonstrating Crate Usage}
+\frametitle{Persist Users to CSV}
 		\begin{lstlisting}[language=Rust]
-			// To demonstrate usage, create a new project and include the following crate:
-			use my_bmi_crate_01::calculate_bmi;
-			fn main() {
-				println!("BMI for 70kg and 1.75m height: {}", calculate_bmi(70.0, 1.75));
-				println!("Daily calories needed: {}", calculate_calories(1500.0, 1.2));
+			fn persist_users_to_csv(users: &Vec<User>) {
+				let mut file = File::create(CSV_FILE_PATH).unwrap();
+				writeln!(file, "username,password").unwrap(); // Write the header
+				for user in users.iter() {
+					writeln!(file, "{},{}", user.username, user.password).unwrap();
+				}
 			}
 		\end{lstlisting}
 		\begin{itemize}
-			\item Shows how to use the \texttt{calculate\_bmi} and \texttt{calculate\_calories} functions from the crate.
-			\item Practical example of including and using a custom crate in a new project.
+			\item Saves the current users to the CSV file.
+			\item Writes the header and user details to the file.
 		\end{itemize}

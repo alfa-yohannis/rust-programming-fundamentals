@@ -18,19 +18,7 @@ fn main() {
     win.make_resizable(true);
 
     let name_input = Input::new(160, 50, 200, 30, "Name:");
-    let mut age_input = Spinner::new(160, 90, 200, 30, "Age:");
-
-    // // Set input to allow only numeric values for the age field
-    // age_input.set_callback({
-    //     let mut age_input = age_input.clone();
-    //     move |input| {
-    //         let text = input.value();
-    //         let filtered: String = text.chars().filter(|c| c.is_numeric()).collect();
-    //         if text != filtered {
-    //             age_input.set_value(&filtered);
-    //         }
-    //     }
-    // });
+    let age_input = Spinner::new(160, 90, 200, 30, "Age:");
 
     let mut btn = Button::new(160, 130, 80, 40, "Say Hi!");
     let mut frame = Frame::new(60, 170, 280, 40, "");

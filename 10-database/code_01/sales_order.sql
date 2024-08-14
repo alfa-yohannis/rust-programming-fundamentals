@@ -1,11 +1,20 @@
--- Your SQL goes here
+-- select * from sales_orders;
+
+DROP TABLE IF EXISTS sales_order_details;
+DROP TABLE IF EXISTS sales_orders;
+
 CREATE TABLE sales_orders (
     id SERIAL PRIMARY KEY,
-    code VARCHAR(10) DEFAULT LPAD(CAST(FLOOR(1 + random() * 9)::INT * 1000000000 + FLOOR(random() * 1000000000)::INT AS VARCHAR), 10, '0') NOT NULL UNIQUE,
-    order_date DATE NOT NULL,
-    customer_id INTEGER NOT NULL REFERENCES customers(id),
-    created TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updated TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    created_by VARCHAR(10) NULL,
-    updated_by VARCHAR(10) NULL
+    code VARCHAR(10) NOT NULL UNIQUE,
+    order_date TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
+	note VARCHAR (256) NULL
 );
+
+CREATE TABLE sales_order_details (
+    id SERIAL PRIMARY KEY,
+    order_code VARCHAR(10) NOT NULL REFERENCES sales_orders(code),
+    line_num INTEGER NOT NULL, 
+    item_id INTEGER NOT NULL,
+    quantity REAL NOT NULL DEFAULT 0,
+    unit VARCHAR(50) NULL,
+    unit_price REAL NOT NULL);

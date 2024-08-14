@@ -1,6 +1,5 @@
 #[cfg(test)]
 mod tests {
-    use chrono::Utc;
     use database::item::{add, delete, get, list, update, Item};
     use tokio_postgres::{Client, NoTls};
 
@@ -29,10 +28,6 @@ mod tests {
             price: 10.0,
             quantity: 100.0,
             unit: Some("pcs".to_string()),
-            created: Utc::now(),
-            updated: Utc::now(),
-            created_by: Some("tester".to_string()),
-            updated_by: Some("tester".to_string()),
         };
         add(client, &item).await.unwrap();
         item

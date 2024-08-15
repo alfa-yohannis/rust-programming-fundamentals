@@ -1,4 +1,3 @@
-use chrono::Utc;
 use tokio_postgres::{Client, Error};
 
 #[derive(Debug, Clone)]

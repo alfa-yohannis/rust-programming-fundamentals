@@ -1,6 +1,6 @@
 use tokio_postgres::{Client, Error};
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Item {
     pub code: String, 
     pub name: String,

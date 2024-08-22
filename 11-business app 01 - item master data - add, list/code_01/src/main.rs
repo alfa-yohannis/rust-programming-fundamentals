@@ -1,3 +1,5 @@
+use async_std::task;
+use business_app::item::Item;
 use fltk::{
     app,
     button::Button,
@@ -7,31 +9,45 @@ use fltk::{
     table::{self, Table},
     window::Window,
 };
-use lazy_static::lazy_static;
-use std::fs::File;
-use std::io::{BufRead, BufReader, Write};
-use std::sync::Mutex;
-use std::thread;
+use tokio_postgres::{Client, NoTls};
 
-const CSV_FILE_PATH: &str = "items.csv";
+async fn create_db_client() -> Client {
+    let (client, connection) = tokio_postgres::connect(
+        "host=localhost user=postgres password=1234 dbname=session10",
+        NoTls,
+    )
+    .await
+    .unwrap();
 
-#[derive(Clone)]
-struct Item {
-    code: String,
-    name: String,
-    currency: String,
-    price: f32,
-    quantity: f32,
-    unit: Option<String>,
+    tokio::spawn(async move {
+        if let Err(e) = connection.await {
+            eprintln!("Connection error: {}", e);
+        }
+    });
+
+    client
 }
 
-lazy_static! {
-    static ref ITEMS: Mutex<Vec<Item>> = Mutex::new(Vec::new());
+async fn load_items_from_db(client: &Client) -> Vec<Item> {
+    business_app::item::list(client)
+        .await
+        .unwrap_or_else(|_| Vec::new())
 }
 
-fn main() {
-    load_items_from_csv();
+async fn persist_item_to_db(client: &Client, item: &Item) {
+    business_app::item::add(client, item).await.unwrap();
+}
 
+async fn delete_item_from_db(client: &Client, code: &str) {
+    business_app::item::delete(client, code).await.unwrap();
+}
+
+async fn update_item_in_db(client: &Client, item: &Item) {
+    business_app::item::update(client, item).await.unwrap();
+}
+
+#[tokio::main]
+async fn main() {
     let app = app::App::default();
     let (screen_width, screen_height) = app::screen_size();
 
@@ -61,7 +77,6 @@ fn main() {
     let mut item_table = Table::new(50, 250, 500, 130, "");
 
     // Initial table setup
-    item_table.set_rows(ITEMS.lock().unwrap().len() as i32);
     item_table.set_cols(6); // Code, Name, Currency, Price, Quantity, Unit
     item_table.set_col_header(true);
     item_table.set_row_header(true);
@@ -72,28 +87,32 @@ fn main() {
     item_table.set_col_resize_min(50);
     item_table.end();
 
-    item_table.draw_cell(move |t, ctx, row, col, x, y, w, h| match ctx {
-        table::TableContext::StartPage => draw::set_font(enums::Font::Helvetica, 14),
-        table::TableContext::ColHeader => {
-            let headers = ["Code", "Name", "Currency", "Price", "Quantity", "Unit"];
-            draw_header(headers[col as usize], x, y, w, h);
+    item_table.draw_cell({
+        move |t, ctx, row, col, x, y, w, h| match ctx {
+            table::TableContext::StartPage => draw::set_font(enums::Font::Helvetica, 14),
+            table::TableContext::ColHeader => {
+                let headers = ["Code", "Name", "Currency", "Price", "Quantity", "Unit"];
+                draw_header(headers[col as usize], x, y, w, h);
+            }
+            table::TableContext::RowHeader => draw_header(&format!("{}", row + 1), x, y, w, h),
+            table::TableContext::Cell => {
+                // Fetch the current items from the database
+                let client = task::block_on(create_db_client());
+                let items = task::block_on(load_items_from_db(&client));
+                let item = &items[row as usize];
+                let data = match col {
+                    0 => &item.code,
+                    1 => &item.name,
+                    2 => &item.currency,
+                    3 => &item.price.to_string(),
+                    4 => &item.quantity.to_string(),
+                    5 => item.unit.as_deref().unwrap_or(""),
+                    _ => "",
+                };
+                draw_data(data, x, y, w, h, t.is_selected(row, col));
+            }
+            _ => (),
         }
-        table::TableContext::RowHeader => draw_header(&format!("{}", row + 1), x, y, w, h),
-        table::TableContext::Cell => {
-            let items = ITEMS.lock().unwrap();
-            let item = &items[row as usize];
-            let data = match col {
-                0 => &item.code,
-                1 => &item.name,
-                2 => &item.currency,
-                3 => &item.price.to_string(),
-                4 => &item.quantity.to_string(),
-                5 => item.unit.as_deref().unwrap_or(""),
-                _ => "",
-            };
-            draw_data(data, x, y, w, h, t.is_selected(row, col));
-        }
-        _ => (),
     });
 
     item_table.handle({
@@ -107,7 +126,8 @@ fn main() {
             enums::Event::Push => {
                 let row = t.callback_row();
                 if row >= 0 {
-                    let items = ITEMS.lock().unwrap();
+                    let client = task::block_on(create_db_client());
+                    let items = task::block_on(load_items_from_db(&client));
                     let item = &items[row as usize];
                     edit_code_input.set_value(&item.code);
                     edit_name_input.set_value(&item.name);
@@ -131,7 +151,6 @@ fn main() {
         let mut edit_quantity_input = edit_quantity_input.clone();
         let mut edit_unit_input = edit_unit_input.clone();
         move |_| {
-            let mut items = ITEMS.lock().unwrap();
             let new_item = Item {
                 code: edit_code_input.value(),
                 name: edit_name_input.value(),
@@ -145,7 +164,9 @@ fn main() {
                 },
             };
             if !new_item.code.is_empty() && !new_item.name.is_empty() {
-                items.push(new_item);
+                let client = task::block_on(create_db_client());
+                task::block_on(persist_item_to_db(&client, &new_item));
+                let items = task::block_on(load_items_from_db(&client));
                 item_table.set_rows(items.len() as i32);
                 item_table.redraw();
                 edit_code_input.set_value("");
@@ -154,7 +175,6 @@ fn main() {
                 edit_price_input.set_value("");
                 edit_quantity_input.set_value("");
                 edit_unit_input.set_value("");
-                thread::spawn(|| persist_items_to_csv());
             }
         }
     });
@@ -169,7 +189,8 @@ fn main() {
         let mut edit_unit_input = edit_unit_input.clone();
         move |_| {
             let code_to_update = edit_code_input.value();
-            let mut items = ITEMS.lock().unwrap();
+            let client = task::block_on(create_db_client());
+            let mut items = task::block_on(load_items_from_db(&client));
             if let Some(pos) = items.iter().position(|i| i.code == code_to_update) {
                 items[pos].name = edit_name_input.value();
                 items[pos].currency = edit_currency_input.value();
@@ -180,14 +201,16 @@ fn main() {
                 } else {
                     Some(edit_unit_input.value())
                 };
+                task::block_on(update_item_in_db(&client, &items[pos]));
+                item_table.set_rows(items.len() as i32);
                 item_table.redraw();
+
                 edit_code_input.set_value("");
                 edit_name_input.set_value("");
                 edit_currency_input.set_value("");
                 edit_price_input.set_value("");
                 edit_quantity_input.set_value("");
                 edit_unit_input.set_value("");
-                thread::spawn(|| persist_items_to_csv());
             }
         }
     });
@@ -197,21 +220,20 @@ fn main() {
         let mut edit_code_input = edit_code_input.clone();
         move |_| {
             let code_to_delete = edit_code_input.value();
-            let mut items = ITEMS.lock().unwrap();
-            if let Some(pos) = items.iter().position(|i| i.code == code_to_delete) {
-                items.remove(pos);
-                item_table.set_rows(items.len() as i32);
-                item_table.redraw();
-                edit_code_input.set_value("");
-                thread::spawn(|| persist_items_to_csv());
-            }
+            let client = task::block_on(create_db_client());
+            task::block_on(delete_item_from_db(&client, &code_to_delete));
+            let items = task::block_on(load_items_from_db(&client));
+            item_table.set_rows(items.len() as i32);
+            item_table.redraw();
+
+            edit_code_input.set_value("");
         }
     });
 
     window.end();
     window.show();
 
-    app.run().unwrap();
+    app.run().unwrap()
 }
 
 fn draw_header(txt: &str, x: i32, y: i32, w: i32, h: i32) {
@@ -243,57 +265,4 @@ fn draw_data(txt: &str, x: i32, y: i32, w: i32, h: i32, selected: bool) {
     draw::draw_text2(txt, x, y, w, h, enums::Align::Center);
     draw::draw_rect(x, y, w, h);
     draw::pop_clip();
-}
-
-fn load_items_from_csv() {
-    let file = File::open(CSV_FILE_PATH).unwrap_or_else(|_| {
-        let mut file = File::create(CSV_FILE_PATH).unwrap();
-        writeln!(file, "code,name,currency,price,quantity,unit").unwrap();
-        file
-    });
-
-    let reader = BufReader::new(file);
-    let mut items = ITEMS.lock().unwrap();
-    items.clear(); // Clear the existing items list before loading new data
-    for line in reader.lines().skip(1) {
-        if let Ok(line) = line {
-            let mut parts = line.split(',');
-            let code = parts.next().unwrap_or("").to_string();
-            let name = parts.next().unwrap_or("").to_string();
-            let currency = parts.next().unwrap_or("").to_string();
-            let price = parts.next().unwrap_or("0.0").parse::<f32>().unwrap_or(0.0);
-            let quantity = parts.next().unwrap_or("0.0").parse::<f32>().unwrap_or(0.0);
-            let unit = parts.next().map(|s| s.to_string());
-
-            if !code.is_empty() {
-                items.push(Item {
-                    code,
-                    name,
-                    currency,
-                    price,
-                    quantity,
-                    unit,
-                });
-            }
-        }
-    }
-}
-
-fn persist_items_to_csv() {
-    let items = ITEMS.lock().unwrap();
-    let mut file = File::create(CSV_FILE_PATH).unwrap();
-    writeln!(file, "code,name,currency,price,quantity,unit").unwrap(); // Write the header
-    for item in items.iter() {
-        writeln!(
-            file,
-            "{},{},{},{},{},{}",
-            item.code,
-            item.name,
-            item.currency,
-            item.price,
-            item.quantity,
-            item.unit.as_deref().unwrap_or("")
-        )
-        .unwrap();
-    }
 }

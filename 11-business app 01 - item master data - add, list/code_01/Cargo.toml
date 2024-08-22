@@ -1,0 +1,10 @@
+[package]
+name = "code_01"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+fltk = "1.4.33"
+lazy_static = "1.5.0"
+tokio = "1.39.3"
+tokio-postgres = "0.7.11"

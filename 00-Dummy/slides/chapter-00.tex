@@ -447,8 +447,8 @@ delete_button.set_callback({
 	\begin{lstlisting}[language=Rust]
 		// Delete the item from the database
 		task::block_on(delete_item_from_db(
-		&DB_CLIENT.lock().unwrap(),
-		&code_to_delete
+			&DB_CLIENT.lock().unwrap(),
+			&code_to_delete
 		));
 	\end{lstlisting}
 	

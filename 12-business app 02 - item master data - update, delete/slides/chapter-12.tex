@@ -87,8 +87,8 @@ use tokio_postgres::{Client, NoTls};
 
 \begin{itemize}
 \item Imports necessary crates and modules.
-\item Sets up `lazy\_static` for static variables.
-\item Defines `Item` from `busines\_app`.
+\item Sets up \texttt{lazy\_static} for static variables.
+\item Defines \texttt{Item} from \texttt{busines\_app}.
 \end{itemize}
 \end{frame}
 
@@ -104,8 +104,8 @@ static ref ITEMS: Mutex<Vec<Item>> = Mutex::new(task::block_on(load_items_from_d
 \end{lstlisting}
 
 \begin{itemize}
-\item Defines global `DB\_CLIENT` and `ITEMS` using `lazy\_static`.
-\item `task::block\_on` ensures asynchronous operations are awaited.
+\item Defines global \texttt{DB\_CLIENT} and \texttt{ITEMS} using \texttt{lazy\_static}.
+\item \texttt{task::block\_on} ensures asynchronous operations are awaited.
 \end{itemize}
 \end{frame}
 
@@ -126,8 +126,8 @@ client
 \end{lstlisting}
 
 \begin{itemize}
-\item `create\_db\_client` establishes a PostgreSQL connection asynchronously.
-\item `tokio::spawn` manages the connection in the background.
+\item \texttt{create\_db\_client} establishes a PostgreSQL connection asynchronously.
+\item \texttt{tokio::spawn} manages the connection in the background.
 \end{itemize}
 \end{frame}
 
@@ -141,7 +141,7 @@ business_app::item::list(client)
 \end{lstlisting}
 
 \begin{itemize}
-\item `load\_items\_from\_db` retrieves items from the database.
+\item \texttt{load\_items\_from\_db} retrieves items from the database.
 \item Returns an empty vector if the database operation fails.
 \end{itemize}
 \end{frame}
@@ -229,7 +229,7 @@ item_table.set_col_width_all(100); // Set a default column width for all columns
 \end{lstlisting}
 
 \begin{itemize}
-\item Initializes the `Table` widget.
+\item Initializes the \texttt{Table} widget.
 \item Configures the number of rows and columns.
 \item Sets column and row headers.
 \end{itemize}
@@ -246,7 +246,7 @@ item_table.end();
 
 \begin{itemize}
 \item Configures column widths and resizing properties.
-\item Finalizes the table setup with `end()`.
+\item Finalizes the table setup with \texttt{end()}.
 \end{itemize}
 \end{frame}
 
@@ -312,7 +312,7 @@ add_button.set_callback({
 
 \begin{itemize}
 	\item Defines the callback for the "Add" button.
-	\item Creates a new `Item` based on user input.
+	\item Creates a new \texttt{Item} based on user input.
 \end{itemize}
 \end{frame}
 
@@ -336,7 +336,7 @@ add_button.set_callback({
 	
 	\begin{itemize}
 		\item Defines the callback for the "Add" button.
-		\item Creates a new `Item` based on user input.
+		\item Creates a new \texttt{Item} based on user input.
 	\end{itemize}
 \end{frame}
 
@@ -422,7 +422,7 @@ update_button.set_callback({
 });
 \end{lstlisting}
 \begin{itemize}
-\item Updates the item in the `ITEMS` vector and refreshes the table.
+\item Updates the item in the \texttt{ITEMS} vector and refreshes the table.
 \item Ensures the table reflects the changes immediately.
 \end{itemize}
 \end{frame}
@@ -439,7 +439,7 @@ delete_button.set_callback({
 	
 	\begin{itemize}
 		\item Sets up the callback for the "Delete" button.
-		\item Clones the `item\_table` and `edit\_code\_input` to use within the callback.
+		\item Clones the \texttt{item\_table} and \texttt{edit\_code\_input} to use within the callback.
 	\end{itemize}
 \end{frame}
 
@@ -454,7 +454,7 @@ delete_button.set_callback({
 	
 	\begin{itemize}
 		\item Deletes the item from the database asynchronously.
-		\item Utilizes `task::block\_on` to handle asynchronous database operations in a synchronous context.
+		\item Utilizes \texttt{task::block\_on} to handle asynchronous database operations in a synchronous context.
 	\end{itemize}
 \end{frame}
 
@@ -473,8 +473,8 @@ delete_button.set_callback({
 \end{lstlisting}
 
 \begin{itemize}
-\item Updates the `ITEMS` vector by removing the deleted item.
-\item Adjusts the number of rows in the `item\_table` and triggers a redraw.
+\item Updates the \texttt{ITEMS} vector by removing the deleted item.
+\item Adjusts the number of rows in the \texttt{item\_table} and triggers a redraw.
 \end{itemize}
 \end{frame}
 

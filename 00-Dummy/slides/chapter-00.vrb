@@ -1,11 +1,21 @@
-\frametitle{Delete Button Callback Part 4}
+\frametitle{Utility Functions (cont.)}
+\vspace{15pt}
 \begin{lstlisting}[language=Rust]
-		window.end();
-		window.show();
-		app.run().unwrap();
-	\end{lstlisting}
-	
-	\begin{itemize}
-		\item Finalizes the window setup and displays it.
-		\item Starts the FLTK application event loop.
-	\end{itemize}
+fn draw_data(txt: &str, x: i32, y: i32, w: i32, h: i32, selected: bool) {
+	draw::set_draw_color(if selected {
+		enums::Color::from_rgb(200, 200, 255)
+	} else {
+		enums::Color::White
+	});
+	// Draw the cell background
+	draw::draw_rectf(x, y, w, h);
+	// Draw the cell borders with a black color
+	draw::set_draw_color(enums::Color::Black);
+	draw::draw_rect(x, y, w, h);
+	draw::draw_text2(txt, x, y, w, h, enums::Align::Center);
+}
+\end{lstlisting}
+\begin{itemize}
+\item Draw table data cells with specified styles.
+\item Highlight selected cells.
+\end{itemize}

@@ -1,0 +1,640 @@
+\documentclass[aspectratio=169, table]{beamer}
+
+\usepackage[utf8]{inputenc}
+\usepackage{listings} 
+
+\usetheme{Pradita}
+
+\subtitle{IF120203-Programming Fundamentals}
+
+\title{Session-12:\\\LARGE{Item Master Data Form:\\Update and Delete}}
+\date[Serial]{\scriptsize {PRU/SPMI/FR-BM-18/0222}}
+\author[Pradita]{\small{\textbf{Alfa Yohannis}}}
+
+
+\lstdefinelanguage{Rust} {
+keywords={::, use, const, struct, fn, let, mut, move, pub, str, i32, if, else, true, false, enum, match, impl, for, while, loop, return, mod, crate, super, Self, self, break, continue, extern, ref, static, type, unsafe, as, async, await, dyn, macro_rules},
+basicstyle=\ttfamily\footnotesize,
+keywordstyle=\color{blue}\bfseries,
+ndkeywords={Result, Option, Ok, None, Item, Vec, Error, Some, app, button, draw, enums, frame, input, prelude, table, window, Window, Button, Input, SecretInput, Table, Frame, Lazy, Mutex, new},
+ndkeywordstyle=\color{purple}\bfseries,
+sensitive=true,
+commentstyle=\color{gray},
+stringstyle=\color{red},
+numbers=left,
+numberstyle=\tiny\color{gray},
+breaklines=true,
+frame=lines,
+backgroundcolor=\color{lightgray!10},
+tabsize=2,
+comment=[l]{//},
+morecomment=[s]{/*}{*/},
+commentstyle=\color{gray}\ttfamily,
+string=[s]{'}{'},
+morestring=[s]{"}{"},
+stringstyle=\color{teal}\ttfamily,
+showstringspaces=false
+}
+
+\lstdefinelanguage{Sql} {
+keywords={DROP, SELECT, FROM, UPDATE, DELETE, ALTER, TABLE, IF, EXISTS, CREATE, SERIAL, PRIMARY, KEY, VARCHAR, DEFAULT, NOT, NULL, INT, FLOAT4, INSERT, INTO, VALUES, REFERENCES, UNIQUE, WITH, TIME, ZONE},
+basicstyle=\ttfamily\footnotesize,
+keywordstyle=\color{blue}\bfseries,
+ndkeywords={FLOOR, CAST, LPAD, CURRENT_TIMESTAMP},
+ndkeywordstyle=\color{purple}\bfseries,
+sensitive=true,
+numbers=left,
+numberstyle=\tiny\color{gray},
+breaklines=true,
+frame=lines,
+backgroundcolor=\color{lightgray!10},
+tabsize=2,
+comment=[l]{--},
+morecomment=[s]{/*}{*/},
+commentstyle=\color{gray}\ttfamily,
+string=[s]{'}{'},
+morestring=[s]{"}{"},
+stringstyle=\color{teal}\ttfamily,
+showstringspaces=false
+}
+
+\begin{document}
+
+\frame{\titlepage}
+
+% Add table of contents slide
+\begin{frame}{Contents}
+\vspace{15pt}
+\begin{columns}[t]
+\begin{column}{.5\textwidth}
+	\tableofcontents[sections={1-12}]
+\end{column}
+\begin{column}{.5\textwidth}
+	\tableofcontents[sections={13-24}]
+\end{column}
+\end{columns}
+\end{frame}
+
+
+\section{Database}
+\begin{frame}[fragile]{Dropping Existing Tables}
+
+\begin{lstlisting}[language=Sql]
+DROP TABLE IF EXISTS item;
+DROP TABLE IF EXISTS sales_order_details;
+DROP TABLE IF EXISTS sales_orders;
+\end{lstlisting}
+
+\begin{itemize}
+\item \texttt{DROP TABLE IF EXISTS} removes the specified table if it exists.
+\item Used here to ensure that tables are recreated without errors.
+\end{itemize}
+\end{frame}
+
+\section{PostgreSQL: Item Table}
+\begin{frame}[fragile]{Creating the \texttt{item} Table (Part 1)}
+\vspace{15pt}
+\begin{lstlisting}[language=Sql]
+CREATE TABLE item (
+id SERIAL PRIMARY KEY,
+code VARCHAR(10) DEFAULT LPAD(CAST(FLOOR(1 + random() * 9)::INT * 1000000000 + FLOOR(random() * 1000000000)::INT AS VARCHAR), 10, '0') NOT NULL UNIQUE,
+\end{lstlisting}
+
+\begin{itemize}
+\item \texttt{id} is a unique identifier for each item.
+\item \texttt{code} is a 10-character string, generated with leading zeros and uniqueness enforced.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Creating the \texttt{item} Table (Part 2)}
+
+\begin{lstlisting}[language=Sql]
+name VARCHAR NOT NULL,
+currency VARCHAR(3) NOT NULL,
+price FLOAT4 NOT NULL,
+quantity FLOAT4 NOT NULL DEFAULT 0,
+unit VARCHAR(50) NULL
+);
+\end{lstlisting}
+
+\begin{itemize}
+\item \texttt{name} is the item's name.
+\item \texttt{currency} is a 3-character code for currency.
+\item \texttt{price} is the cost of the item.
+\item \texttt{quantity} is the available stock, defaulting to 0 if not specified.
+\item \texttt{unit} is an optional field describing the measurement unit.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Inserting Data into \texttt{item}}
+
+\begin{lstlisting}[language=Sql]
+INSERT INTO item (code, name, currency, price, quantity, unit)
+VALUES
+('0000000010', 'Organic Almonds', 'USD', 15.49, 50.00, 'kg'),
+('0000000020', 'Stainless Steel Water Bottle', 'USD', 23.99, 150.00, 'pcs'),
+('0000000030', 'Bluetooth Headphones', 'USD', 89.99, 75.00, 'pcs');
+\end{lstlisting}
+
+\begin{itemize}
+\item Inserts three rows into the \texttt{item} table.
+\item Each row provides values for \texttt{code}, \texttt{name}, \texttt{currency}, \texttt{price}, \texttt{quantity}, and \texttt{unit}.
+\end{itemize}
+\end{frame}
+
+\section{PostgreSQL: Sales Order Tables}
+\begin{frame}[fragile]{Creating the \texttt{sales\_orders} Table}
+\vspace{15pt}
+\begin{lstlisting}[language=Sql]
+CREATE TABLE sales_orders (
+id SERIAL PRIMARY KEY,
+code VARCHAR(10) NOT NULL UNIQUE,
+order_date TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
+note VARCHAR(256) NULL
+);
+\end{lstlisting}
+
+\begin{itemize}
+\item \texttt{id} is a unique identifier for each order.
+\item \texttt{code} is a unique identifier for the order.
+\item \texttt{order\_date} records when the order was placed.
+\item \texttt{note} is an optional field for additional information.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Creating the \texttt{sales\_order\_details} Table}
+\vspace{15pt}
+\begin{lstlisting}[language=Sql]
+CREATE TABLE sales_order_details (
+id SERIAL PRIMARY KEY,
+order_code VARCHAR(10) NOT NULL REFERENCES sales_orders(code),
+line_num INTEGER NOT NULL,
+item_id INTEGER NOT NULL,
+quantity REAL NOT NULL DEFAULT 0,
+unit VARCHAR(50) NULL,
+unit_price REAL NOT NULL
+);
+\end{lstlisting}
+\vspace{-20pt}
+\begin{columns}[t]
+\begin{column}{.5\pagewidth}
+	\begin{itemize}
+		\item \texttt{id} is a unique identifier for each detail record.
+		\item \texttt{order\_code} links to the \texttt{sales\_orders} table.
+		\item \texttt{line\_num} indicates the item line number in the order.
+	\end{itemize}
+\end{column}
+\begin{column}{.5\pagewidth}
+	\begin{itemize}
+		\item \texttt{item\_id} references the \texttt{item} table.
+		\item \texttt{quantity} is the amount of the item ordered.
+		\item \texttt{unit} describes the measurement unit for the item.
+		\item \texttt{unit\_price} is the price per unit of the item.
+	\end{itemize}
+\end{column}
+\end{columns}
+\end{frame}
+
+\section{Rust: Publish Modules}
+\begin{frame}[fragile]{Module Declarations in \texttt{src/lib.rs}}
+\begin{lstlisting}[language=Rust]
+pub mod item;
+pub mod sales_order;
+pub mod sales_order_detail;
+\end{lstlisting}
+
+\textbf{Explanation:}
+\begin{itemize}
+\item \texttt{pub mod item;} declares a public module named \texttt{item}.
+\item \texttt{pub mod sales\_order;} declares a public module named \texttt{sales\_order}.
+\item \texttt{pub mod sales\_order\_detail;} declares a public module named \texttt{sales\_order\_detail}.
+\item Each module is expected to be defined in a corresponding file, such as \texttt{item.rs}, \texttt{sales\_order.rs}, and \texttt{sales\_order\_detail.rs}.
+\end{itemize}
+\end{frame}
+
+
+\section{Rust: Item}
+\begin{frame}[fragile]{Rust Code Overview: Item Module}
+\vspace{15pt}
+\begin{lstlisting}[language=Rust]
+use tokio_postgres::{Client, Error};
+
+#[derive(Debug)]
+pub struct Item {
+	pub code: String,
+	pub name: String,
+	pub currency: String,
+	pub price: f32,
+	pub quantity: f32,
+	pub unit: Option<String>,
+}
+\end{lstlisting}
+
+\begin{itemize}
+\item \texttt{Item} struct represents an item with attributes: \texttt{code}, \texttt{name}, \texttt{currency}, \texttt{price}, \texttt{quantity}, and \texttt{unit}.
+\item \texttt{unit} is an optional field.
+\end{itemize}
+\end{frame}
+
+\section{Rust: Item Operations}
+\begin{frame}[fragile]{Adding an Item}
+\vspace{15pt}
+\begin{lstlisting}[language=Rust]
+pub async fn add(client: &Client, item: &Item) -> Result<(), Error> {
+	
+	let stmt = client.prepare("INSERT INTO item (code, name, currency, price, quantity, unit) VALUES ($1, $2, $3, $4, $5, $6)",).await?;
+	
+	client.execute(&stmt, &[&item.code, &item.name, &item.currency, &item.price, &item.quantity, &item.unit,],).await?;
+	
+	Ok(())
+}
+\end{lstlisting}
+
+\begin{itemize}
+\item \texttt{add} function inserts a new item into the \texttt{item} table.
+\item It prepares and executes an \texttt{INSERT} SQL statement.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Deleting an Item}
+\vspace{15pt}
+\begin{lstlisting}[language=Rust]
+pub async fn delete(client: &Client, code: &str) -> Result<(), Error> {
+	
+	let stmt = client.prepare("DELETE FROM item WHERE code = $1").await?;
+	
+	client.execute(&stmt, &[&code]).await?;
+	
+	Ok(())
+}
+\end{lstlisting}
+
+\begin{itemize}
+\item \texttt{delete} function removes an item from the \texttt{item} table based on the \texttt{code}.
+\item It prepares and executes a \texttt{DELETE} SQL statement.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}[fragile]{Updating an Item}
+\vspace{15pt}
+\begin{lstlisting}[language=Rust]
+pub async fn update(client: &Client, item: &Item) -> Result<(), Error> {
+	
+	let stmt = client.prepare("UPDATE item SET name = $1, currency = $2, price = $3, quantity = $4, unit = $5 WHERE code = $6",).await?;
+	
+	client.execute(&stmt, &[&item.name, &item.currency, &item.price, &item.quantity, &item.unit, &item.code,],).await?;
+	
+	Ok(())
+}
+\end{lstlisting}
+
+\begin{itemize}
+\item \texttt{update} function updates the details of an existing item in the \texttt{item} table.
+\item It prepares and executes an \texttt{UPDATE} SQL statement based on the \texttt{code}.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Listing All Items}
+\vspace{15pt}
+\begin{lstlisting}[language=Rust]
+pub async fn list(client: &Client) -> Result<Vec<Item>, Error> {
+	let rows = client
+	.query("SELECT code, name, currency, price, quantity, unit FROM item ORDER BY code",&[],).await?;	
+	let items = rows.iter().map(|row| Item {
+		code: row.get("code"), name: row.get("name"),
+		currency: row.get("currency"), price: row.get("price"),
+		quantity: row.get("quantity"), unit: row.get("unit"),
+	}).collect();
+	Ok(items)
+}
+\end{lstlisting}
+
+\begin{itemize}
+\item \texttt{list} function retrieves all items from the \texttt{item} table.
+\item It executes a \texttt{SELECT} SQL statement and maps the result to a vector of \texttt{Item} structs.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Getting a Specific Item}
+\vspace{15pt}
+\begin{lstlisting}[language=Rust]
+pub async fn get(client: &Client, code: &str) -> Result<Option<Item>, Error> {
+	let stmt = client.prepare("SELECT code, name, currency, price, quantity, unit FROM item WHERE code = $1").await?;
+	let row = client.query_opt(&stmt, &[&code]).await?;
+	if let Some(row) = row {
+		Ok(Some(Item {
+			code: row.get("code"), name: row.get("name"),
+			currency: row.get("currency"), price: row.get("price"),
+			quantity: row.get("quantity"), unit: row.get("unit"),
+		}))
+	} else { Ok(None) } }
+\end{lstlisting}
+
+\begin{itemize}
+\item \texttt{get} function retrieves a specific item based on its \texttt{code}.
+\item It executes a \texttt{SELECT} SQL statement and returns an \texttt{Option<Item>} where \texttt{None} indicates no item was found.
+\end{itemize}
+\end{frame}
+
+\section{Rust: Sales Order}
+\begin{frame}[fragile]{Rust Code Overview: Sales Order Module}
+\begin{lstlisting}[language=Rust]
+use chrono::{DateTime, Utc};
+use tokio_postgres::{Client, Error};
+
+#[derive(Debug, Clone)]
+pub struct SalesOrder {
+	pub code: String,
+	pub order_date: DateTime<Utc>,
+	pub note: Option<String>,
+}
+\end{lstlisting}
+
+\begin{itemize}
+\item \texttt{SalesOrder} struct represents a sales order with attributes: \texttt{code}, \texttt{order\_date}, and \texttt{note}.
+\item \texttt{order\_date} is a timestamp with timezone.
+\item \texttt{note} is an optional field.
+\end{itemize}
+\end{frame}
+
+\section{Rust: Sales Order Operations}
+\begin{frame}[fragile]{Adding a Sales Order}
+\begin{lstlisting}[language=Rust]
+pub async fn add_sales_order(client: &Client, order: &SalesOrder) -> Result<(), Error> {
+	let stmt = client.prepare("INSERT INTO sales_orders (code, order_date, note) VALUES ($1, $2, $3)").await?;
+	client.execute(&stmt, &[&order.code, &order.order_date, &order.note]).await?;
+	Ok(())
+}
+\end{lstlisting}
+
+\begin{itemize}
+\item \texttt{add\_sales\_order} function inserts a new sales order into the \texttt{sales\_orders} table.
+\item It prepares and executes an \texttt{INSERT} SQL statement.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}[fragile]{Getting a Sales Order}
+\vspace{15pt}
+\begin{lstlisting}[language=Rust]
+pub async fn get_sales_order(client: &Client, code: &str) -> Result<Option<SalesOrder>, Error> {
+	let stmt = client.prepare("SELECT code, order_date, note FROM sales_orders WHERE code = $1").await?;
+	let row_opt = client.query_opt(&stmt, &[&code]).await?;
+	if let Some(row) = row_opt {
+		Ok(Some(SalesOrder { code: row.get("code"), order_date: row.get("order_date"), note: row.get("note") }))
+	} else {
+		Ok(None)
+	}
+}
+\end{lstlisting}
+
+\begin{itemize}
+\item \texttt{get\_sales\_order} function retrieves a specific sales order based on its \texttt{code}.
+\item It executes a \texttt{SELECT} SQL statement and returns an \texttt{Option<SalesOrder>} where \texttt{None} indicates no order was found.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}[fragile]{Updating a Sales Order}
+\begin{lstlisting}[language=Rust]
+pub async fn update_sales_order(client: &Client, order: &SalesOrder) -> Result<(), Error> {
+	let stmt = client.prepare("UPDATE sales_orders SET order_date = $1, note = $2 WHERE code = $3").await?;
+	client.execute(&stmt, &[&order.order_date, &order.note, &order.code]).await?;
+	Ok(())
+}
+\end{lstlisting}
+
+\begin{itemize}
+\item \texttt{update\_sales\_order} function updates an existing sales order in the \texttt{sales\_orders} table.
+\item It prepares and executes an \texttt{UPDATE} SQL statement based on the \texttt{code}.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}[fragile]{Deleting a Sales Order}
+\begin{lstlisting}[language=Rust]
+pub async fn delete_sales_order(client: &Client, code: &str) -> Result<(), Error> {
+	let stmt = client.prepare("DELETE FROM sales_orders WHERE code = $1").await?;
+	client.execute(&stmt, &[&code]).await?;
+	Ok(())
+}
+\end{lstlisting}
+
+\begin{itemize}
+\item \texttt{delete\_sales\_order} function removes a sales order from the \texttt{sales\_orders} table based on the \texttt{code}.
+\item It prepares and executes a \texttt{DELETE} SQL statement.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Listing All Sales Orders}
+\vspace{15pt}
+\begin{lstlisting}[language=Rust]
+pub async fn list_sales_orders(client: &Client) -> Result<Vec<SalesOrder>, Error> {
+	let rows = client.query("SELECT code, order_date, note FROM sales_orders ORDER BY code", &[]).await?;
+	let orders = rows.iter().map(|row| SalesOrder {
+		code: row.get("code"), order_date: row.get("order_date"), 
+		note: row.get("note"),
+	}).collect();
+	Ok(orders)
+}
+\end{lstlisting}
+
+\begin{itemize}
+\item \texttt{list\_sales\_orders} function retrieves all sales orders from the \texttt{sales\_orders} table.
+\item It executes a \texttt{SELECT} SQL statement and maps the result to a vector of \texttt{SalesOrder} structs.
+\end{itemize}
+\end{frame}
+
+
+\section{Rust: Sales Order Detail}
+
+\begin{frame}[fragile]{SalesOrderDetail Struct}
+\begin{columns}[t]
+\begin{column}{0.5\pagewidth}
+	\begin{lstlisting}[language=Rust]
+		use tokio_postgres::{Client, Error};
+		
+		#[derive(Debug, Clone)]
+		pub struct SalesOrderDetail {
+			pub id: i32,
+			pub order_code: String,
+			pub line_num: i32,
+			pub item_id: i32,
+			pub quantity: f32,
+			pub unit: Option<String>,
+			pub unit_price: f32,
+		}
+	\end{lstlisting}
+\end{column}
+\begin{column}{0.5\textwidth}
+	\begin{itemize}
+		\item \texttt{id} is the unique identifier for each detail record.
+		\item \texttt{order\_code} is the reference to the order.
+		\item \texttt{line\_num} is the line number of the item in the order.
+		\item \texttt{item\_id} is the identifier of the item.
+		\item \texttt{quantity} is the amount of the item ordered.
+		\item \texttt{unit} describes the measurement unit.
+		\item \texttt{unit\_price} is the price per unit of the item.
+	\end{itemize}
+\end{column}
+\end{columns}
+\end{frame}
+
+
+\section{Rust: Sales Order Detail Operations}
+\begin{frame}[fragile]{Adding Sales Order Detail}
+	\begin{lstlisting}[language=Rust]
+pub async fn add_sales_order_detail(client: &Client, detail: &SalesOrderDetail) -> Result<(), Error> {
+	let stmt = client.prepare("INSERT INTO sales_order_details (order_code, line_num, item_id, quantity, unit, unit_price) VALUES ($1, $2, $3, $4, $5, $6)").await?;
+	client.execute(&stmt, &[&detail.order_code, &detail.line_num, &detail.item_id, &detail.quantity, &detail.unit, &detail.unit_price]).await?;
+	Ok(())
+}
+\end{lstlisting}
+\begin{itemize}
+\item Prepares an \texttt{INSERT} statement for adding a sales order detail.
+\item Executes the statement with the detail's attributes.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Getting Sales Order Detail by ID}
+\vspace{15pt}
+\begin{lstlisting}[language=Rust]
+pub async fn get_sales_order_detail(client: &Client, id: i32, ) -> Result<Option<SalesOrderDetail>, Error> {
+	let stmt = client.prepare("SELECT id, order_code, line_num, item_id, quantity, unit, unit_price FROM sales_order_details WHERE id = $1").await?;
+	let row_opt = client.query_opt(&stmt, &[&id]).await?;
+	if let Some(row) = row_opt {
+		Ok(Some(SalesOrderDetail {
+			id: row.get("id"), order_code: row.get("order_code"),
+			line_num: row.get("line_num"), item_id: row.get("item_id"),
+			quantity: row.get("quantity"), unit: row.get("unit"),
+			unit_price: row.get("unit_price"), }))
+	} else { Ok(None) } }
+\end{lstlisting}
+\begin{itemize}
+\item Prepares a \texttt{SELECT} statement to fetch a sales order detail by \texttt{id}.
+\item Returns \texttt{Option<SalesOrderDetail>} based on the query result.
+\end{itemize}
+\end{frame}
+
+
+
+\begin{frame}[fragile]{Updating Sales Order Detail}
+\vspace{15pt}
+\begin{lstlisting}[language=Rust]
+pub async fn update_sales_order_detail(
+client: &Client,
+detail: &SalesOrderDetail,
+) -> Result<(), Error> {
+	let stmt = client.prepare("UPDATE sales_order_details SET quantity = $1, unit = $2, unit_price = $3 WHERE order_code = $4 and line_num = $5",).await?;
+	
+	client.execute(&stmt, &[ &detail.quantity, &detail.unit, &detail.unit_price, &detail.order_code, &detail.line_num, ], ).await?;
+	
+	Ok(())
+}
+\end{lstlisting}
+\begin{itemize}
+\item Prepares an \texttt{UPDATE} statement to modify existing sales order details.
+\item Updates \texttt{quantity}, \texttt{unit}, and \texttt{unit\_price} based on \texttt{order\_code} and \texttt{line\_num}.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Deleting Sales Order Detail}
+\vspace{15pt}
+\begin{lstlisting}[language=Rust]
+pub async fn delete_sales_order_detail(
+client: &Client,
+detail: &SalesOrderDetail,
+) -> Result<(), Error> {
+	let stmt = client
+	.prepare("DELETE FROM sales_order_details WHERE order_code = $1 and line_num = $2")
+	.await?;
+	client
+	.execute(&stmt, &[&detail.order_code, &detail.line_num])
+	.await?;
+	Ok(())
+}
+\end{lstlisting}
+\begin{itemize}
+\item Prepares a \texttt{DELETE} statement to remove sales order details based on \texttt{order\_code} and \texttt{line\_num}.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Deleting Sales Order Detail by Code}
+\begin{lstlisting}[language=Rust]
+pub async fn delete_sales_order_detail_by_code(client: &Client, code: &str) -> Result<(), Error> {
+	let stmt = client
+	.prepare("DELETE FROM sales_order_details WHERE order_code = $1")
+	.await?;
+	client.execute(&stmt, &[&code]).await?;
+	Ok(())
+}
+\end{lstlisting}
+\begin{itemize}
+\item Prepares a \texttt{DELETE} statement to remove all details for a given \texttt{order\_code}.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Listing All Sales Order Details}
+\vspace{15pt}
+\begin{lstlisting}[language=Rust]
+pub async fn list_sales_order_details(client: &Client) -> Result<Vec<SalesOrderDetail>, Error> {
+	let rows = client.query("SELECT id, order_code, line_num, item_id, quantity, unit, unit_price FROM sales_order_details ORDER BY order_code, line_num", &[],).await?;
+	let details = rows.iter().map(|row| SalesOrderDetail {
+		id: row.get("id"), order_code: row.get("order_code"),
+		line_num: row.get("line_num"), item_id: row.get("item_id"),
+		quantity: row.get("quantity"), unit: row.get("unit"),
+		unit_price: row.get("unit_price"),
+	}).collect();
+	Ok(details)
+}
+\end{lstlisting}
+\begin{itemize}
+\item Queries all sales order details ordered by \texttt{order\_code} and \texttt{line\_num}.
+\item Returns a \texttt{Vec<SalesOrderDetail>} containing all records.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Getting Sales Order Details by Order Code}
+\begin{lstlisting}[language=Rust]
+pub async fn get_details_by_order_code(
+client: &Client,
+order_code: &str,
+) -> Result<Vec<SalesOrderDetail>, Error> {
+	let stmt = client.prepare(
+	"SELECT id, order_code, line_num, item_id, quantity, unit, unit_price
+	FROM sales_order_details WHERE order_code = $1 ORDER BY line_num",
+	).await?;
+\end{lstlisting}
+\begin{itemize}
+	\item Defines an asynchronous function to fetch details by \texttt{order\_code}.
+	\item Prepares a \texttt{SELECT} statement to retrieve and order results.
+	\item Uses \texttt{client.prepare} and \texttt{client.query}.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Processing and Returning Results}
+	\vspace{15pt}
+\begin{lstlisting}[language=Rust]
+	let rows = client.query(&stmt, &[&order_code]).await?;
+	let details = rows.iter().map(|row| SalesOrderDetail {
+		id: row.get("id"),
+		order_code: row.get("order_code"),
+		line_num: row.get("line_num"),
+		item_id: row.get("item_id"),
+		quantity: row.get("quantity"),
+		unit: row.get("unit"),
+		unit_price: row.get("unit_price"),
+	}).collect();
+	Ok(details)
+}
+\end{lstlisting}
+\begin{itemize}
+\item Executes the query and processes the results.
+\item Maps rows to \texttt{SalesOrderDetail} structs and collects them into a vector.
+\item Returns the vector wrapped in an \texttt{Ok} result.
+\end{itemize}
+\end{frame}
+
+
+\end{document}

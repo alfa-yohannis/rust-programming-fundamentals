@@ -7,7 +7,7 @@
 
 \subtitle{IF120203-Programming Fundamentals}
 
-\title{Session-10:\\\LARGE{Database in Rust}\\ \vspace{15pt}}
+\title{Session-12:\\\LARGE{Item Master Data Form:\\Update and Delete}}
 \date[Serial]{\scriptsize {PRU/SPMI/FR-BM-18/0222}}
 \author[Pradita]{\small{\textbf{Alfa Yohannis}}}
 
@@ -36,27 +36,7 @@ stringstyle=\color{teal}\ttfamily,
 showstringspaces=false
 }
 
-\lstdefinelanguage{Sql} {
-keywords={DROP, SELECT, FROM, UPDATE, DELETE, ALTER, TABLE, IF, EXISTS, CREATE, SERIAL, PRIMARY, KEY, VARCHAR, DEFAULT, NOT, NULL, INT, FLOAT4, INSERT, INTO, VALUES, REFERENCES, UNIQUE, WITH, TIME, ZONE},
-basicstyle=\ttfamily\footnotesize,
-keywordstyle=\color{blue}\bfseries,
-ndkeywords={FLOOR, CAST, LPAD, CURRENT_TIMESTAMP},
-ndkeywordstyle=\color{purple}\bfseries,
-sensitive=true,
-numbers=left,
-numberstyle=\tiny\color{gray},
-breaklines=true,
-frame=lines,
-backgroundcolor=\color{lightgray!10},
-tabsize=2,
-comment=[l]{--},
-morecomment=[s]{/*}{*/},
-commentstyle=\color{gray}\ttfamily,
-string=[s]{'}{'},
-morestring=[s]{"}{"},
-stringstyle=\color{teal}\ttfamily,
-showstringspaces=false
-}
+
 
 \begin{document}
 
@@ -64,657 +44,453 @@ showstringspaces=false
 
 % Add table of contents slide
 \begin{frame}{Contents}
-	\vspace{15pt}
-	\begin{columns}[t]
-		\begin{column}{.5\textwidth}
-			\tableofcontents[sections={1-12}]
-		\end{column}
-		\begin{column}{.5\textwidth}
-			\tableofcontents[sections={13-24}]
-		\end{column}
-	\end{columns}
-\end{frame}
-
-
-\section{Database}
-\begin{frame}[fragile]{Dropping Existing Tables}
-
-\begin{lstlisting}[language=Sql]
-DROP TABLE IF EXISTS item;
-DROP TABLE IF EXISTS sales_order_details;
-DROP TABLE IF EXISTS sales_orders;
-\end{lstlisting}
-
-\begin{itemize}
-\item \texttt{DROP TABLE IF EXISTS} removes the specified table if it exists.
-\item Used here to ensure that tables are recreated without errors.
-\end{itemize}
-\end{frame}
-
-\section{PostgreSQL: Item Table}
-\begin{frame}[fragile]{Creating the \texttt{item} Table (Part 1)}
 \vspace{15pt}
-\begin{lstlisting}[language=Sql]
-CREATE TABLE item (
-id SERIAL PRIMARY KEY,
-code VARCHAR(10) DEFAULT LPAD(CAST(FLOOR(1 + random() * 9)::INT * 1000000000 + FLOOR(random() * 1000000000)::INT AS VARCHAR), 10, '0') NOT NULL UNIQUE,
-\end{lstlisting}
-
-\begin{itemize}
-\item \texttt{id} is a unique identifier for each item.
-\item \texttt{code} is a 10-character string, generated with leading zeros and uniqueness enforced.
-\end{itemize}
-\end{frame}
-
-\begin{frame}[fragile]{Creating the \texttt{item} Table (Part 2)}
-
-\begin{lstlisting}[language=Sql]
-name VARCHAR NOT NULL,
-currency VARCHAR(3) NOT NULL,
-price FLOAT4 NOT NULL,
-quantity FLOAT4 NOT NULL DEFAULT 0,
-unit VARCHAR(50) NULL
-);
-\end{lstlisting}
-
-\begin{itemize}
-\item \texttt{name} is the item's name.
-\item \texttt{currency} is a 3-character code for currency.
-\item \texttt{price} is the cost of the item.
-\item \texttt{quantity} is the available stock, defaulting to 0 if not specified.
-\item \texttt{unit} is an optional field describing the measurement unit.
-\end{itemize}
-\end{frame}
-
-\begin{frame}[fragile]{Inserting Data into \texttt{item}}
-
-\begin{lstlisting}[language=Sql]
-INSERT INTO item (code, name, currency, price, quantity, unit)
-VALUES
-('0000000010', 'Organic Almonds', 'USD', 15.49, 50.00, 'kg'),
-('0000000020', 'Stainless Steel Water Bottle', 'USD', 23.99, 150.00, 'pcs'),
-('0000000030', 'Bluetooth Headphones', 'USD', 89.99, 75.00, 'pcs');
-\end{lstlisting}
-
-\begin{itemize}
-\item Inserts three rows into the \texttt{item} table.
-\item Each row provides values for \texttt{code}, \texttt{name}, \texttt{currency}, \texttt{price}, \texttt{quantity}, and \texttt{unit}.
-\end{itemize}
-\end{frame}
-
-\section{PostgreSQL: Sales Order Tables}
-\begin{frame}[fragile]{Creating the \texttt{sales\_orders} Table}
-\vspace{15pt}
-\begin{lstlisting}[language=Sql]
-CREATE TABLE sales_orders (
-id SERIAL PRIMARY KEY,
-code VARCHAR(10) NOT NULL UNIQUE,
-order_date TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
-note VARCHAR(256) NULL
-);
-\end{lstlisting}
-
-\begin{itemize}
-\item \texttt{id} is a unique identifier for each order.
-\item \texttt{code} is a unique identifier for the order.
-\item \texttt{order\_date} records when the order was placed.
-\item \texttt{note} is an optional field for additional information.
-\end{itemize}
-\end{frame}
-
-\begin{frame}[fragile]{Creating the \texttt{sales\_order\_details} Table}
-\vspace{15pt}
-\begin{lstlisting}[language=Sql]
-CREATE TABLE sales_order_details (
-id SERIAL PRIMARY KEY,
-order_code VARCHAR(10) NOT NULL REFERENCES sales_orders(code),
-line_num INTEGER NOT NULL,
-item_id INTEGER NOT NULL,
-quantity REAL NOT NULL DEFAULT 0,
-unit VARCHAR(50) NULL,
-unit_price REAL NOT NULL
-);
-\end{lstlisting}
-\vspace{-20pt}
 \begin{columns}[t]
-\begin{column}{.5\pagewidth}
-\begin{itemize}
-\item \texttt{id} is a unique identifier for each detail record.
-\item \texttt{order\_code} links to the \texttt{sales\_orders} table.
-\item \texttt{line\_num} indicates the item line number in the order.
-\end{itemize}
+\begin{column}{.5\textwidth}
+	\tableofcontents[sections={1-3}]
 \end{column}
-\begin{column}{.5\pagewidth}
-\begin{itemize}
-\item \texttt{item\_id} references the \texttt{item} table.
-\item \texttt{quantity} is the amount of the item ordered.
-\item \texttt{unit} describes the measurement unit for the item.
-\item \texttt{unit\_price} is the price per unit of the item.
-\end{itemize}
+\begin{column}{.5\textwidth}
+	\tableofcontents[sections={4-6}]
 \end{column}
 \end{columns}
 \end{frame}
 
-\section{Rust: Publish Modules}
-\begin{frame}[fragile]{Module Declarations in \texttt{src/lib.rs}}
-\begin{lstlisting}[language=Rust]
-pub mod item;
-pub mod sales_order;
-pub mod sales_order_detail;
-\end{lstlisting}
 
-\textbf{Explanation:}
+\section{Introduction}
+\begin{frame}{Introduction}
+In this session, we will explore how to integrate FLTK with PostgreSQL in a Rust application. We will cover:
 \begin{itemize}
-\item \texttt{pub mod item;} declares a public module named \texttt{item}.
-\item \texttt{pub mod sales\_order;} declares a public module named \texttt{sales\_order}.
-\item \texttt{pub mod sales\_order\_detail;} declares a public module named \texttt{sales\_order\_detail}.
-\item Each module is expected to be defined in a corresponding file, such as \texttt{item.rs}, \texttt{sales\_order.rs}, and \texttt{sales\_order\_detail.rs}.
+\item Database setup
+\item Main application setup
+\item Table configuration
+\item Button callbacks
 \end{itemize}
 \end{frame}
 
-
-\section{Rust: Item}
-\begin{frame}[fragile]{Rust Code Overview: Item Module}
-\vspace{15pt}
+\section{Database Setup}
+\subsection{Imports and Setup}
+\begin{frame}[fragile]{Imports and Setup}
 \begin{lstlisting}[language=Rust]
-use tokio_postgres::{Client, Error};
+#[macro_use]
+extern crate lazy_static;
 
-#[derive(Debug)]
-	pub struct Item {
-	pub code: String,
-	pub name: String,
-	pub currency: String,
-	pub price: f32,
-	pub quantity: f32,
-	pub unit: Option<String>,
+use async_std::task;
+use business_app::item::Item;
+use fltk::{
+	app,
+	button::Button,
+	draw, enums,
+	input::Input,
+	prelude::*,
+	table::{self, Table},
+	window::Window,
+};
+use std::sync::Mutex;
+use tokio_postgres::{Client, NoTls};
+\end{lstlisting}
+
+\begin{itemize}
+\item Imports necessary crates and modules.
+\item Sets up `lazy\_static` for static variables.
+\item Defines `Item` from `busines\_app`.
+\end{itemize}
+\end{frame}
+
+\subsection{Database Client}
+\begin{frame}[fragile]{Database Client Part 1}
+\begin{lstlisting}[language=Rust]
+lazy_static! {
+	static ref DB_CLIENT: Mutex<Client> = Mutex::new(task::block_on(create_db_client()));
+	static ref ITEMS: Mutex<Vec<Item>> = Mutex::new(task::block_on(load_items_from_db(
+	&DB_CLIENT.lock().unwrap()
+	)));
 }
 \end{lstlisting}
 
 \begin{itemize}
-\item \texttt{Item} struct represents an item with attributes: \texttt{code}, \texttt{name}, \texttt{currency}, \texttt{price}, \texttt{quantity}, and \texttt{unit}.
-\item \texttt{unit} is an optional field.
+\item Defines global `DB\_CLIENT` and `ITEMS` using `lazy\_static`.
+\item `task::block\_on` ensures asynchronous operations are awaited.
 \end{itemize}
 \end{frame}
 
-\section{Rust: Item Operations}
-\begin{frame}[fragile]{Adding an Item}
-\vspace{15pt}
+\begin{frame}[fragile]{Database Client Part 2}
 \begin{lstlisting}[language=Rust]
-pub async fn add(client: &Client, item: &Item) -> Result<(), Error> {
+async fn create_db_client() -> Client {
+	let (client, connection) = tokio_postgres::connect(
+	"host=localhost user=postgres password=1234 dbname=session10",
+	NoTls,
+	)
+	.await
+	.unwrap();
 	
-let stmt = client.prepare("INSERT INTO item (code, name, currency, price, quantity, unit) VALUES ($1, $2, $3, $4, $5, $6)",).await?;
-
-client.execute(&stmt, &[&item.code, &item.name, &item.currency, &item.price, &item.quantity, &item.unit,],).await?;
-
-Ok(())
-}
-\end{lstlisting}
-
-\begin{itemize}
-\item \texttt{add} function inserts a new item into the \texttt{item} table.
-\item It prepares and executes an \texttt{INSERT} SQL statement.
-\end{itemize}
-\end{frame}
-
-\begin{frame}[fragile]{Deleting an Item}
-\vspace{15pt}
-\begin{lstlisting}[language=Rust]
-pub async fn delete(client: &Client, code: &str) -> Result<(), Error> {
-
-	let stmt = client.prepare("DELETE FROM item WHERE code = $1").await?;
-	
-	client.execute(&stmt, &[&code]).await?;
-	
-	Ok(())
-}
-\end{lstlisting}
-
-\begin{itemize}
-\item \texttt{delete} function removes an item from the \texttt{item} table based on the \texttt{code}.
-\item It prepares and executes a \texttt{DELETE} SQL statement.
-\end{itemize}
-\end{frame}
-
-
-\begin{frame}[fragile]{Updating an Item}
-\vspace{15pt}
-\begin{lstlisting}[language=Rust]
-pub async fn update(client: &Client, item: &Item) -> Result<(), Error> {
-	
-	let stmt = client.prepare("UPDATE item SET name = $1, currency = $2, price = $3, quantity = $4, unit = $5 WHERE code = $6",).await?;
-	
-	client.execute(&stmt, &[&item.name, &item.currency, &item.price, &item.quantity, &item.unit, &item.code,],).await?;
-	
-	Ok(())
-}
-\end{lstlisting}
-
-\begin{itemize}
-\item \texttt{update} function updates the details of an existing item in the \texttt{item} table.
-\item It prepares and executes an \texttt{UPDATE} SQL statement based on the \texttt{code}.
-\end{itemize}
-\end{frame}
-
-\begin{frame}[fragile]{Listing All Items}
-\vspace{15pt}
-\begin{lstlisting}[language=Rust]
-pub async fn list(client: &Client) -> Result<Vec<Item>, Error> {
-	let rows = client
-	.query("SELECT code, name, currency, price, quantity, unit FROM item ORDER BY code",&[],).await?;	
-	let items = rows.iter().map(|row| Item {
-		code: row.get("code"), name: row.get("name"),
-		currency: row.get("currency"), price: row.get("price"),
-		quantity: row.get("quantity"), unit: row.get("unit"),
-	}).collect();
-	Ok(items)
-}
-\end{lstlisting}
-
-\begin{itemize}
-\item \texttt{list} function retrieves all items from the \texttt{item} table.
-\item It executes a \texttt{SELECT} SQL statement and maps the result to a vector of \texttt{Item} structs.
-\end{itemize}
-\end{frame}
-
-\begin{frame}[fragile]{Getting a Specific Item}
-\vspace{15pt}
-\begin{lstlisting}[language=Rust]
-pub async fn get(client: &Client, code: &str) -> Result<Option<Item>, Error> {
-	let stmt = client.prepare("SELECT code, name, currency, price, quantity, unit FROM item WHERE code = $1").await?;
-	let row = client.query_opt(&stmt, &[&code]).await?;
-	if let Some(row) = row {
-		Ok(Some(Item {
-			code: row.get("code"), name: row.get("name"),
-			currency: row.get("currency"), price: row.get("price"),
-			quantity: row.get("quantity"), unit: row.get("unit"),
-		}))
-	} else { Ok(None) } }
-\end{lstlisting}
-
-\begin{itemize}
-\item \texttt{get} function retrieves a specific item based on its \texttt{code}.
-\item It executes a \texttt{SELECT} SQL statement and returns an \texttt{Option<Item>} where \texttt{None} indicates no item was found.
-\end{itemize}
-\end{frame}
-
-\section{Rust: Sales Order}
-\begin{frame}[fragile]{Rust Code Overview: Sales Order Module}
-	\begin{lstlisting}[language=Rust]
-		use chrono::{DateTime, Utc};
-		use tokio_postgres::{Client, Error};
-		
-		#[derive(Debug, Clone)]
-		pub struct SalesOrder {
-			pub code: String,
-			pub order_date: DateTime<Utc>,
-			pub note: Option<String>,
+	tokio::spawn(async move {
+		if let Err(e) = connection.await {
+			eprintln!("Connection error: {}", e);
 		}
-	\end{lstlisting}
+	});
 	
-	\begin{itemize}
-		\item \texttt{SalesOrder} struct represents a sales order with attributes: \texttt{code}, \texttt{order\_date}, and \texttt{note}.
-		\item \texttt{order\_date} is a timestamp with timezone.
-		\item \texttt{note} is an optional field.
-	\end{itemize}
+	client
+}
+\end{lstlisting}
+
+\begin{itemize}
+\item `create\_db\_client` establishes a PostgreSQL connection asynchronously.
+\item `tokio::spawn` manages the connection in the background.
+\end{itemize}
 \end{frame}
 
-\section{Rust: Sales Order Operations}
-\begin{frame}[fragile]{Adding a Sales Order}
-	\begin{lstlisting}[language=Rust]
-		pub async fn add_sales_order(client: &Client, order: &SalesOrder) -> Result<(), Error> {
-			let stmt = client
-			.prepare(
-			"INSERT INTO sales_orders (code, order_date, note)
-			VALUES ($1, $2, $3)",
-			)
-			.await?;
-			
-			client
-			.execute(&stmt, &[&order.code, &order.order_date, &order.note])
-			.await?;
-			
-			Ok(())
-		}
-	\end{lstlisting}
-	
-	\begin{itemize}
-		\item \texttt{add\_sales\_order} function inserts a new sales order into the \texttt{sales\_orders} table.
-		\item It prepares and executes an \texttt{INSERT} SQL statement.
-	\end{itemize}
+\begin{frame}[fragile]{Database Client Part 3}
+\begin{lstlisting}[language=Rust]
+async fn load_items_from_db(client: &Client) -> Vec<Item> {
+	business_app::item::list(client)
+	.await
+	.unwrap_or_else(|_| Vec::new())
+}
+\end{lstlisting}
+
+\begin{itemize}
+\item `load\_items\_from\_db` retrieves items from the database.
+\item Returns an empty vector if the database operation fails.
+\end{itemize}
 \end{frame}
 
-\begin{frame}[fragile]{Getting a Sales Order}
-	\begin{lstlisting}[language=Rust]
-		pub async fn get_sales_order(client: &Client, code: &str) -> Result<Option<SalesOrder>, Error> {
-			let stmt = client
-			.prepare("SELECT code, order_date, note FROM sales_orders WHERE code = $1")
-			.await?;
-			
-			let row_opt = client.query_opt(&stmt, &[&code]).await?;
-			
-			if let Some(row) = row_opt {
-				Ok(Some(SalesOrder {
-					code: row.get("code"),
-					order_date: row.get("order_date"),
-					note: row.get("note"),
-				}))
-			} else {
-				Ok(None)
+\subsection{Database Operations}
+\begin{frame}[fragile]{Database Operations}
+\begin{lstlisting}[language=Rust]
+async fn persist_item_to_db(client: &Client, item: &Item) {
+	business_app::item::add(client, item).await.unwrap();
+}
+
+async fn delete_item_from_db(client: &Client, code: &str) {
+	business_app::item::delete(client, code).await.unwrap();
+}
+
+async fn update_item_in_db(client: &Client, item: &Item) {
+	business_app::item::update(client, item).await.unwrap();
+}
+\end{lstlisting}
+
+\begin{itemize}
+\item Defines functions for database operations: add, delete, and update items.
+\item Each function handles asynchronous operations and unwraps results.
+\end{itemize}
+\end{frame}
+
+\section{Main Application}
+\subsection{Setup}
+\begin{frame}[fragile]{Main Application Setup Part 1}
+\begin{lstlisting}[language=Rust]
+#[tokio::main]
+async fn main() {
+	let app = app::App::default();
+	let (screen_width, screen_height) = app::screen_size();
+	
+	let window_width = 600;
+	let window_height = 400;
+	let mut window = Window::new(
+	(screen_width as i32 - window_width) / 2,
+	(screen_height as i32 - window_height) / 2,
+	window_width,
+	window_height,
+	"Item List",
+	);
+\end{lstlisting}
+
+\begin{itemize}
+	\item Initializes the FLTK application.
+	\item Creates and centers a window on the screen.
+	\item Sets up window dimensions and title.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Main Application Setup Part 2}
+\begin{lstlisting}[language=Rust]
+	window.make_resizable(true);
+	
+	let edit_code_input = Input::new(50, 50, 140, 30, "Code:");
+	let edit_name_input = Input::new(50, 100, 140, 30, "Name:");
+	let edit_currency_input = Input::new(50, 150, 140, 30, "Currency:");
+	let edit_price_input = Input::new(250, 50, 140, 30, "Price:");
+	let edit_quantity_input = Input::new(250, 100, 140, 30, "Quantity:");
+	let edit_unit_input = Input::new(250, 150, 140, 30, "Unit:");
+	
+	let mut add_button = Button::new(50, 200, 80, 40, "Add");
+	let mut update_button = Button::new(150, 200, 80, 40, "Update");
+	let mut delete_button = Button::new(250, 200, 80, 40, "Delete");
+\end{lstlisting}
+
+\begin{itemize}
+	\item Sets up input fields and buttons.
+	\item Configures their positions and sizes.
+	\item Makes the window resizable.
+\end{itemize}
+\end{frame}
+
+\subsection{Table Configuration}
+\begin{frame}[fragile]{Table Configuration Part 1}
+\begin{lstlisting}[language=Rust]
+	let mut item_table = Table::new(50, 250, 500, 130, "");
+	
+	// Use the global ITEMS vector to set the number of rows in the table
+	item_table.set_rows(ITEMS.lock().unwrap().len() as i32);
+	item_table.set_cols(6); // Code, Name, Currency, Price, Quantity, Unit
+	item_table.set_col_header(true);
+	item_table.set_row_header(true);
+	item_table.set_col_width_all(100); // Set a default column width for all columns
+\end{lstlisting}
+
+\begin{itemize}
+	\item Initializes the `Table` widget.
+	\item Configures the number of rows and columns.
+	\item Sets column and row headers.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Table Configuration Part 2}
+\begin{lstlisting}[language=Rust]
+	item_table.set_col_width(0, 100);
+	item_table.set_col_width(1, 150);
+	item_table.set_col_resize(true);
+	item_table.set_col_resize_min(50);
+	item_table.end();
+\end{lstlisting}
+
+\begin{itemize}
+	\item Configures column widths and resizing properties.
+	\item Finalizes the table setup with `end()`.
+\end{itemize}
+\end{frame}
+
+\subsection{Table Drawing}
+\begin{frame}[fragile]{Table Drawing Part 1}
+\begin{lstlisting}[language=Rust]
+	item_table.draw_cell({
+		move |t, ctx, row, col, x, y, w, h| match ctx {
+			table::TableContext::StartPage => draw::set_font(enums::Font::Helvetica, 14),
+			table::TableContext::ColHeader => {
+				let headers = ["Code", "Name", "Currency", "Price", "Quantity", "Unit"];
+				draw_header(headers[col as usize], x, y, w, h);
 			}
-		}
-	\end{lstlisting}
-	
-	\begin{itemize}
-		\item \texttt{get\_sales\_order} function retrieves a specific sales order based on its \texttt{code}.
-		\item It executes a \texttt{SELECT} SQL statement and returns an \texttt{Option<SalesOrder>} where \texttt{None} indicates no order was found.
-	\end{itemize}
-\end{frame}
-
-\begin{frame}[fragile]{Updating a Sales Order}
-	\begin{lstlisting}[language=Rust]
-		pub async fn update_sales_order(client: &Client, order: &SalesOrder) -> Result<(), Error> {
-			let stmt = client
-			.prepare(
-			"UPDATE sales_orders
-			SET order_date = $1, note = $2
-			WHERE code = $3",
-			)
-			.await?;
-			
-			client
-			.execute(&stmt, &[&order.order_date, &order.note, &order.code])
-			.await?;
-			
-			Ok(())
-		}
-	\end{lstlisting}
-	
-	\begin{itemize}
-		\item \texttt{update\_sales\_order} function updates an existing sales order in the \texttt{sales\_orders} table.
-		\item It prepares and executes an \texttt{UPDATE} SQL statement based on the \texttt{code}.
-	\end{itemize}
-\end{frame}
-
-\begin{frame}[fragile]{Deleting a Sales Order}
-	\begin{lstlisting}[language=Rust]
-		pub async fn delete_sales_order(client: &Client, code: &str) -> Result<(), Error> {
-			let stmt = client.prepare("DELETE FROM sales_orders WHERE code = $1").await?;
-			client.execute(&stmt, &[&code]).await?;
-			Ok(())
-		}
-	\end{lstlisting}
-	
-	\begin{itemize}
-		\item \texttt{delete\_sales\_order} function removes a sales order from the \texttt{sales\_orders} table based on the \texttt{code}.
-		\item It prepares and executes a \texttt{DELETE} SQL statement.
-	\end{itemize}
-\end{frame}
-
-\begin{frame}[fragile]{Listing All Sales Orders}
-	\begin{lstlisting}[language=Rust]
-		pub async fn list_sales_orders(client: &Client) -> Result<Vec<SalesOrder>, Error> {
-			let rows = client.query("SELECT code, order_date, note FROM sales_orders ORDER BY code", &[]).await?;
-			
-			let orders = rows
-			.iter()
-			.map(|row| SalesOrder {
-				code: row.get("code"),
-				order_date: row.get("order_date"),
-				note: row.get("note"),
-			})
-			.collect();
-			
-			Ok(orders)
-		}
-	\end{lstlisting}
-	
-	\begin{itemize}
-		\item \texttt{list\_sales\_orders} function retrieves all sales orders from the \texttt{sales\_orders} table.
-		\item It executes a \texttt{SELECT} SQL statement and maps the result to a vector of \texttt{SalesOrder} structs.
-	\end{itemize}
-\end{frame}
-
-\section{Rust: Sales Order Detail}
-
-\begin{frame}[fragile]{SalesOrderDetail Struct}
-	\begin{lstlisting}[language=Rust]
-		use tokio_postgres::{Client, Error};
-		
-		#[derive(Debug, Clone)]
-		pub struct SalesOrderDetail {
-			pub id: i32,
-			pub order_code: String,
-			pub line_num: i32,
-			pub item_id: i32,
-			pub quantity: f32,
-			pub unit: Option<String>,
-			pub unit_price: f32,
-		}
-	\end{lstlisting}
-	\begin{itemize}
-		\item \texttt{id} is the unique identifier for each detail record.
-		\item \texttt{order\_code} is the reference to the order.
-		\item \texttt{line\_num} is the line number of the item in the order.
-		\item \texttt{item\_id} is the identifier of the item.
-		\item \texttt{quantity} is the amount of the item ordered.
-		\item \texttt{unit} describes the measurement unit.
-		\item \texttt{unit\_price} is the price per unit of the item.
-	\end{itemize}
-\end{frame}
-
-\section{Rust: Sales Order Detail Operations}
-
-\begin{frame}[fragile]{Adding Sales Order Detail}
-	\begin{lstlisting}[language=Rust]
-		pub async fn add_sales_order_detail(
-		client: &Client,
-		detail: &SalesOrderDetail,
-		) -> Result<(), Error> {
-			let stmt = client
-			.prepare(
-			"INSERT INTO sales_order_details (order_code, line_num, item_id, quantity, unit, unit_price)
-			VALUES ($1, $2, $3, $4, $5, $6)",
-			)
-			.await?;
-			
-			client
-			.execute(
-			&stmt,
-			&[
-			&detail.order_code,
-			&detail.line_num,
-			&detail.item_id,
-			&detail.quantity,
-			&detail.unit,
-			&detail.unit_price,
-			],
-			)
-			.await?;
-			
-			Ok(())
-		}
-	\end{lstlisting}
-	\begin{itemize}
-		\item Prepares an \texttt{INSERT} statement for adding a sales order detail.
-		\item Executes the statement with the detail's attributes.
-	\end{itemize}
-\end{frame}
-
-\begin{frame}[fragile]{Getting Sales Order Detail by ID}
-	\begin{lstlisting}[language=Rust]
-		pub async fn get_sales_order_detail(
-		client: &Client,
-		id: i32,
-		) -> Result<Option<SalesOrderDetail>, Error> {
-			let stmt = client
-			.prepare(
-			"SELECT id, order_code, line_num, item_id, quantity, unit, unit_price
-			FROM sales_order_details WHERE id = $1",
-			)
-			.await?;
-			
-			let row_opt = client.query_opt(&stmt, &[&id]).await?;
-			
-			if let Some(row) = row_opt {
-				Ok(Some(SalesOrderDetail {
-					id: row.get("id"),
-					order_code: row.get("order_code"),
-					line_num: row.get("line_num"),
-					item_id: row.get("item_id"),
-					quantity: row.get("quantity"),
-					unit: row.get("unit"),
-					unit_price: row.get("unit_price"),
-				}))
-			} else {
-				Ok(None)
+			table::TableContext::RowHeader => draw_header(&format!("{}", row + 1), x, y, w, h),
+			table::TableContext::Cell => {
+				let item = &ITEMS.lock().unwrap()[row as usize];
+				let data = match col {
+					0 => &item.code,
+					1 => &item.name,
+					2 => &item.currency,
+					3 => &item.price.to_string(),
+					4 => &item.quantity.to_string(),
+					5 => &item.unit.as_deref().unwrap_or(""),
+					_ => "",
+				};
+				draw_cell_data(data, x, y, w, h);
 			}
+			_ => (),
 		}
+	});
+\end{lstlisting}
+
+\begin{itemize}
+	\item Retrieves and displays item data based on column index.
+	\item Manages drawing of cell content.
+\end{itemize}
+\end{frame}
+
+\section{Button Callbacks}
+\subsection{Add Button}
+\begin{frame}[fragile]{Add Button Callback Part 1}
+\begin{lstlisting}[language=Rust]
+add_button.set_callback({
+	let mut item_table = item_table.clone();
+	let mut edit_code_input = edit_code_input.clone();
+	let mut edit_name_input = edit_name_input.clone();
+	let mut edit_currency_input = edit_currency_input.clone();
+	let mut edit_price_input = edit_price_input.clone();
+	let mut edit_quantity_input = edit_quantity_input.clone();
+	let mut edit_unit_input = edit_unit_input.clone();
 	\end{lstlisting}
+	
 	\begin{itemize}
-		\item Prepares a \texttt{SELECT} statement to fetch a sales order detail by \texttt{id}.
-		\item Returns \texttt{Option<SalesOrderDetail>} based on the query result.
+		\item Defines the callback for the "Add" button.
+		\item Creates a new `Item` based on user input.
 	\end{itemize}
 \end{frame}
 
-\begin{frame}[fragile]{Updating Sales Order Detail}
+\begin{frame}[fragile]{Add Button Callback Part 2}
+\begin{lstlisting}[language=Rust]
+		move |_| {
+			let new_item = Item {
+				code: edit_code_input.value(),
+				name: edit_name_input.value(),
+				currency: edit_currency_input.value(),
+				price: edit_price_input.value().parse().unwrap_or(0.0),
+				quantity: edit_quantity_input.value().parse().unwrap_or(0.0),
+				unit: if edit_unit_input.value().is_empty() {
+					None
+				} else {
+					Some(edit_unit_input.value())
+				},
+			};
+		\end{lstlisting}
+		
+		\begin{itemize}
+			\item Defines the callback for the "Add" button.
+			\item Creates a new `Item` based on user input.
+		\end{itemize}
+	\end{frame}
+
+\begin{frame}[fragile]{Add Button Callback Part 3}
 	\begin{lstlisting}[language=Rust]
-		pub async fn update_sales_order_detail(
-		client: &Client,
-		detail: &SalesOrderDetail,
-		) -> Result<(), Error> {
-			let stmt = client
-			.prepare(
-			"UPDATE sales_order_details
-			SET quantity = $1, unit = $2, unit_price = $3
-			WHERE order_code = $4 and line_num = $5",
-			)
-			.await?;
-			
-			client
-			.execute(
-			&stmt,
-			&[
-			&detail.quantity,
-			&detail.unit,
-			&detail.unit_price,
-			&detail.order_code,
-			&detail.line_num,
-			],
-			)
-			.await?;
-			
-			Ok(())
-		}
+		// Persist the new item to the database
+		task::block_on(persist_item_to_db(
+		&DB_CLIENT.lock().unwrap(),
+		&new_item
+		));
+		// Update the table
+		let mut items = ITEMS.lock().unwrap();
+		items.push(new_item);
+		item_table.set_rows(items.len() as i32);
+		item_table.redraw();
+	}
+});
+\end{lstlisting}
+
+\begin{itemize}
+	\item Adds the new item to the database and updates the table.
+	\item Refreshes the item list and redraws the table.
+\end{itemize}
+\end{frame}
+
+\subsection{Update Button}
+\begin{frame}[fragile]{Update Button Callback Part 1}
+\vspace{15pt}
+\begin{lstlisting}[language=Rust]
+update_button.set_callback({
+	let mut item_table = item_table.clone();
+	let mut edit_code_input = edit_code_input.clone();
+	let mut edit_name_input = edit_name_input.clone();
+	let mut edit_currency_input = edit_currency_input.clone();
+	let mut edit_price_input = edit_price_input.clone();
+	let mut edit_quantity_input = edit_quantity_input.clone();
+	let mut edit_unit_input = edit_unit_input.clone();
 	\end{lstlisting}
 	\begin{itemize}
-		\item Prepares an \texttt{UPDATE} statement to modify existing sales order details.
-		\item Updates \texttt{quantity}, \texttt{unit}, and \texttt{unit\_price} based on \texttt{order\_code} and \texttt{line\_num}.
+		\item Defines the callback for the "Update" button.
+		\item Prepares the updated item for database and table update.
 	\end{itemize}
 \end{frame}
 
-\begin{frame}[fragile]{Deleting Sales Order Detail}
-	\begin{lstlisting}[language=Rust]
-		pub async fn delete_sales_order_detail(
-		client: &Client,
-		detail: &SalesOrderDetail,
-		) -> Result<(), Error> {
-			let stmt = client
-			.prepare("DELETE FROM sales_order_details WHERE order_code = $1 and line_num = $2")
-			.await?;
-			client
-			.execute(&stmt, &[&detail.order_code, &detail.line_num])
-			.await?;
-			Ok(())
-		}
+\begin{frame}[fragile]{Update Button Callback Part 2}
+\vspace{15pt}
+\begin{lstlisting}[language=Rust]
+	move |_| {
+		let updated_item = Item {
+			code: edit_code_input.value(),
+			name: edit_name_input.value(),
+			currency: edit_currency_input.value(),
+			price: edit_price_input.value().parse().unwrap_or(0.0),
+			quantity: edit_quantity_input.value().parse().unwrap_or(0.0),
+			unit: if edit_unit_input.value().is_empty() {
+				None
+			} else {
+				Some(edit_unit_input.value())
+			},
+		};
 	\end{lstlisting}
 	\begin{itemize}
-		\item Prepares a \texttt{DELETE} statement to remove sales order details based on \texttt{order\_code} and \texttt{line\_num}.
+		\item Defines the callback for the "Update" button.
+		\item Prepares the updated item for database and table update.
+	\end{itemize}
+\end{frame}
+	
+\begin{frame}[fragile]{Update Button Callback Part 3}
+\vspace{15pt}
+\begin{lstlisting}[language=Rust]
+		// Update the item in the database
+		task::block_on(update_item_in_db(&DB_CLIENT.lock().unwrap(), &updated_item));
+		
+		// Update the table
+		let mut items = ITEMS.lock().unwrap();
+		let pos = items.iter().position(|x| x.code == updated_item.code);
+		if let Some(pos) = pos {
+			items[pos] = updated_item;
+			item_table.redraw();
+		}
+	}
+});
+\end{lstlisting}
+\begin{itemize}
+\item Updates the item in the `ITEMS` vector and refreshes the table.
+\item Ensures the table reflects the changes immediately.
+\end{itemize}
+\end{frame}
+
+	
+
+
+\begin{frame}[fragile]{Delete Button Callback Part 1}
+	\begin{lstlisting}[language=Rust]
+		delete_button.set_callback({
+			let mut item_table = item_table.clone();
+			let mut edit_code_input = edit_code_input.clone();
+			move |_| {
+				let code_to_delete = edit_code_input.value();
+			\end{lstlisting}
+			
+			\begin{itemize}
+				\item Sets up the callback for the "Delete" button.
+				\item Clones the `item\_table` and `edit\_code\_input` to use within the callback.
+			\end{itemize}
+		\end{frame}
+		
+		\begin{frame}[fragile]{Delete Button Callback Part 2}
+			\begin{lstlisting}[language=Rust]
+				// Delete the item from the database
+				task::block_on(delete_item_from_db(
+				&DB_CLIENT.lock().unwrap(),
+				&code_to_delete
+				));
+			\end{lstlisting}
+			
+			\begin{itemize}
+				\item Deletes the item from the database asynchronously.
+				\item Utilizes `task::block\_on` to handle asynchronous database operations in a synchronous context.
+			\end{itemize}
+		\end{frame}
+		
+		\begin{frame}[fragile]{Delete Button Callback Part 3}
+			\begin{lstlisting}[language=Rust]
+				// Update the table
+				let mut items = ITEMS.lock().unwrap();
+				let pos = items.iter().position(|x| x.code == code_to_delete);
+				if let Some(pos) = pos {
+					items.remove(pos);
+					item_table.set_rows(items.len() as i32);
+					item_table.redraw();
+				}
+			}
+		});
+	\end{lstlisting}
+	
+	\begin{itemize}
+		\item Updates the `ITEMS` vector by removing the deleted item.
+		\item Adjusts the number of rows in the `item\_table` and triggers a redraw.
 	\end{itemize}
 \end{frame}
 
-\begin{frame}[fragile]{Deleting Sales Order Detail by Code}
+\begin{frame}[fragile]{Delete Button Callback Part 4}
 	\begin{lstlisting}[language=Rust]
-		pub async fn delete_sales_order_detail_by_code(client: &Client, code: &str) -> Result<(), Error> {
-			let stmt = client
-			.prepare("DELETE FROM sales_order_details WHERE order_code = $1")
-			.await?;
-			client.execute(&stmt, &[&code]).await?;
-			Ok(())
-		}
+		window.end();
+		window.show();
+		app.run().unwrap();
 	\end{lstlisting}
+	
 	\begin{itemize}
-		\item Prepares a \texttt{DELETE} statement to remove all details for a given \texttt{order\_code}.
+		\item Finalizes the window setup and displays it.
+		\item Starts the FLTK application event loop.
 	\end{itemize}
 \end{frame}
 
-\begin{frame}[fragile]{Listing All Sales Order Details}
-	\begin{lstlisting}[language=Rust]
-		pub async fn list_sales_order_details(client: &Client) -> Result<Vec<SalesOrderDetail>, Error> {
-			let rows = client
-			.query(
-			"SELECT id, order_code, line_num, item_id, quantity, unit, unit_price
-			FROM sales_order_details ORDER BY order_code, line_num",
-			&[],
-			)
-			.await?;
-			
-			let details = rows
-			.iter()
-			.map(|row| SalesOrderDetail {
-				id: row.get("id"),
-				order_code: row.get("order_code"),
-				line_num: row.get("line_num"),
-				item_id: row.get("item_id"),
-				quantity: row.get("quantity"),
-				unit: row.get("unit"),
-				unit_price: row.get("unit_price"),
-			})
-			.collect();
-			
-			Ok(details)
-		}
-	\end{lstlisting}
-	\begin{itemize}
-		\item Queries all sales order details ordered by \texttt{order\_code} and \texttt{line\_num}.
-		\item Returns a \texttt{Vec<SalesOrderDetail>} containing all records.
-	\end{itemize}
-\end{frame}
 
-\begin{frame}[fragile]{Getting Sales Order Details by Order Code}
-	\begin{lstlisting}[language=Rust]
-		pub async fn get_details_by_order_code(
-		client: &Client,
-		order_code: &str,
-		) -> Result<Vec<SalesOrderDetail>, Error> {
-			let stmt = client
-			.prepare(
-			"SELECT id, order_code, line_num, item_id, quantity, unit, unit_price
-			FROM sales_order_details WHERE order_code = $1 ORDER BY line_num",
-			)
-			.await?;
-			
-			let rows = client.query(&stmt, &[&order_code]).await?;
-			
-			let details = rows
-			.iter()
-			.map(|row| SalesOrderDetail {
-				id: row.get("id"),
-				order_code: row.get("order_code"),
-				line_num: row.get("line_num"),
-				item_id: row.get("item_id"),
-				quantity: row.get("quantity"),
-				unit: row.get("unit"),
-				unit_price: row.get("unit_price"),
-			})
-			.collect();
-			
-			Ok(details)
-		}
-	\end{lstlisting}
-	\begin{itemize}
-		\item Retrieves sales order details for a specific \texttt{order\_code}.
-		\item Orders results by \texttt{line\_num}.
-	\end{itemize}
-\end{frame}
 
 \end{document}

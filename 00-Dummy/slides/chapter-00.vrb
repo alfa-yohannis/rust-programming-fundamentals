@@ -1,35 +1,11 @@
-\frametitle{Getting Sales Order Details by Order Code}
+\frametitle{Delete Button Callback Part 4}
 \begin{lstlisting}[language=Rust]
-		pub async fn get_details_by_order_code(
-		client: &Client,
-		order_code: &str,
-		) -> Result<Vec<SalesOrderDetail>, Error> {
-			let stmt = client
-			.prepare(
-			"SELECT id, order_code, line_num, item_id, quantity, unit, unit_price
-			FROM sales_order_details WHERE order_code = $1 ORDER BY line_num",
-			)
-			.await?;
-			
-			let rows = client.query(&stmt, &[&order_code]).await?;
-			
-			let details = rows
-			.iter()
-			.map(|row| SalesOrderDetail {
-				id: row.get("id"),
-				order_code: row.get("order_code"),
-				line_num: row.get("line_num"),
-				item_id: row.get("item_id"),
-				quantity: row.get("quantity"),
-				unit: row.get("unit"),
-				unit_price: row.get("unit_price"),
-			})
-			.collect();
-			
-			Ok(details)
-		}
+		window.end();
+		window.show();
+		app.run().unwrap();
 	\end{lstlisting}
+	
 	\begin{itemize}
-		\item Retrieves sales order details for a specific \texttt{order\_code}.
-		\item Orders results by \texttt{line\_num}.
+		\item Finalizes the window setup and displays it.
+		\item Starts the FLTK application event loop.
 	\end{itemize}

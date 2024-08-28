@@ -2,11 +2,10 @@
 extern crate lazy_static;
 
 use async_std::task;
-use business_app::item::Item;
+use business_app::sales_order::{get_sales_order, list_sales_orders, SalesOrder};
+use business_app::sales_order_detail::{get_details_by_order_code, SalesOrderDetail};
 use fltk::{
-    app,
-    button::Button,
-    draw, enums,
+    app, button::Button, draw, enums,
     input::Input,
     prelude::*,
     table::{self, Table},
@@ -17,9 +16,10 @@ use tokio_postgres::{Client, NoTls};
 
 lazy_static! {
     static ref DB_CLIENT: Mutex<Client> = Mutex::new(task::block_on(create_db_client()));
-    static ref ITEMS: Mutex<Vec<Item>> = Mutex::new(task::block_on(load_items_from_db(
-        &DB_CLIENT.lock().unwrap()
-    )));
+    static ref ORDER_DETAILS: Mutex<Vec<SalesOrderDetail>> = Mutex::new(vec![]);
+    static ref ORDER: Mutex<Option<SalesOrder>> = Mutex::new(None);
+    static ref ALL_ORDERS: Mutex<Vec<SalesOrder>> = Mutex::new(vec![]);
+    static ref CURRENT_ORDER_INDEX: Mutex<usize> = Mutex::new(0);
 }
 
 async fn create_db_client() -> Client {
@@ -39,22 +39,27 @@ async fn create_db_client() -> Client {
     client
 }
 
-async fn load_items_from_db(client: &Client) -> Vec<Item> {
-    business_app::item::list(client)
+async fn load_orders_from_db(client: &Client) -> Vec<SalesOrder> {
+    list_sales_orders(client).await.unwrap_or_else(|_| Vec::new())
+}
+
+async fn load_order_details_from_db(client: &Client, code: &str) -> Vec<SalesOrderDetail> {
+    get_details_by_order_code(client, code)
         .await
         .unwrap_or_else(|_| Vec::new())
 }
 
-async fn persist_item_to_db(client: &Client, item: &Item) {
-    business_app::item::add(client, item).await.unwrap();
-}
+fn display_order_and_details(order: &SalesOrder, table: &mut Table, order_code_input: &Input, order_date_input: &Input, order_note_input: &Input) {
+    order_code_input.set_value(&order.code);
+    order_date_input.set_value(&order.order_date.to_string());
+    order_note_input.set_value(order.note.as_deref().unwrap_or(""));
 
-async fn delete_item_from_db(client: &Client, code: &str) {
-    business_app::item::delete(client, code).await.unwrap();
-}
+    let client = DB_CLIENT.lock().unwrap();
+    let details = task::block_on(load_order_details_from_db(&client, &order.code));
+    *ORDER_DETAILS.lock().unwrap() = details.clone();
 
-async fn update_item_in_db(client: &Client, item: &Item) {
-    business_app::item::update(client, item).await.unwrap();
+    table.set_rows(details.len() as i32);
+    table.redraw();
 }
 
 #[tokio::main]
@@ -69,177 +74,126 @@ async fn main() {
         (screen_height as i32 - window_height) / 2,
         window_width,
         window_height,
-        "Item List",
+        "Sales Order Details",
     );
 
     window.make_resizable(true);
 
-    let edit_code_input = Input::new(50, 50, 140, 30, "Code:");
-    let edit_name_input = Input::new(50, 100, 140, 30, "Name:");
-    let edit_currency_input = Input::new(50, 150, 140, 30, "Currency:");
-    let edit_price_input = Input::new(250, 50, 140, 30, "Price:");
-    let edit_quantity_input = Input::new(250, 100, 140, 30, "Quantity:");
-    let edit_unit_input = Input::new(250, 150, 140, 30, "Unit:");
+    let mut first_button = Button::new(50, 10, 80, 30, "First");
+    let mut prev_button = Button::new(140, 10, 80, 30, "Prev");
+    let mut next_button = Button::new(230, 10, 80, 30, "Next");
+    let mut last_button = Button::new(320, 10, 80, 30, "Last");
 
-    let mut add_button = Button::new(50, 200, 80, 40, "Add");
-    let mut update_button = Button::new(150, 200, 80, 40, "Update");
-    let mut delete_button = Button::new(250, 200, 80, 40, "Delete");
+    let mut order_code_input = Input::new(50, 50, 140, 30, "Order Code:");
+    let mut order_date_input = Input::new(250, 50, 140, 30, "Order Date:");
+    let mut order_note_input = Input::new(50, 100, 340, 30, "Note:");
 
-    let mut item_table = Table::new(50, 250, 500, 130, "");
+    let mut details_table = Table::new(50, 150, 500, 200, "");
 
-    // Use the global ITEMS vector to set the number of rows in the table
-    item_table.set_rows(ITEMS.lock().unwrap().len() as i32);
-    item_table.set_cols(6); // Code, Name, Currency, Price, Quantity, Unit
-    item_table.set_col_header(true);
-    item_table.set_row_header(true);
-    item_table.set_col_width_all(100); // Set a default column width for all columns
-    item_table.set_col_width(0, 100);
-    item_table.set_col_width(1, 150);
-    item_table.set_col_resize(true);
-    item_table.set_col_resize_min(50);
-    item_table.end();
+    details_table.set_rows(0);
+    details_table.set_cols(5); // Line, Item Code, Quantity, Unit, Unit Price
+    details_table.set_col_header(true);
+    details_table.set_row_header(true);
+    details_table.set_col_width_all(100);
+    details_table.set_col_resize(true);
+    details_table.set_col_resize_min(50);
+    details_table.end();
 
-    item_table.draw_cell({
+    details_table.draw_cell({
         move |t, ctx, row, col, x, y, w, h| match ctx {
             table::TableContext::StartPage => draw::set_font(enums::Font::Helvetica, 14),
             table::TableContext::ColHeader => {
-                let headers = ["Code", "Name", "Currency", "Price", "Quantity", "Unit"];
+                let headers = ["Line", "Item Code", "Quantity", "Unit", "Unit Price"];
                 draw_header(headers[col as usize], x, y, w, h);
             }
             table::TableContext::RowHeader => draw_header(&format!("{}", row + 1), x, y, w, h),
             table::TableContext::Cell => {
-                // Fetch the specific item directly from the ITEMS vector
-                let items = ITEMS.lock().unwrap();
-                let item = &items[row as usize];
+                let details = ORDER_DETAILS.lock().unwrap();
+                let detail = &details[row as usize];
                 let data = match col {
-                    0 => &item.code,
-                    1 => &item.name,
-                    2 => &item.currency,
-                    3 => &item.price.to_string(),
-                    4 => &item.quantity.to_string(),
-                    5 => item.unit.as_deref().unwrap_or(""),
-                    _ => "",
+                    0 => detail.line_num.to_string(),
+                    1 => detail.item_code.clone(),
+                    2 => detail.quantity.to_string(),
+                    3 => detail.unit.clone().unwrap_or_else(|| "".to_string()),
+                    4 => detail.unit_price.to_string(),
+                    _ => "".to_string(),
                 };
-                draw_data(data, x, y, w, h, t.is_selected(row, col));
+                draw_data(&data, x, y, w, h, t.is_selected(row, col));
             }
             _ => (),
         }
     });
 
-    item_table.handle({
-        let mut edit_code_input = edit_code_input.clone();
-        let mut edit_name_input = edit_name_input.clone();
-        let mut edit_currency_input = edit_currency_input.clone();
-        let mut edit_price_input = edit_price_input.clone();
-        let mut edit_quantity_input = edit_quantity_input.clone();
-        let mut edit_unit_input = edit_unit_input.clone();
+    // Load all orders and display the first one
+    let client = DB_CLIENT.lock().unwrap();
+    let orders = task::block_on(load_orders_from_db(&client));
+    if !orders.is_empty() {
+        *ALL_ORDERS.lock().unwrap() = orders.clone();
+        let first_order = &orders[0];
+        display_order_and_details(first_order, &mut details_table, &order_code_input, &order_date_input, &order_note_input);
+    }
 
-        move |t, ev| match ev {
-            enums::Event::Push => {
-                let row = t.callback_row();
-                if row >= 0 {
-                    // Use the global ITEMS vector to get the item
-                    let items = ITEMS.lock().unwrap();
-                    let item = &items[row as usize];
-                    edit_code_input.set_value(&item.code);
-                    edit_name_input.set_value(&item.name);
-                    edit_currency_input.set_value(&item.currency);
-                    edit_price_input.set_value(&item.price.to_string());
-                    edit_quantity_input.set_value(&item.quantity.to_string());
-                    edit_unit_input.set_value(item.unit.as_deref().unwrap_or(""));
-                }
-                true
-            }
-            _ => false,
-        }
-    });
-
-    add_button.set_callback({
-        let mut item_table = item_table.clone();
-        let mut edit_code_input = edit_code_input.clone();
-        let mut edit_name_input = edit_name_input.clone();
-        let mut edit_currency_input = edit_currency_input.clone();
-        let mut edit_price_input = edit_price_input.clone();
-        let mut edit_quantity_input = edit_quantity_input.clone();
-        let mut edit_unit_input = edit_unit_input.clone();
+    // Navigation buttons callbacks
+    first_button.set_callback({
+        let details_table = details_table.clone();
+        let order_code_input = order_code_input.clone();
+        let order_date_input = order_date_input.clone();
+        let order_note_input = order_note_input.clone();
         move |_| {
-            let new_item = Item {
-                code: edit_code_input.value(),
-                name: edit_name_input.value(),
-                currency: edit_currency_input.value(),
-                price: edit_price_input.value().parse().unwrap_or(0.0),
-                quantity: edit_quantity_input.value().parse().unwrap_or(0.0),
-                unit: if edit_unit_input.value().is_empty() {
-                    None
-                } else {
-                    Some(edit_unit_input.value())
-                },
-            };
-            if !new_item.code.is_empty() && !new_item.name.is_empty() {
-                // Use the global DB_CLIENT and ITEMS
-                let client = DB_CLIENT.lock().unwrap();
-                let mut items = ITEMS.lock().unwrap();
-                task::block_on(persist_item_to_db(&client, &new_item));
-                items.push(new_item);
-                item_table.set_rows(items.len() as i32);
-                item_table.redraw();
-                edit_code_input.set_value("");
-                edit_name_input.set_value("");
-                edit_currency_input.set_value("");
-                edit_price_input.set_value("");
-                edit_quantity_input.set_value("");
-                edit_unit_input.set_value("");
+            let mut index = CURRENT_ORDER_INDEX.lock().unwrap();
+            *index = 0;
+            let orders = ALL_ORDERS.lock().unwrap();
+            if let Some(order) = orders.get(*index) {
+                display_order_and_details(order, &details_table, &order_code_input, &order_date_input, &order_note_input);
             }
         }
     });
 
-    update_button.set_callback({
-        let mut item_table = item_table.clone();
-        let mut edit_code_input = edit_code_input.clone();
-        let mut edit_name_input = edit_name_input.clone();
-        let mut edit_currency_input = edit_currency_input.clone();
-        let mut edit_price_input = edit_price_input.clone();
-        let mut edit_quantity_input = edit_quantity_input.clone();
-        let mut edit_unit_input = edit_unit_input.clone();
+    prev_button.set_callback({
+        let details_table = details_table.clone();
+        let order_code_input = order_code_input.clone();
+        let order_date_input = order_date_input.clone();
+        let order_note_input = order_note_input.clone();
         move |_| {
-            let code_to_update = edit_code_input.value();
-            let client = DB_CLIENT.lock().unwrap();
-            let mut items = ITEMS.lock().unwrap();
-            if let Some(pos) = items.iter().position(|i| i.code == code_to_update) {
-                items[pos].name = edit_name_input.value();
-                items[pos].currency = edit_currency_input.value();
-                items[pos].price = edit_price_input.value().parse().unwrap_or(0.0);
-                items[pos].quantity = edit_quantity_input.value().parse().unwrap_or(0.0);
-                items[pos].unit = if edit_unit_input.value().is_empty() {
-                    None
-                } else {
-                    Some(edit_unit_input.value())
-                };
-                task::block_on(update_item_in_db(&client, &items[pos]));
-                item_table.redraw();
-                edit_code_input.set_value("");
-                edit_name_input.set_value("");
-                edit_currency_input.set_value("");
-                edit_price_input.set_value("");
-                edit_quantity_input.set_value("");
-                edit_unit_input.set_value("");
+            let mut index = CURRENT_ORDER_INDEX.lock().unwrap();
+            if *index > 0 {
+                *index -= 1;
+            }
+            let orders = ALL_ORDERS.lock().unwrap();
+            if let Some(order) = orders.get(*index) {
+                display_order_and_details(order, &details_table, &order_code_input, &order_date_input, &order_note_input);
             }
         }
     });
 
-    delete_button.set_callback({
-        let mut item_table = item_table.clone();
-        let mut edit_code_input = edit_code_input.clone();
+    next_button.set_callback({
+        let details_table = details_table.clone();
+        let order_code_input = order_code_input.clone();
+        let order_date_input = order_date_input.clone();
+        let order_note_input = order_note_input.clone();
         move |_| {
-            let code_to_delete = edit_code_input.value();
-            let client = DB_CLIENT.lock().unwrap();
-            let mut items = ITEMS.lock().unwrap();
-            if let Some(pos) = items.iter().position(|i| i.code == code_to_delete) {
-                task::block_on(delete_item_from_db(&client, &code_to_delete));
-                items.remove(pos);
-                item_table.set_rows(items.len() as i32);
-                item_table.redraw();
-                edit_code_input.set_value("");
+            let mut index = CURRENT_ORDER_INDEX.lock().unwrap();
+            let orders = ALL_ORDERS.lock().unwrap();
+            if *index < orders.len() - 1 {
+                *index += 1;
+            }
+            if let Some(order) = orders.get(*index) {
+                display_order_and_details(order, &details_table, &order_code_input, &order_date_input, &order_note_input);
+            }
+        }
+    });
+
+    last_button.set_callback({
+        let details_table = details_table.clone();
+        let order_code_input = order_code_input.clone();
+        let order_date_input = order_date_input.clone();
+        let order_note_input = order_note_input.clone();
+        move |_| {
+            let mut index = CURRENT_ORDER_INDEX.lock().unwrap();
+            let orders = ALL_ORDERS.lock().unwrap();
+            *index = orders.len().saturating_sub(1);
+            if let Some(order) = orders.get(*index) {
+                display_order_and_details(order, &details_table, &order_code_input, &order_date_input, &order_note_input);
             }
         }
     });
@@ -263,19 +217,12 @@ fn draw_header(txt: &str, x: i32, y: i32, w: i32, h: i32) {
 }
 
 fn draw_data(txt: &str, x: i32, y: i32, w: i32, h: i32, selected: bool) {
-    // Set the background color depending on whether the cell is selected
     draw::set_draw_color(if selected {
         enums::Color::from_rgb(200, 200, 255)
     } else {
         enums::Color::White
     });
-    // Draw the cell background
     draw::draw_rectf(x, y, w, h);
-
-    // Draw the cell borders with a black color
     draw::set_draw_color(enums::Color::Black);
-    draw::draw_rect(x, y, w, h);
-
-    // Draw the text centered within the cell
-    draw::draw_text2(txt, x, y, w, h, enums::Align::Center);
+    draw::draw_text2(txt, x, y, w, h, enums::Align::Left);
 }

@@ -1,7 +1,7 @@
 -- Drop existing tables if they exist
-DROP TABLE IF EXISTS item;
 DROP TABLE IF EXISTS sales_order_details;
 DROP TABLE IF EXISTS sales_orders;
+DROP TABLE IF EXISTS item;
 
 -- Create item table with code as the unique identifier
 CREATE TABLE item (
@@ -35,6 +35,7 @@ CREATE TABLE sales_order_details (
     order_code VARCHAR(10) NOT NULL REFERENCES sales_orders(code),
     line_num INTEGER NOT NULL, 
     item_code VARCHAR(10) NOT NULL REFERENCES item(code),
+    item_name VARCHAR NOT NULL,
     quantity REAL NOT NULL DEFAULT 0,
     unit VARCHAR(50) NULL,
     unit_price REAL NOT NULL,
@@ -48,17 +49,17 @@ VALUES
     ('SO00002', 'Second order for selected items'),
     ('SO00003', 'Third order including electronics');
 
--- Insert Sales Order Details for all orders using item_code
-INSERT INTO sales_order_details (order_code, line_num, item_code, quantity, unit, unit_price, currency)
+-- Insert Sales Order Details for all orders using item_code and item_name
+INSERT INTO sales_order_details (order_code, line_num, item_code, item_name, quantity, unit, unit_price, currency)
 VALUES
     -- Details for Sales Order SO00001
-    ('SO00001', 1, '0000000010', 5.00, 'kg', 15.49, 'USD'),
-    ('SO00001', 2, '0000000020', 10.00, 'pcs', 23.99, 'USD'),
+    ('SO00001', 1, '0000000010', 'Organic Almonds', 5.00, 'kg', 15.49, 'USD'),
+    ('SO00001', 2, '0000000020', 'Stainless Steel Water Bottle', 10.00, 'pcs', 23.99, 'USD'),
 
     -- Details for Sales Order SO00002
-    ('SO00002', 1, '0000000020', 20.00, 'pcs', 23.99, 'USD'),
-    ('SO00002', 2, '0000000030', 5.00, 'pcs', 89.99, 'USD'),
+    ('SO00002', 1, '0000000020', 'Stainless Steel Water Bottle', 20.00, 'pcs', 23.99, 'USD'),
+    ('SO00002', 2, '0000000030', 'Bluetooth Headphones', 5.00, 'pcs', 89.99, 'USD'),
 
     -- Details for Sales Order SO00003
-    ('SO00003', 1, '0000000010', 10.00, 'kg', 15.49, 'USD'),
-    ('SO00003', 2, '0000000030', 3.00, 'pcs', 89.99, 'USD');
+    ('SO00003', 1, '0000000010', 'Organic Almonds', 10.00, 'kg', 15.49, 'USD'),
+    ('SO00003', 2, '0000000030', 'Bluetooth Headphones', 3.00, 'pcs', 89.99, 'USD');

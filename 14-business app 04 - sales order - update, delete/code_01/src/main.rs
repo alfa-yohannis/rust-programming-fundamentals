@@ -2,8 +2,8 @@
 extern crate lazy_static;
 
 use async_std::task;
-use business_app::sales_order::{SalesOrder, list_sales_orders, get_sales_order};
-use business_app::sales_order_detail::{SalesOrderDetail, get_details_by_order_code};
+use business_app::sales_order::{list_sales_orders, SalesOrder};
+use business_app::sales_order_detail::{get_details_by_order_code, SalesOrderDetail};
 use fltk::{
     app,
     button::Button,
@@ -21,8 +21,10 @@ lazy_static! {
     static ref ORDER_DETAILS: Mutex<Vec<SalesOrderDetail>> = Mutex::new(vec![]);
     static ref ORDER: Mutex<Option<SalesOrder>> = Mutex::new(None);
     static ref ORDER_INDEX: Mutex<usize> = Mutex::new(0);
-    // static ref ORDER_LIST: Mutex<Vec<SalesOrder>> = Mutex::new(vec![]);
-    static ref ORDER_LIST: Mutex<Vec<SalesOrder>> = Mutex::new(task::block_on(load_all_orders_from_db(&DB_CLIENT.lock().unwrap())));
+    static ref ORDER_LIST: Mutex<Vec<SalesOrder>> = Mutex::new(task::block_on(
+        load_all_orders_from_db(&DB_CLIENT.lock().unwrap())
+    ));
+    static ref ADD_MODE: Mutex<bool> = Mutex::new(false);
 }
 
 async fn create_db_client() -> Client {
@@ -43,14 +45,23 @@ async fn create_db_client() -> Client {
 }
 
 async fn load_all_orders_from_db(client: &Client) -> Vec<SalesOrder> {
-    list_sales_orders(client).await.unwrap_or_else(|_| Vec::new())
+    list_sales_orders(client)
+        .await
+        .unwrap_or_else(|_| Vec::new())
 }
 
 async fn load_order_details_from_db(client: &Client, code: &str) -> Vec<SalesOrderDetail> {
-    get_details_by_order_code(client, code).await.unwrap_or_else(|_| Vec::new())
+    get_details_by_order_code(client, code)
+        .await
+        .unwrap_or_else(|_| Vec::new())
 }
 
-fn update_order_details(order_code_input: &mut Input, order_date_input: &mut Input, order_note_input: &mut Input, details_table: &mut Table) {
+fn update_order_details(
+    order_code_input: &mut Input,
+    order_date_input: &mut Input,
+    order_note_input: &mut Input,
+    details_table: &mut Table,
+) {
     let orders = ORDER_LIST.lock().unwrap();
     let index = *ORDER_INDEX.lock().unwrap();
 
@@ -73,7 +84,7 @@ async fn main() {
     let app = app::App::default();
     let (screen_width, screen_height) = app::screen_size();
 
-    let window_width = 600;
+    let window_width = 800; // Adjusted width
     let window_height = 400;
     let mut window = Window::new(
         (screen_width as i32 - window_width) / 2,
@@ -89,15 +100,16 @@ async fn main() {
     let mut prev_button = Button::new(120, 10, 60, 30, "Prev");
     let mut next_button = Button::new(190, 10, 60, 30, "Next");
     let mut last_button = Button::new(260, 10, 60, 30, "Last");
+    let mut add_mode_button = Button::new(330, 10, 60, 30, "New ...");
 
     let mut order_code_input = Input::new(50, 50, 140, 30, "Order Code:");
     let mut order_date_input = Input::new(250, 50, 140, 30, "Order Date:");
     let mut order_note_input = Input::new(50, 100, 340, 30, "Note:");
 
-    let mut details_table = Table::new(50, 150, 500, 200, "");
+    let mut details_table = Table::new(50, 150, 700, 200, ""); // Adjusted width
 
     details_table.set_rows(0);
-    details_table.set_cols(5); // Line, Item Code, Quantity, Unit, Unit Price
+    details_table.set_cols(6); // Updated to include item_name
     details_table.set_col_header(true);
     details_table.set_row_header(true);
     details_table.set_col_width_all(100);
@@ -109,7 +121,14 @@ async fn main() {
         move |t, ctx, row, col, x, y, w, h| match ctx {
             table::TableContext::StartPage => draw::set_font(enums::Font::Helvetica, 14),
             table::TableContext::ColHeader => {
-                let headers = ["Line", "Item Code", "Quantity", "Unit", "Unit Price"];
+                let headers = [
+                    "Line",
+                    "Item Code",
+                    "Item Name",
+                    "Quantity",
+                    "Unit",
+                    "Unit Price",
+                ];
                 draw_header(headers[col as usize], x, y, w, h);
             }
             table::TableContext::RowHeader => draw_header(&format!("{}", row + 1), x, y, w, h),
@@ -119,9 +138,10 @@ async fn main() {
                 let data = match col {
                     0 => detail.line_num.to_string(),
                     1 => detail.item_code.clone(),
-                    2 => detail.quantity.to_string(),
-                    3 => detail.unit.clone().unwrap_or_else(|| "".to_string()),
-                    4 => detail.unit_price.to_string(),
+                    2 => detail.item_name.clone(), // New field displayed
+                    3 => detail.quantity.to_string(),
+                    4 => detail.unit.clone().unwrap_or_else(|| "".to_string()),
+                    5 => detail.unit_price.to_string(),
                     _ => "".to_string(),
                 };
                 draw_data(&data, x, y, w, h, t.is_selected(row, col));
@@ -130,7 +150,6 @@ async fn main() {
         }
     });
 
-  
     first_button.set_callback({
         let mut order_code_input = order_code_input.clone();
         let mut order_date_input = order_date_input.clone();
@@ -138,7 +157,12 @@ async fn main() {
         let mut details_table = details_table.clone();
         move |_| {
             *ORDER_INDEX.lock().unwrap() = 0;
-            update_order_details(&mut order_code_input, &mut order_date_input, &mut order_note_input, &mut details_table);
+            update_order_details(
+                &mut order_code_input,
+                &mut order_date_input,
+                &mut order_note_input,
+                &mut details_table,
+            );
         }
     });
 
@@ -152,7 +176,12 @@ async fn main() {
             if index > 0 {
                 *ORDER_INDEX.lock().unwrap() = index - 1;
             }
-            update_order_details(&mut order_code_input, &mut order_date_input, &mut order_note_input, &mut details_table);
+            update_order_details(
+                &mut order_code_input,
+                &mut order_date_input,
+                &mut order_note_input,
+                &mut details_table,
+            );
         }
     });
 
@@ -167,7 +196,12 @@ async fn main() {
             if index < max_index {
                 *ORDER_INDEX.lock().unwrap() = index + 1;
             }
-            update_order_details(&mut order_code_input, &mut order_date_input, &mut order_note_input, &mut details_table);
+            update_order_details(
+                &mut order_code_input,
+                &mut order_date_input,
+                &mut order_note_input,
+                &mut details_table,
+            );
         }
     });
 
@@ -179,13 +213,49 @@ async fn main() {
         move |_| {
             let max_index = ORDER_LIST.lock().unwrap().len() - 1;
             *ORDER_INDEX.lock().unwrap() = max_index;
-            update_order_details(&mut order_code_input, &mut order_date_input, &mut order_note_input, &mut details_table);
+            update_order_details(
+                &mut order_code_input,
+                &mut order_date_input,
+                &mut order_note_input,
+                &mut details_table,
+            );
         }
     });
 
+    add_mode_button.set_callback({
+        let mut order_code_input = order_code_input.clone();
+        let mut order_date_input = order_date_input.clone();
+        let mut order_note_input = order_note_input.clone();
+        let mut details_table = details_table.clone();
+        move |_| {
+            order_code_input.set_value("");
+            order_date_input.set_value("");
+            order_note_input.set_value("");
+
+            // Clear existing order details and set one empty row in the table
+            *ORDER_DETAILS.lock().unwrap() = vec![SalesOrderDetail {
+                line_num: 1,
+                item_code: String::new(),
+                item_name: String::new(),
+                quantity: 0.0,
+                unit: Some(String::new()),
+                unit_price: 0.0,
+                id: 0,
+                order_code: String::new(),
+                currency: String::new(),
+            }];
+            details_table.set_rows(1);
+            details_table.redraw();
+        }
+    });
 
     // Load the first sales order
-    update_order_details(&mut order_code_input, &mut order_date_input, &mut order_note_input, &mut details_table);
+    update_order_details(
+        &mut order_code_input,
+        &mut order_date_input,
+        &mut order_note_input,
+        &mut details_table,
+    );
 
     window.end();
     window.show();

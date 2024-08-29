@@ -2,10 +2,12 @@
 extern crate lazy_static;
 
 use async_std::task;
-use business_app::sales_order::{get_sales_order, list_sales_orders, SalesOrder};
-use business_app::sales_order_detail::{get_details_by_order_code, SalesOrderDetail};
+use business_app::sales_order::{SalesOrder, list_sales_orders, get_sales_order};
+use business_app::sales_order_detail::{SalesOrderDetail, get_details_by_order_code};
 use fltk::{
-    app, button::Button, draw, enums,
+    app,
+    button::Button,
+    draw, enums,
     input::Input,
     prelude::*,
     table::{self, Table},
@@ -18,8 +20,9 @@ lazy_static! {
     static ref DB_CLIENT: Mutex<Client> = Mutex::new(task::block_on(create_db_client()));
     static ref ORDER_DETAILS: Mutex<Vec<SalesOrderDetail>> = Mutex::new(vec![]);
     static ref ORDER: Mutex<Option<SalesOrder>> = Mutex::new(None);
-    static ref ALL_ORDERS: Mutex<Vec<SalesOrder>> = Mutex::new(vec![]);
-    static ref CURRENT_ORDER_INDEX: Mutex<usize> = Mutex::new(0);
+    static ref ORDER_INDEX: Mutex<usize> = Mutex::new(0);
+    // static ref ORDER_LIST: Mutex<Vec<SalesOrder>> = Mutex::new(vec![]);
+    static ref ORDER_LIST: Mutex<Vec<SalesOrder>> = Mutex::new(task::block_on(load_all_orders_from_db(&DB_CLIENT.lock().unwrap())));
 }
 
 async fn create_db_client() -> Client {
@@ -39,27 +42,30 @@ async fn create_db_client() -> Client {
     client
 }
 
-async fn load_orders_from_db(client: &Client) -> Vec<SalesOrder> {
+async fn load_all_orders_from_db(client: &Client) -> Vec<SalesOrder> {
     list_sales_orders(client).await.unwrap_or_else(|_| Vec::new())
 }
 
 async fn load_order_details_from_db(client: &Client, code: &str) -> Vec<SalesOrderDetail> {
-    get_details_by_order_code(client, code)
-        .await
-        .unwrap_or_else(|_| Vec::new())
+    get_details_by_order_code(client, code).await.unwrap_or_else(|_| Vec::new())
 }
 
-fn display_order_and_details(order: &SalesOrder, table: &mut Table, order_code_input: &Input, order_date_input: &Input, order_note_input: &Input) {
-    order_code_input.set_value(&order.code);
-    order_date_input.set_value(&order.order_date.to_string());
-    order_note_input.set_value(order.note.as_deref().unwrap_or(""));
+fn update_order_details(order_code_input: &mut Input, order_date_input: &mut Input, order_note_input: &mut Input, details_table: &mut Table) {
+    let orders = ORDER_LIST.lock().unwrap();
+    let index = *ORDER_INDEX.lock().unwrap();
 
-    let client = DB_CLIENT.lock().unwrap();
-    let details = task::block_on(load_order_details_from_db(&client, &order.code));
-    *ORDER_DETAILS.lock().unwrap() = details.clone();
+    if let Some(order) = orders.get(index) {
+        order_code_input.set_value(&order.code);
+        order_date_input.set_value(&order.order_date.to_string());
+        order_note_input.set_value(order.note.as_deref().unwrap_or(""));
 
-    table.set_rows(details.len() as i32);
-    table.redraw();
+        let client = DB_CLIENT.lock().unwrap();
+        let details = task::block_on(load_order_details_from_db(&client, &order.code));
+        *ORDER_DETAILS.lock().unwrap() = details.clone();
+
+        details_table.set_rows(details.len() as i32);
+        details_table.redraw();
+    }
 }
 
 #[tokio::main]
@@ -79,10 +85,10 @@ async fn main() {
 
     window.make_resizable(true);
 
-    let mut first_button = Button::new(50, 10, 80, 30, "First");
-    let mut prev_button = Button::new(140, 10, 80, 30, "Prev");
-    let mut next_button = Button::new(230, 10, 80, 30, "Next");
-    let mut last_button = Button::new(320, 10, 80, 30, "Last");
+    let mut first_button = Button::new(50, 10, 60, 30, "First");
+    let mut prev_button = Button::new(120, 10, 60, 30, "Prev");
+    let mut next_button = Button::new(190, 10, 60, 30, "Next");
+    let mut last_button = Button::new(260, 10, 60, 30, "Last");
 
     let mut order_code_input = Input::new(50, 50, 140, 30, "Order Code:");
     let mut order_date_input = Input::new(250, 50, 140, 30, "Order Date:");
@@ -124,79 +130,62 @@ async fn main() {
         }
     });
 
-    // Load all orders and display the first one
-    let client = DB_CLIENT.lock().unwrap();
-    let orders = task::block_on(load_orders_from_db(&client));
-    if !orders.is_empty() {
-        *ALL_ORDERS.lock().unwrap() = orders.clone();
-        let first_order = &orders[0];
-        display_order_and_details(first_order, &mut details_table, &order_code_input, &order_date_input, &order_note_input);
-    }
-
-    // Navigation buttons callbacks
+  
     first_button.set_callback({
-        let details_table = details_table.clone();
-        let order_code_input = order_code_input.clone();
-        let order_date_input = order_date_input.clone();
-        let order_note_input = order_note_input.clone();
+        let mut order_code_input = order_code_input.clone();
+        let mut order_date_input = order_date_input.clone();
+        let mut order_note_input = order_note_input.clone();
+        let mut details_table = details_table.clone();
         move |_| {
-            let mut index = CURRENT_ORDER_INDEX.lock().unwrap();
-            *index = 0;
-            let orders = ALL_ORDERS.lock().unwrap();
-            if let Some(order) = orders.get(*index) {
-                display_order_and_details(order, &details_table, &order_code_input, &order_date_input, &order_note_input);
-            }
+            *ORDER_INDEX.lock().unwrap() = 0;
+            update_order_details(&mut order_code_input, &mut order_date_input, &mut order_note_input, &mut details_table);
         }
     });
 
     prev_button.set_callback({
-        let details_table = details_table.clone();
-        let order_code_input = order_code_input.clone();
-        let order_date_input = order_date_input.clone();
-        let order_note_input = order_note_input.clone();
+        let mut order_code_input = order_code_input.clone();
+        let mut order_date_input = order_date_input.clone();
+        let mut order_note_input = order_note_input.clone();
+        let mut details_table = details_table.clone();
         move |_| {
-            let mut index = CURRENT_ORDER_INDEX.lock().unwrap();
-            if *index > 0 {
-                *index -= 1;
+            let index = ORDER_INDEX.lock().unwrap().clone();
+            if index > 0 {
+                *ORDER_INDEX.lock().unwrap() = index - 1;
             }
-            let orders = ALL_ORDERS.lock().unwrap();
-            if let Some(order) = orders.get(*index) {
-                display_order_and_details(order, &details_table, &order_code_input, &order_date_input, &order_note_input);
-            }
+            update_order_details(&mut order_code_input, &mut order_date_input, &mut order_note_input, &mut details_table);
         }
     });
 
     next_button.set_callback({
-        let details_table = details_table.clone();
-        let order_code_input = order_code_input.clone();
-        let order_date_input = order_date_input.clone();
-        let order_note_input = order_note_input.clone();
+        let mut order_code_input = order_code_input.clone();
+        let mut order_date_input = order_date_input.clone();
+        let mut order_note_input = order_note_input.clone();
+        let mut details_table = details_table.clone();
         move |_| {
-            let mut index = CURRENT_ORDER_INDEX.lock().unwrap();
-            let orders = ALL_ORDERS.lock().unwrap();
-            if *index < orders.len() - 1 {
-                *index += 1;
+            let index = ORDER_INDEX.lock().unwrap().clone();
+            let max_index = ORDER_LIST.lock().unwrap().len() - 1;
+            if index < max_index {
+                *ORDER_INDEX.lock().unwrap() = index + 1;
             }
-            if let Some(order) = orders.get(*index) {
-                display_order_and_details(order, &details_table, &order_code_input, &order_date_input, &order_note_input);
-            }
+            update_order_details(&mut order_code_input, &mut order_date_input, &mut order_note_input, &mut details_table);
         }
     });
 
     last_button.set_callback({
-        let details_table = details_table.clone();
-        let order_code_input = order_code_input.clone();
-        let order_date_input = order_date_input.clone();
-        let order_note_input = order_note_input.clone();
+        let mut order_code_input = order_code_input.clone();
+        let mut order_date_input = order_date_input.clone();
+        let mut order_note_input = order_note_input.clone();
+        let mut details_table = details_table.clone();
         move |_| {
-            let mut index = CURRENT_ORDER_INDEX.lock().unwrap();
-            let orders = ALL_ORDERS.lock().unwrap();
-            *index = orders.len().saturating_sub(1);
-            if let Some(order) = orders.get(*index) {
-                display_order_and_details(order, &details_table, &order_code_input, &order_date_input, &order_note_input);
-            }
+            let max_index = ORDER_LIST.lock().unwrap().len() - 1;
+            *ORDER_INDEX.lock().unwrap() = max_index;
+            update_order_details(&mut order_code_input, &mut order_date_input, &mut order_note_input, &mut details_table);
         }
     });
+
+
+    // Load the first sales order
+    update_order_details(&mut order_code_input, &mut order_date_input, &mut order_note_input, &mut details_table);
 
     window.end();
     window.show();
@@ -224,5 +213,6 @@ fn draw_data(txt: &str, x: i32, y: i32, w: i32, h: i32, selected: bool) {
     });
     draw::draw_rectf(x, y, w, h);
     draw::set_draw_color(enums::Color::Black);
-    draw::draw_text2(txt, x, y, w, h, enums::Align::Left);
+    draw::draw_rect(x, y, w, h);
+    draw::draw_text2(txt, x, y, w, h, enums::Align::Center);
 }

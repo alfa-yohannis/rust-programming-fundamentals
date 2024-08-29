@@ -8,9 +8,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="064adcaa-5d05-4b29-a6e8-2044ad80477e" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../14-business app 04 - sales order - update, delete/code_01/src/main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/../../14-business app 04 - sales order - update, delete/code_01/src/main.rs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -23,10 +21,10 @@
   <component name="MacroExpansionManager">
     <option name="directoryName" value="ybqe0mmh" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "customColor": "",
-  "associatedIndex": 7
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;customColor&quot;: &quot;&quot;,
+  &quot;associatedIndex&quot;: 7
+}</component>
   <component name="ProjectId" id="2l2P8m7edo2XSVhGSu7xM0j4SvL" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -38,6 +36,7 @@
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.rust.reset.selective.auto.import": "true",
     "git-widget-placeholder": "main",
+    "last_opened_file_path": "/home/alfa/projects/rust-programming-fundamentals/14-business app 04 - sales order - update, delete/code_01",
     "node.js.detected.package.eslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
@@ -94,6 +93,7 @@
       <option name="presentableId" value="Default" />
       <updated>1724375041844</updated>
       <workItem from="1724375043993" duration="6792000" />
+      <workItem from="1724886604892" duration="27000" />
     </task>
     <servers />
   </component>
